@@ -1,6 +1,7 @@
 import * as functions from "firebase-functions";
 import * as express from "express";
 import * as cors from "cors";
+import "dotenv/config";
 import {productsRoutes} from "./products/products.routes";
 // Start writing Firebase Functions
 // https://firebase.google.com/docs/functions/typescript
