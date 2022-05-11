@@ -1,7 +1,7 @@
-const {Request, Response} = require("express");
+const express = require("express");
 const {db} = require("../../config/firebase");
 
-export async function getAll(req, res) {
+async function getAll(req, res) {
   try {
     const productsArray = [];
     const products = await db.collection("products").get();
@@ -14,7 +14,7 @@ export async function getAll(req, res) {
   }
 }
 
-export const getProduct = async (req, res) => {
+const getProduct = async (req, res) => {
   try {
     const {id} = req.params;
     if (!id) return res.status(500).send("Bad request");
@@ -32,4 +32,9 @@ export const getProduct = async (req, res) => {
 
 function handleError(res, err) {
   return res.status(500).send({message: `${err.code} - ${err.message}`});
+}
+
+module.exports = {
+  getAll,
+  getProduct
 }
