@@ -3,18 +3,25 @@ const {db} = require("../../config/firebase");
 
 async function getAll(req, res) {
   try {
-    const productsArray = [];
-    const products = await db.collection("products").get();
-    products.docs.map((prod) => {
-      productsArray.push(prod.data());
-    });
-    res.send(productsArray);
+    const products = await productServices.getAllSer();
+    console.log("Aca esta tu error");
+    res.json(products);
   } catch (error) {
-    handleError(res, error);
+    next(error);
   }
 }
 
-const getProduct = async (req, res) => {
+function boomErrorHandler(err, req, res, next) {
+
+  if (err?.isBoom) {
+    console.log("es un error de boom");
+    const {output} = err;
+    res.status(output.statusCode).json(output.payload);
+  }
+  next(err);
+}
+const getProduct = async (req, res, next) => {
+  console.log("Aca esta tu error");
   try {
     const {id} = req.params;
     if (!id) return res.status(500).send("Bad request");
