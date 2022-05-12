@@ -6,7 +6,7 @@ const service = new UserServices;
 
 const customerClaim = async (req, res, next) => {
   try {
-    const setCC = service.customerClaimServ();
+    const setCC = await service.customerClaimServ();
     return setCC;
   } catch (error) {
     next();

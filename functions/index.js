@@ -6,7 +6,10 @@ const {logErrors, errorHandler,boomErrorHandler } = require("./src/middlewares/e
 //modulos personalizados
 const { productsRoutes } = require("./src/products/products.routes");
 const userRoutes = require("./src/users/user.routes");
+const UserServices = require("./src/users/user.services")
 //nombre
+const userService = new UserServices
+
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -16,6 +19,10 @@ app.use(cors({ origin: true }));
 app.use(boomErrorHandler);
 //app.use(errorHandler);
 
+
+exports.setCustomerClaim = functions.auth
+.user()
+.onCreate(userService.customerClaimServ(user))
 
 productsRoutes(app);
 
