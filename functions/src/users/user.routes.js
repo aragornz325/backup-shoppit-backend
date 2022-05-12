@@ -1,8 +1,9 @@
-const { tryUser } = require("./user.controller");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const {customerClaim} = require("./user.controller");
 
 const userRoutes = (app) => {
-  app.get("/user", tryUser);
-}
+  app.get("/user", customerClaim);
+};
 
 
 module.exports = userRoutes;

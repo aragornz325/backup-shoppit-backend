@@ -1,14 +1,18 @@
-const { getAuth } = require("firebase-admin/auth")
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable no-undef */
+/* const {getAuth} = require("firebase-admin/auth"); */
+const UserServices = require("./user.services");
+const service = new UserServices;
 
-const tryUser = async (req, res) => {
-  const auth = getAuth()
-
-  await auth.setCustomUserClaims("p3Tn1lnvaTN8RaxYa940XXzVNso2", { user: true });
-  const userRecord = await auth.getUser("p3Tn1lnvaTN8RaxYa940XXzVNso2");
-  res.json({ data: userRecord.customClaims });
-
-}
+const customerClaim = async (req, res, next) => {
+  try {
+    const setCC = service.customerClaimServ();
+    return setCC;
+  } catch (error) {
+    next();
+  }
+};
 
 module.exports = {
-  tryUser
-}
+  customerClaim,
+};
