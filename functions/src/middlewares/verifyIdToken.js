@@ -1,30 +1,34 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable no-undef */
+const boom = require("@hapi/boom");
+
 const validateFirebaseIdToken = async (req, res, next) => {
   functions.logger.log('Check if request is authorized with Firebase ID token');
 
-  if ((!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) &&
+  if ((!req.headers.authorization ||
+       !req.headers.authorization.startsWith("Bearer ")) &&
       !(req.cookies && req.cookies.__session)) {
     functions.logger.error(
-      'No Firebase ID token was passed as a Bearer token in the Authorization header.',
+      "No Firebase ID token was passed as a Bearer token in the Authorization header.",
       'Make sure you authorize your request by providing the following HTTP header:',
       'Authorization: Bearer <Firebase ID Token>',
       'or by passing a "__session" cookie.'
     );
-    res.status(403).send('Unauthorized');
-    return;
+    throw boom.unauthorized("does not have the required authorization");
   }
 
   let idToken;
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
-    functions.logger.log('Found "Authorization" header');
-    // Read the ID Token from the Authorization header.
-    idToken = req.headers.authorization.split('Bearer ')[1];
-  } else if(req.cookies) {
-    functions.logger.log('Found "__session" cookie');
-    // Read the ID Token from cookie.
+  if (req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer ")) {
+    functions.logger.log("Found \"Authorization\" header");
+
+    idToken = req.headers.authorization.split("Bearer ")[1];
+  } else if (req.cookies) {
+    functions.logger.log("Found \"__session\" cookie");
+
     idToken = req.cookies.__session;
   } else {
-    // No cookie
-    res.status(403).send('Unauthorized');
+    res.status(403).send("Unauthorized");
     return;
   }
 

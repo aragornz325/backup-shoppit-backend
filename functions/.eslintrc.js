@@ -26,7 +26,6 @@ module.exports = {
     "import",
   ],
   rules: {
-    "camelcase": 0,
     "no-console": 1,
     "linebreak-style": 0,
     "quotes": ["error", "double"],

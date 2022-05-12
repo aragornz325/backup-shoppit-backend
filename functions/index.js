@@ -8,7 +8,10 @@ const {logErrors, errorHandler,boomErrorHandler, error404Handler } = require("./
 //modulos personalizados
 const { productsRoutes } = require("./src/products/products.routes");
 const userRoutes = require("./src/users/user.routes");
+const UserServices = require("./src/users/user.services")
 //nombre
+const userService = new UserServices
+
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -22,6 +25,7 @@ exports.setCustomerClaim = functions.auth
 .onCreate(userService.customerClaimServ)
 
 productsRoutes(app);
+
 userRoutes(app);
 
 app.use(logErrors);

@@ -1,7 +1,11 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+const boom = require("@hapi/boom");
 const express = require("express");
 const {db} = require("../../config/firebase");
+const ProductServices = require("./products.services");
+const productServices = new ProductServices;
 
-async function getAll(req, res) {
+async function getAll(req, res, next) {
   try {
     const products = await productServices.getAllSer();
     console.log("Aca esta tu error");
@@ -24,24 +28,30 @@ const getProduct = async (req, res, next) => {
   console.log("Aca esta tu error");
   try {
     const {id} = req.params;
-    if (!id) return res.status(500).send("Bad request");
-    const product = await db.collection("products").doc(id).get();
-    if (product.exists) {
-      return res.send(product.data());
-    } else {
-      return res.status(404).send("Not found");
+    if (!id) {
+      throw boom.badData();
     }
+    const product = await productServices.getProductServ(id);
+    return product;
   } catch (error) {
-    return handleError(res, error);
+    next();
+  }
+};
+
+const AddProduct = async (req, res, next) => {
+  try {
+    const {body} = req.body;
+    // eslint-disable-next-line new-cap
+    const newProduct = productServices.AddProductServ(body);
+    return newProduct;
+  } catch (error) {
+    next();
   }
 };
 
 
-function handleError(res, err) {
-  return res.status(500).send({message: `${err.code} - ${err.message}`});
-}
-
 module.exports = {
   getAll,
-  getProduct
-}
+  getProduct,
+  AddProduct,
+};
