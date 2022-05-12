@@ -15,14 +15,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors({ origin: true }));
 
-//app.use(logErrors);
+app.use(logErrors);
 app.use(boomErrorHandler);
-//app.use(errorHandler);
+app.use(errorHandler);
 
 
 exports.setCustomerClaim = functions.auth
 .user()
-.onCreate(userService.customerClaimServ(user))
+.onCreate(userService.customerClaimServ)
 
 productsRoutes(app);
 

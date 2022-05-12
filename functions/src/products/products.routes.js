@@ -1,8 +1,8 @@
-const {getAll, getProduct} = require("./products.controller");
+const {getAll, getProduct, AddProduct} = require("./products.controller");
 
 const productsRoutes = (app) => {
   app.get("/products", getAll);
-  // app.post("/products/", createProduct);
+  app.post("/products/", AddProduct);
   app.get("/products/:id", getProduct);
 };
 

@@ -7,8 +7,8 @@ const productServices = new ProductServices;
 
 async function getAll(req, res, next) {
   try {
-    const products = productServices.getAllSer();
-    return products;
+    const products = await productServices.getAllSer();
+    return JSON.stringify(products);
   } catch (error) {
     next();
   }
@@ -20,8 +20,19 @@ const getProduct = async (req, res, next) => {
     if (!id) {
       throw boom.badData();
     }
-    const product = productServices.getProductServ(id);
+    const product = await productServices.getProductServ(id);
     return product;
+  } catch (error) {
+    next();
+  }
+};
+
+const AddProduct = async (req, res, next) => {
+  try {
+    const {body} = req.body;
+    // eslint-disable-next-line new-cap
+    const newProduct = productServices.AddProductServ(body);
+    return newProduct;
   } catch (error) {
     next();
   }
@@ -31,4 +42,5 @@ const getProduct = async (req, res, next) => {
 module.exports = {
   getAll,
   getProduct,
+  AddProduct,
 };
