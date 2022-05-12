@@ -8,7 +8,7 @@ class ProductServices {
     const productsArray = [];
     const products = await db.collection("products").get();
     
-    if (!products.docs) {
+    if (!products.docs || products.docs.length == 0) {
       throw boom.notFound("no products found");
     }
     products.docs.map((prod) => {
