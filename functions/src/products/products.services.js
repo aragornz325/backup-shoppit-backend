@@ -8,10 +8,10 @@ class ProductServices {
     console.log('entre a getAll---------> te traigo todo')
     const productArray = [];
     const products = await db.collection("products").get();
-    // console.log(products.docs);
-    // if (products === null) {
-    //   throw boom.notFound("no products found");
-    // }
+    console.log(products.docs);
+    if (products === null) {
+      throw boom.notFound("no products found");
+    }
     console.log(products);
     products.docs.map((prod) => {
       productArray.push(prod.data());
