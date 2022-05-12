@@ -42,7 +42,7 @@ const vendor = joi.object({
   name: joi.string(),
   picture: joi.string(),
   storeName: joi.string(),
-  vendor_id: joi.string.alphanum(),
+  vendor_id: joi.string().alphanum(),
 });
 const volumen = joi.number();
 const weight = joi.number();
