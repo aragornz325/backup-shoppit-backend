@@ -13,11 +13,11 @@ class UserServices {
 
   async createUserWithEmailAndPswd(email, password) {
     const auth = getAuth();
-    const user = await createUserWithEmailAndPassword(auth, email, password);
+    const user = await createUserWithEmailAndPassword(getAuth(), email, password);
     if (!user) throw boom.unauthorized("User already exists");
     return user;
   }
-  async signInUserWithEmailAndPswd(email, password){
+  async signInUserWithEmailAndPswd(email, password) {
     const auth = getAuth();
     const user = await signInWithEmailAndPassword(auth, email, password);
     if (!user) throw boom.unauthorized("Credentials invalid");
