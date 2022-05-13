@@ -36,7 +36,7 @@ const tags = joi.array();
 const total_sales = joi.number();
 const type = joi.string();
 const updated = joi.array();
-const variable_products= joi.array();
+const variable_products = joi.array();
 const vendor = joi.object({
   minimum_purchase: joi.number(),
   name: joi.string(),
@@ -59,7 +59,7 @@ const createProduct = joi.object({
   featuredImage: featuredImage.required(),
   freeShipping: freeShipping.required(),
   height: height.required(),
-  id: id.required(),
+  //id: id.required(),
   images: images.required(),
   in_stock: in_stock.required(),
   is_published: is_published.required(),

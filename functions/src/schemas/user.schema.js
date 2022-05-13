@@ -1,0 +1,94 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+const joi = require("joi");
+
+const addresses = joi.array();
+const billing = joi.string();
+const cookie = joi.string();
+const firstName = joi.string();
+const lastName = joi.string();
+const id = joi.string();
+const identification = joi.object({
+  number: joi.number(),
+  type: joi.string(),
+});
+const isConsultor = joi.boolean();
+const isSocial = joi.boolean();
+const isVender = joi.boolean();
+const loggedIn = joi.boolean();
+const minimum_purchase = joi.string();
+const nicename = joi.string();
+const picture = joi.string().uri();
+const product_id_selected_from_web = joi.string();
+const purchases = joi.array();
+const recentProducts = joi.array();
+const sheetsId = joi.string();
+const storeName = joi.string();
+const storePicture = joi.string();
+const url = joi.string();
+const username = joi.string();
+const wishList = joi.array();
+const password = joi.string().alphanum().min(4).max(12);
+const email = joi.string().email()
+
+
+const createUser = joi.object({
+addresses: addresses.required(),
+billing: billing.required(),  
+cookie: cookie.required(),
+firstName: firstName.required(), 
+lastName: lastName.required(),
+identification: identification.required(),
+isConsultor: isConsultor.required(),
+isSocial: isSocial.required(),
+isVender: isVender.required(),
+loggedIn: loggedIn.required(),
+minimum_purchase: minimum_purchase.required(),
+nicename: nicename.required(),
+picture: picture.required(), 
+product_id_selected_from_web: product_id_selected_from_web.required(),
+purchases: purchases.required(), 
+recentProducts: recentProducts.required(),
+sheetsId: sheetsId.required(),
+storeName: storeName.required(),
+storePicture: storePicture.required(),
+url: url.required(),
+username: username.required(),
+wishList: wishList.required(),
+})
+
+const updateUser = joi.object({
+addresses: addresses,
+billing: billing,  
+cookie: cookie,
+firstName: firstName, 
+lastName: lastName,
+id: id, 
+identification: identification,
+isConsultor: isConsultor,
+isSocial: isSocial,
+isVender: isVender,
+loggedIn: loggedIn,
+minimum_purchase: minimum_purchase,
+nicename: nicename,
+picture: picture, 
+product_id_selected_from_web: product_id_selected_from_web,
+purchases: purchases, 
+recentProducts: recentProducts,
+sheetsId: sheetsId,
+storeName: storeName,
+storePicture: storePicture,
+url: url,
+username: username,
+wishList: wishList,
+});
+
+const createUssAndPass = joi.object({
+  email: email.required(),
+  password: password.required(),
+})
+
+module.exports = {
+  createUser,
+  updateUser,
+  createUssAndPass,
+};

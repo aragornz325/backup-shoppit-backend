@@ -10,11 +10,12 @@ async function getAll(req, res, next) {
     const products = await productServices.getAllSer();
     res.status(200).json(products);
   } catch (error) {
-    next();
+    next(error);
   }
 }
 
 const getProduct = async (req, res, next) => {
+  console.log("Aca esta tu error");
   try {
     const {id} = req.params;
     if (!id) {
@@ -29,9 +30,10 @@ const getProduct = async (req, res, next) => {
 
 const AddProduct = async (req, res, next) => {
   try {
-    const {body} = req.body;
+      
     // eslint-disable-next-line new-cap
-    const newProduct = productServices.AddProductServ(body);
+    const newProduct = await productServices.AddProductServ(req.body);
+    console.log(newProduct)
     res.status(200).json(newProduct);
   } catch (error) {
     next();

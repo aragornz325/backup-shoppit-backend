@@ -11,11 +11,22 @@ class UserServices {
     return {data: userRecord.customClaims};
   }
 
-  async createUserServ() {
+  async createUserServ(user) {
     const newUser = await db.collection("users").add({
-    
+      user
     });
   }
+
+async createUserWithEmailAndPasswordsev (data){
+  const {email, password} = data
+  const auth = getAuth();
+  const newUser = await service.createUserWithEmailAndPswd(email, password)
+  if (!user){
+    throw boom.badData('no se creo el usuario')
+  };
+  return user
+}
+
 }
 
 

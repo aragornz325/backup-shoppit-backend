@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-//const boom = require("@hapi/boom");
+const boom = require("@hapi/boom");
 
 function logErrors(err, req, res, next) {
-  console.error(err);
   next(err);
 }
 
@@ -24,10 +23,16 @@ function boomErrorHandler(err, req, res, next) {
   }
   next(err);
 }
-
+function error404Handler (req, res) {
+  res.status(404)
+  res.send ({
+  message: boom.notFound('el recurso que busca no existe')
+  })
+}
 
 module.exports= {
   logErrors,
   errorHandler,
   boomErrorHandler,
+  error404Handler
 };
