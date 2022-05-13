@@ -7,7 +7,7 @@ class ProductServices {
   async getAllSer() {
     const productsArray = [];
     const products = await db.collection("products").get();
-    
+
     if (!products.docs || products.docs.length == 0) {
       throw boom.notFound("no products found");
     }
@@ -26,28 +26,24 @@ class ProductServices {
     return JSON.stringify(product);
   }
 
-  async AddProductServ() {
+  async AddProductServ(body) {
+    
     const newProduct = await db.collection("products").add({
-      name: "un producto",
-      description: "un super nuevo producto",
-      price: 2500,
-      currency: "u$s",
-      inStock: true,
-      quantityInStock: 10,
+    ...body   
     });
-    console.log(newProduct);
-    return {message: "se agrego con exito"};
+    console.log(newProduct)
+    if (!newProduct){
+      throw boom.badData('no se creo nada')
+    } else {
+      return {
+        message: "product created successfully",
+        FDM: newProduct
+      }
+    }
   }
 }
 
 
-//   console.log('entre aca, te traigo uno----------->')
-//   const product = await db.collection("products").doc(id).get();
-//   if (!product) {
-//     throw boom.notFound("the product does not exist");
-//   }
-//   return JSON.stringify(product);
-// }
-// }
+
 
 module.exports = ProductServices;

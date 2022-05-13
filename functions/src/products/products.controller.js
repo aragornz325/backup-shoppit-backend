@@ -8,22 +8,12 @@ const productServices = new ProductServices;
 async function getAll(req, res, next) {
   try {
     const products = await productServices.getAllSer();
-    console.log("Aca esta tu error");
-    res.json(products);
+    res.status(200).json(products);
   } catch (error) {
     next(error);
   }
 }
 
-function boomErrorHandler(err, req, res, next) {
-
-  if (err?.isBoom) {
-    console.log("es un error de boom");
-    const {output} = err;
-    res.status(output.statusCode).json(output.payload);
-  }
-  next(err);
-}
 const getProduct = async (req, res, next) => {
   console.log("Aca esta tu error");
   try {
@@ -32,7 +22,7 @@ const getProduct = async (req, res, next) => {
       throw boom.badData();
     }
     const product = await productServices.getProductServ(id);
-    return product;
+    res.status(200).json(product);
   } catch (error) {
     next();
   }
@@ -40,10 +30,11 @@ const getProduct = async (req, res, next) => {
 
 const AddProduct = async (req, res, next) => {
   try {
-    const {body} = req.body;
+      
     // eslint-disable-next-line new-cap
-    const newProduct = productServices.AddProductServ(body);
-    return newProduct;
+    const newProduct = await productServices.AddProductServ(req.body);
+    console.log(newProduct)
+    res.status(200).json(newProduct);
   } catch (error) {
     next();
   }

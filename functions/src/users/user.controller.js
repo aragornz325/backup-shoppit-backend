@@ -16,11 +16,8 @@ const customerClaim = async (req, res, next) => {
 
 
 const createUserWithEmailAndPassword = async (req, res, next) => {
-  const auth = getAuth();
-  const { email, password } = req.body;
   try {
-    if (!email || !password) throw boom.badRequest();
-    const user = await service.createUserWithEmailAndPswd(email, password);
+   const user = service.createUserWithEmailAndPasswordsev(req.body)
     res.status(200).send(user);
   } catch (error) {
     next(error)

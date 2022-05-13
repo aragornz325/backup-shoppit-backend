@@ -10,7 +10,7 @@ const featured = joi.boolean();
 const featuredImage = joi.string().uri();
 const freeShipping = joi.boolean();
 const height = joi.number();
-const id = joi.string().alphanum();
+const id = joi.string().alphanum().min(27).max(28);
 const images = joi.array().items(joi.string().uri());
 const in_stock = joi.boolean();
 const is_published = joi.boolean();
@@ -59,7 +59,7 @@ const createProduct = joi.object({
   featuredImage: featuredImage.required(),
   freeShipping: freeShipping.required(),
   height: height.required(),
-  id: id.required(),
+  //id: id.required(),
   images: images.required(),
   in_stock: in_stock.required(),
   is_published: is_published.required(),
