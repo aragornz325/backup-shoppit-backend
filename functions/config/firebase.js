@@ -1,10 +1,8 @@
-const firebase = require("firebase");
-const {initializeApp, cert} = require("firebase-admin/app");
-const {getFirestore} = require("firebase-admin/firestore");
+const { initializeApp: initApp } = require("firebase/app")
+const { initializeApp, cert } = require("firebase-admin/app");
+const { getFirestore } = require("firebase-admin/firestore");
 
 console.log(process.env.stg_project_id)
-
-
 
 //credenciales de staging
 initializeApp({
@@ -27,4 +25,4 @@ initializeApp({
 // });
 
 const db = getFirestore();
-module.exports = {db};
+module.exports = { db };
