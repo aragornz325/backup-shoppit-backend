@@ -15,8 +15,7 @@ async function getAll(req, res, next) {
 }
 
 const getProduct = async (req, res, next) => {
-  console.log("Aca esta tu error");
-  try {
+   try {
     const {id} = req.params;
     if (!id) {
       throw boom.badData();
@@ -40,9 +39,22 @@ const AddProduct = async (req, res, next) => {
   }
 };
 
+const updateProductCon = async (req, res, next) => {
+  try {
+    const {id} = req.params
+    const body = req.body 
+    console.log(id, req.body)
+    const productToUpdate = await productServices.updateProductServ(body, id)
+    res.status(200).json(productToUpdate)
+  } catch(error) {
+    next(error)
+  }
+}
+
 
 module.exports = {
   getAll,
   getProduct,
   AddProduct,
+  updateProductCon
 };

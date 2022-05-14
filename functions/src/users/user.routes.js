@@ -8,6 +8,7 @@ const userRoutes = (app) => {
   app.post("/signin",validatorHandler(createUssAndPass, "body"),
                      createUserWithEmailAndPassword);
 };
-app.patch("/user", validatorHandler(updateUser, "body"), );
+
+//app.patch("/user", validatorHandler(updateUser, "body"), );
 
 module.exports = userRoutes;
