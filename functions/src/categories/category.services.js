@@ -1,3 +1,22 @@
+/* eslint-disable import/no-unresolved */
+const boom = require('@hapi/boom');
+const { serverTimestamp } = require('firebase-admin/firestore');
+const { db } = require('../../config/firebase');
+
+class CategoriesService {
+  async createCategorie(data) {
+    const newCat = await db.collection('categories').add({
+      ...data,
+    });
+    return {
+      message: 'category created sucssefully',
+      newCat,
+    };
+  }
+}
+
+module.exports = CategoriesService;
+
 // const getCollection = async ({ path, subCollection = "" }) => {
 //     let docs = [];
 //     let docsWithSubcollections = [];
