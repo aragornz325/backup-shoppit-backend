@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { customerClaim, createUserWithEmailAndPassword } = require('./user.controller');
-const { createUser, updateUser, createUssAndPass } = require('../schemas/user.schema');
+const { createUser, updateUser, createUssAndPass } = require('../schemas/user.schema'); /* DTOs */
 const validatorHandler = require('../middlewares/validatorHandler');
 
 const userRoutes = (app) => {

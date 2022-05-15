@@ -14,7 +14,7 @@ class ProductServices {
       throw boom.notFound('no products found');
     }
     products.docs.map((prod) => {
-      productsArray.push(prod.data());
+      productsArray.push({id: prod.id, ...prod.data()});
     });
     return productsArray;
   }
@@ -28,9 +28,11 @@ class ProductServices {
   }
 
   async AddProductServ(body) {
+    console.log(body)
     const newProduct = await db.collection('products').add({
-      ...body,
+      body,
     });
+    console.log(newProduct)
     return {
       message: 'product created sucssefully',
       newProduct,

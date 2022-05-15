@@ -1,34 +1,51 @@
+/* eslint-disable no-unreachable */
 const CategoriesService = require('./category.services');
-const categoriesService = new CategoriesService;
+const categoriesService = new CategoriesService();
 const boom = require('@hapi/boom');
 const { db } = require('../../config/firebase');
 
-class CategoriesController {
-  async getCat() {
-    try {
-
-    } catch (error) {}
+const getCat = async (req, res, next) => {
+  try {
+    const allCategories = await categoriesService.getAllCategory();
+    res.status(200).json(allCategories);
+  } catch (error) {
+    console.log(error);
   }
+};
 
-  async getOneCat() {
-    try {
-    } catch (error) {}
+const getOneCat = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const getOne = await categoriesService.getOneCategorie(id);
+    res.status(200).json(getOne);
+  } catch (error) {
+    next(error);
   }
+};
 
-  async createCat(req, res, next) {
-    const { body } = req.body;
-    try {
-      const newCategory = categoriesService.createCategorie(body);
-      res.status(200).json(newCategory);
-    } catch (error) {
-      next(error);
-    }
+const createCat = async (req, res, next) => {
+  console.log('estoy en el controller de categorias');
+
+  try {
+    const body = req.body;
+    const newCategory = await categoriesService.createCategorie(body);
+    res.status(200).json(newCategory);
+  } catch (error) {
+    next(error);
   }
+};
 
-  async updateCat() {
-    try {
-    } catch (error) {}
+const updateCat = async (req, res, next) => {
+  try {
+    res.status(200).json({ message: 'updapeo uno' });
+  } catch (error) {
+    next(error);
   }
-}
+};
 
-module.exports = CategoriesController;
+module.exports = {
+  getCat,
+  getOneCat,
+  createCat,
+  updateCat,
+};

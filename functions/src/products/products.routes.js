@@ -4,7 +4,7 @@ const {
   getAll, getProduct, AddProduct, updateProductCon,
 } = require('./products.controller');
 const validatorHandler = require('../middlewares/validatorHandler');
-const { createProduct, updateProduct, getOne } = require('../schemas/prod.schema');
+const { createProduct, updateProduct, getOne } = require('../schemas/prod.schema'); /* DTOs */
 
 const productsRoutes = (app) => {
   app.get('/products', getAll);

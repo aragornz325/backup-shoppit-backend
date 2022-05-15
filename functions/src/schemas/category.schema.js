@@ -1,8 +1,8 @@
 const joi = require('joi');
 
 const image = joi.string().uri();
-const name = joi.string().uri();
-const id = joi.string().alphanum.min(27).max(28);
+const name = joi.string();
+const id = joi.string().alphanum().min(20).max(20);
 
 const createCategory = joi.object({
   image: image.required(),

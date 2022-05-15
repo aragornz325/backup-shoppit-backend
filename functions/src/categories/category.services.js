@@ -1,17 +1,45 @@
 /* eslint-disable import/no-unresolved */
-const boom = require('@hapi/boom');
-const { serverTimestamp } = require('firebase-admin/firestore');
-const { db } = require('../../config/firebase');
+const boom = require("@hapi/boom");
+const { serverTimestamp, QuerySnapshot } = require("firebase-admin/firestore");
+const { db } = require("../../config/firebase");
 
 class CategoriesService {
   async createCategorie(data) {
-    const newCat = await db.collection('categories').add({
+    let check = "";
+    const getC = await db
+      .collection("categories")
+      .where("name", "==", data.name)
+      .get();
+
+    getC.forEach((doc) => {
+      check = doc.data();
+    });
+    if (check.name === data.name) {
+      throw boom.conflict('the category already exists');
+    }
+
+    const newCat = await db.collection("categories").add({
       ...data,
     });
     return {
-      message: 'category created sucssefully',
       newCat,
+      message: 'category created sucssefully',
     };
+  }
+
+  async getOneCategorie(data) {
+    const refCat = await db.collection('categories').doc(data).get();
+    console.log(refCat)
+    return refCat.data();
+  }
+
+  async getAllCategory() {
+    const categoriesArray = [];
+    const categories = await db.collection("categories").get();
+    categories.docs.map((categ) => {
+      categoriesArray.push({ id: categ.id, ...categ.data() });
+    });
+    return categoriesArray;
   }
 }
 
