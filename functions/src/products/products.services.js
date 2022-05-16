@@ -24,11 +24,10 @@ class ProductServices {
     if (!product) {
       throw boom.notFound('the product does not exist');
     }
-    return JSON.stringify(product);
+    return product;
   }
 
   async AddProductServ(body) {
-    console.log(body)
     const newProduct = await db.collection('products').add({
       body,
     });

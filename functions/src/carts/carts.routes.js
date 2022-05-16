@@ -1,19 +1,20 @@
 /* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/no-var-requires */
-const {createCarts} = require('./carts.controller')
+const { createCarts, getAllcarts, getOneCart, updateCarts, delOneCart } = require('./carts.controller')
 
-const validatorHandler = require("../middlewares/validatorHandler");
+const validatorHandler = require('../middlewares/validatorHandler');
 const {
   createCartsSc,
-  updateCarts,
-  getOneCart,
+  updateCartsSc,
+  getOneCartSc,
 } = require('../schemas/carts.schema'); /* DTOs */
 
 const productsRoutes = (app) => {
-  app.get('/carts', );
-  app.post('/carts', validatorHandler(createCarts, 'body'), createCartsSc);
-  app.get('/carts/:id', validatorHandler(getOneCart, 'params'), );
-  app.patch('/carts/:id', validatorHandler(getOneCart, 'params'), validatorHandler(updateCarts, 'body'), );
+  app.get('/carts', getAllcarts);
+  app.post('/carts', validatorHandler(createCartsSc, 'body'), createCarts);
+  app.get('/carts/:id', validatorHandler(getOneCartSc, 'params'), getOneCart);
+  app.patch('/carts/:id', validatorHandler(getOneCartSc, 'params'), validatorHandler(updateCartsSc, 'body'), updateCarts);
+  app.delete('/carts/:id', validatorHandler(getOneCartSc, 'params'), delOneCart);
 };
 
 module.exports = {

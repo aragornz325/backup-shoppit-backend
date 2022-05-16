@@ -1,15 +1,13 @@
 /* eslint-disable no-unreachable */
 const CategoriesService = require('./category.services');
 const categoriesService = new CategoriesService();
-const boom = require('@hapi/boom');
-const { db } = require('../../config/firebase');
 
 const getCat = async (req, res, next) => {
   try {
     const allCategories = await categoriesService.getAllCategory();
     res.status(200).json(allCategories);
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -24,10 +22,8 @@ const getOneCat = async (req, res, next) => {
 };
 
 const createCat = async (req, res, next) => {
-  console.log('estoy en el controller de categorias');
-
   try {
-    const body = req.body;
+    const { body } = req.body;
     const newCategory = await categoriesService.createCategorie(body);
     res.status(200).json(newCategory);
   } catch (error) {

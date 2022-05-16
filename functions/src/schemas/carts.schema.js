@@ -12,7 +12,7 @@ const storeName = joi.string();
 const vendor_id = joi.string().alphanum();
 const vendor_image = joi.string().uri();
 
-const createCarts = joi.object({
+const createCartsSc = joi.object({
   buyer_id: buyer_id.required(),
   cart_paid: cart_paid.required(),
   name: name.required(),
@@ -42,12 +42,12 @@ const updateCartsSc = joi.object({
   vendor_image,
 });
 
-const getOneCart = joi.object({
+const getOneCartSc = joi.object({
   id: joi.string().alphanum().min(20).max(20),
 });
 
 module.exports = {
   createCartsSc,
-  updateCarts,
-  getOneCart,
+  updateCartsSc,
+  getOneCartSc,
 };

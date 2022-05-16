@@ -5,7 +5,7 @@ const { db } = require('../../config/firebase');
 const ProductServices = require('./products.services');
 const productServices = new ProductServices;
 
-async function getAll(req, res, next) {
+const getAll = async (req, res, next) => {
   try {
     const products = await productServices.getAllSer();
     res.status(200).json(products);
