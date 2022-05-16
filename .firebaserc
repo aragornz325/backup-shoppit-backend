@@ -1,6 +1,6 @@
 {
   "projects": {
-    "default": "shoppit-app-stg",
+    "default": "ecommerce-mp",
     "staging": "shoppit-app-stg"
   },
   "targets": {}
