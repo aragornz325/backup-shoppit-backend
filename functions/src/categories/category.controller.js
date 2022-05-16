@@ -37,7 +37,20 @@ const createCat = async (req, res, next) => {
 
 const updateCat = async (req, res, next) => {
   try {
-    res.status(200).json({ message: 'updapeo uno' });
+    const { id } = req.params;
+    const { body } = req;
+    const updateCategory = await categoriesService.updateCat(body, id);
+    res.status(200).json(updateCategory);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteCat = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const deltecat = await categoriesService.deleteCat(id);
+    res.status(200).json(deltecat);
   } catch (error) {
     next(error);
   }
@@ -48,4 +61,5 @@ module.exports = {
   getOneCat,
   createCat,
   updateCat,
+  deleteCat,
 };

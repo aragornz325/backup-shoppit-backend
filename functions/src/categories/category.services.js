@@ -1,14 +1,15 @@
+/* eslint-disable class-methods-use-this */
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable import/no-unresolved */
-const boom = require("@hapi/boom");
-const { serverTimestamp, QuerySnapshot } = require("firebase-admin/firestore");
-const { db } = require("../../config/firebase");
+const boom = require('@hapi/boom');
+const { db } = require('../../config/firebase');
 
 class CategoriesService {
   async createCategorie(data) {
-    let check = "";
+    let check = '';
     const getC = await db
-      .collection("categories")
-      .where("name", "==", data.name)
+      .collection('categories')
+      .where('name', '==', data.name)
       .get();
 
     getC.forEach((doc) => {
@@ -17,8 +18,12 @@ class CategoriesService {
     if (check.name === data.name) {
       throw boom.conflict('the category already exists');
     }
-
-    const newCat = await db.collection("categories").add({
+    // db.collection('categories').add({
+    //   ...data,
+    // })
+    //   .then(function (docRef) { console.log('se agrego la categoria con ID ', docRef.id)})
+    //   .catch(function (error) { console.error('error al crear el documento', error)})
+    const newCat = await db.collection('categories').add({
       ...data,
     });
     return {
@@ -29,17 +34,35 @@ class CategoriesService {
 
   async getOneCategorie(data) {
     const refCat = await db.collection('categories').doc(data).get();
-    console.log(refCat)
+    // console.log(refCat)
     return refCat.data();
   }
 
   async getAllCategory() {
     const categoriesArray = [];
-    const categories = await db.collection("categories").get();
+    const categories = await db.collection('categories').get();
     categories.docs.map((categ) => {
       categoriesArray.push({ id: categ.id, ...categ.data() });
     });
     return categoriesArray;
+  }
+
+  async deleteCat(id) {
+    const delCat = await db.collection('categories').doc(id).delete();
+    console.log(delCat);
+    // if (Object.keys(delCat).length === 0) { throw boom.badData(' nothing deleted'); }
+    return { message: 'category deleted', delCat };
+  }
+
+  async updateCat(data, id) {
+    const refUser = db.collection('categories').doc(id);
+    // console.log(`category => ${id} se actualiza con ${data}`);
+    const updater = await refUser.update(data);
+    console.log(updater);
+    if (updater._writeTime) {
+      return { message: `category ${id} update`, updater };
+    }
+    throw boom.notImplemented('not updated');
   }
 }
 
