@@ -1,6 +1,3 @@
-/* eslint-disable class-methods-use-this */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable import/no-unresolved */
 const boom = require('@hapi/boom');
 const { db } = require('../../config/firebase');
 
