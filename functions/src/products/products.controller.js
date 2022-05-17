@@ -28,7 +28,6 @@ const addProduct = async (req, res, next) => {
   try {
     // eslint-disable-next-line new-cap
     const newProduct = await productServices.AddProductServ(req.body);
-    console.log(newProduct);
     res.status(200).json(newProduct);
   } catch (error) {
     next(error);
