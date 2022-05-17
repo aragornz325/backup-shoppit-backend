@@ -1,6 +1,4 @@
-// const boom = require("@hapi/boom");
-const { getAuth } = require("firebase/auth")
-// const { db } = require("../../config/firebase");
+const { getAuth } = require("firebase-admin/auth")
 
 class UserServices {
   async customerClaimServ(user) {
@@ -10,27 +8,12 @@ class UserServices {
     return { data: userRecord.customClaims };
   }
 
+  //! No se pueden crear usuarios dedsde el backend ya que este usa firebase-admin
   // async createUserWithEmailAndPswd(email, password) {
   //   const auth = getAuth();
   //   const user = await createUserWithEmailAndPassword(getAuth(), email, password);
   //   if (!user) throw boom.unauthorized("User already exists");
   //   return user;
-  // }
-  // async signInUserWithEmailAndPswd(email, password) {
-  //   const auth = getAuth();
-  //   const user = await signInWithEmailAndPassword(auth, email, password);
-  //   if (!user) throw boom.unauthorized("Credentials invalid");
-  //   return user;
-  // }
-
-  // async createUserWithEmailAndPasswordsev(data) {
-  //   const { email, password } = data
-  //   const auth = getAuth();
-  //   const newUser = await this.createUserWithEmailAndPswd(email, password)
-  //   if (!user) {
-  //     throw boom.badData('no se creo el usuario')
-  //   };
-  //   return user
   // }
 
 }
