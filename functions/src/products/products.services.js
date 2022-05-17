@@ -1,49 +1,51 @@
+/* eslint-disable class-methods-use-this */
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-var-requires */
-const {db} = require("../../config/firebase");
-const boom = require("@hapi/boom");
-const express = require("express");
+const boom = require('@hapi/boom');
+const { serverTimestamp } = require('firebase-admin/firestore');
+const { db } = require("../../config/firebase");
 
 class ProductServices {
   async getAllSer() {
     const productsArray = [];
-    const products = await db.collection("products").get();
+    const products = await db.collection('products').get();
 
     if (!products.docs || products.docs.length == 0) {
-      throw boom.notFound("no products found");
+      throw boom.notFound('no products found');
     }
     products.docs.map((prod) => {
-      productsArray.push(prod.data());
+      productsArray.push({id: prod.id, ...prod.data()});
     });
     return productsArray;
   }
 
   async getProductServ(id) {
-    console.log('entre aca, te traigo uno----------->')
-    const product = await db.collection("products").doc(id).get();
+    const product = await db.collection('products').doc(id).get();
     if (!product) {
-      throw boom.notFound("the product does not exist");
+      throw boom.notFound('the product does not exist');
     }
-    return JSON.stringify(product);
+    return product;
   }
 
   async AddProductServ(body) {
-    
-    const newProduct = await db.collection("products").add({
-    ...body   
+    const newProduct = await db.collection('products').add({
+      body,
     });
     console.log(newProduct)
-    if (!newProduct){
-      throw boom.badData('no se creo nada')
-    } else {
-      return {
-        message: "product created successfully",
-        FDM: newProduct
-      }
+    return {
+      message: 'product created sucssefully',
+      newProduct,
+    };
+  }
+
+  async updateProductServ(data, id) {
+    const refUser = db.collection('products').doc(id);
+    console.log(`product => ${id} se actualiza con ${data}`);
+    const updater = await refUser.update(data);
+    if (updater._writeTime) {
+      return { message: `product ${id} update`, updater };
     }
+    throw boom.notImplemented('not updated');
   }
 }
-
-
-
-
 module.exports = ProductServices;
