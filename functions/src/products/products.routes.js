@@ -1,5 +1,3 @@
-/* eslint-disable no-undef */
-/* eslint-disable @typescript-eslint/no-var-requires */
 const {
   getAll, getProduct, AddProduct, updateProductCon,
 } = require('./products.controller');

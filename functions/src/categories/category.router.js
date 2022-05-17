@@ -1,6 +1,3 @@
-/* eslint-disable new-parens */
-/* eslint-disable no-undef */
-/* eslint-disable @typescript-eslint/no-var-requires */
 const validatorHandler = require("../middlewares/validatorHandler");
 const {
   createCategory,
