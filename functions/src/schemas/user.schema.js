@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 const joi = require("joi");
 
 const addresses = joi.array();

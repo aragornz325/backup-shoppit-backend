@@ -6,7 +6,7 @@ const {
 } = require('../schemas/category.schema'); /* DTOs */
 const {
   getCat,
-  getOneCat,
+  getCatByID,
   createCat,
   updateCat,
   deleteCat,
@@ -15,7 +15,7 @@ const {
 const categoriesRoutes = (app) => {
   app.get('/categories', getCat);
   app.post('/categories', validatorHandler(createCategory, 'body'), createCat);
-  app.get('/categories/:id', validatorHandler(getOnecategory, 'params'), getOneCat);
+  app.get('/categories/:id', validatorHandler(getOnecategory, 'params'), getCatByID);
   app.patch('/categories/:id', validatorHandler(getOnecategory, 'params'), validatorHandler(updateCategory, 'body'), updateCat);
   app.delete('/categories/:id', validatorHandler(getOnecategory, 'params'), deleteCat);
 };

@@ -11,7 +11,7 @@ const getCat = async (req, res, next) => {
   }
 };
 
-const getOneCat = async (req, res, next) => {
+const getCatByID = async (req, res, next) => {
   try {
     const { id } = req.params;
     const getOne = await categoriesService.getOneCategorie(id);
@@ -54,7 +54,7 @@ const deleteCat = async (req, res, next) => {
 
 module.exports = {
   getCat,
-  getOneCat,
+  getCatByID,
   createCat,
   updateCat,
   deleteCat,
