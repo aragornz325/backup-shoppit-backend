@@ -86,8 +86,12 @@ const createUssAndPass = joi.object({
   password: password.required(),
 })
 
+const verifyIdToken = joi.object({
+  idToken: joi.string().required()
+})
 module.exports = {
   createUser,
   updateUser,
   createUssAndPass,
+  verifyIdToken
 };

@@ -10,6 +10,20 @@ const customerClaim = async (req, res, next) => {
   }
 };
 
+const decodeIdToken = async(req, res, next) => {
+  try {
+    const {idToken} = req.body;  
+    const decoded = await service.verifyIdToken(idToken);
+    const setCustomClaim = await service.customerClaimServ(decoded.uid);
+    console.log(setCustomClaim);
+    res.json({decoded});
+  } catch (error) {
+    next(error) 
+  }
+}
+
+//!No se pueden crear usuarios desde el backend
+//TODO: Revisar si hay alguna forma o sacarlo
 const createUserWithEmailAndPassword = async (req, res, next) => {
   try {
     const user = service.createUserWithEmailAndPasswordsev(req.body);
@@ -22,4 +36,5 @@ const createUserWithEmailAndPassword = async (req, res, next) => {
 module.exports = {
   customerClaim,
   createUserWithEmailAndPassword,
+  decodeIdToken
 };

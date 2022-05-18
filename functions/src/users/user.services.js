@@ -1,14 +1,22 @@
 const { getAuth } = require("firebase-admin/auth")
 
 class UserServices {
-  async customerClaimServ(user) {
+  async customerClaimServ(id) {
     const auth = getAuth();
-    await auth.setCustomUserClaims(user.uid, { customer: true });
-    const userRecord = await auth.getUser(user.uid);
+    await auth.setCustomUserClaims(id, { 
+      seller: true,
+     });
+    const userRecord = await auth.getUser(id);
     return { data: userRecord.customClaims };
   }
 
+  async verifyIdToken(idToken){
+    const token = await getAuth().verifyIdToken(idToken);  
+    return token;
+  }
+
   //! No se pueden crear usuarios dedsde el backend ya que este usa firebase-admin
+    //TODO: Revisar si hay alguna forma o sacarlo
   // async createUserWithEmailAndPswd(email, password) {
   //   const auth = getAuth();
   //   const user = await createUserWithEmailAndPassword(getAuth(), email, password);
