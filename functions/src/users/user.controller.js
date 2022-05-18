@@ -1,9 +1,6 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable no-undef */
 const UserServices = require('./user.services');
 const service = new UserServices;
 
-// eslint-disable-next-line consistent-return
 const customerClaim = async (req, res, next) => {
   try {
     const setCC = await service.customerClaimServ();
