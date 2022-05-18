@@ -1,13 +1,7 @@
 {
   "projects": {
-<<<<<<< HEAD
-    "default": "ecommerce-mp"
-  }
-}
-=======
     "default": "ecommerce-mp",
     "staging": "shoppit-app-stg"
   },
   "targets": {}
 }
->>>>>>> 972d74f7af85342625dcfcbbb5d3ac6b67ecc4fc

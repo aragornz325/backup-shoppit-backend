@@ -6,6 +6,7 @@ require("dotenv").config();
 
 const {logErrors, errorHandler,boomErrorHandler, error404Handler } = require("./src/middlewares/error.handler")
 //modulos personalizados
+const { faqsRoutes } = require('./src/faqs/faqs.router')
 const { productsRoutes } = require('./src/products/products.routes');
 const { categoriesRoutes } = require('./src/categories/category.router');
 const userRoutes = require('./src/users/user.routes');
@@ -27,6 +28,8 @@ categoriesRoutes(app);
 productsRoutes(app);
 
 userRoutes(app);
+
+faqsRoutes(app);
 
 app.use(logErrors);
 app.use(boomErrorHandler);
