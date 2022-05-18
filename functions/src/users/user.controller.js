@@ -14,9 +14,9 @@ const decodeIdToken = async(req, res, next) => {
   try {
     const {idToken} = req.body;  
     const decoded = await service.verifyIdToken(idToken);
-    const setCustomClaim = await service.customerClaimServ(decoded.uid);
-    console.log(setCustomClaim);
-    res.json({decoded});
+    //TODO: Sacar esta funcion, es solo de prueba
+    await service.customerClaimServ(decoded.uid);
+    res.json(decoded);
   } catch (error) {
     next(error) 
   }

@@ -5,7 +5,7 @@ const { decodeIdToken } = require('./user.controller');
 
 const userRoutes = (app) => {
   app.get('/user', customerClaim);
-  app.post('/verifyToken', validatorHandler(verifyIdToken, 'body'), decodeIdToken)
+  app.post('/verify-token', validatorHandler(verifyIdToken, 'body'), decodeIdToken)
 
   //!No se pueden crear usuarios desde el backend
   //TODO: Revisar si hay alguna forma o sacarlo

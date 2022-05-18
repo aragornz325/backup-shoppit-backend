@@ -31,7 +31,8 @@ function App() {
     try {
       const user = await signInWithEmailAndPassword(getAuth(), data.email, data.password);
       let token = user._tokenResponse.idToken;
-      const response = await axios.post(apiURL+"/verifyToken", {
+      console.log(token);
+      const response = await axios.post(apiURL+"/verify-token", {
         idToken: token
       });
       console.log(response);
