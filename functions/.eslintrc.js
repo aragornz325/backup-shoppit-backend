@@ -9,6 +9,7 @@ module.exports = {
         "ecmaVersion": "latest"
     },
     "rules": {
-      "no-console": 1
+        "no-prototype-builtins": 0,
+        "no-console": 1
     }
 }
