@@ -34,7 +34,7 @@ class ProductServices {
     console.log(newProduct)
     return {
       message: 'product created sucssefully',
-      newProduct,
+      newProduct
     };
   }
 

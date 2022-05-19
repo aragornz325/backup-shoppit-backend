@@ -1,4 +1,5 @@
 const boom = require("@hapi/boom");
+
 function chequearRoles(...roles) {
   return (req, res, next) => {
 
@@ -12,7 +13,7 @@ function chequearRoles(...roles) {
       }
     });
 
-    next(boom.unauthorized(`no tienes los permisos para este recurso`))
+    next(boom.unauthorized(`you do not have the permissions for this resource`))
   }
 }
 

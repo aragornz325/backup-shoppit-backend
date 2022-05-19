@@ -1,16 +1,16 @@
+const express = require('express');
+const router = express.Router();
 const {
   getAll, getProduct, addProduct, updateProductCon,
 } = require('./products.controller');
 const validatorHandler = require('../middlewares/validatorHandler');
 const { createProduct, updateProduct, getOne } = require('../schemas/prod.schema'); /* DTOs */
 
-const productsRoutes = (app) => {
-  app.get('/products', getAll);
-  app.post('/products', validatorHandler(createProduct, 'body'), addProduct);
-  app.get('/products/:id', validatorHandler(getOne, 'params'), getProduct);
-  app.patch('/products/:id', validatorHandler(updateProduct, 'body'), updateProductCon);
-};
 
-module.exports = {
-  productsRoutes,
-};
+  router.get('/', getAll);
+  router.post('/', validatorHandler(createProduct, 'body'), addProduct);
+  router.get('/:id', validatorHandler(getOne, 'params'), getProduct);
+  router.patch('/:id', validatorHandler(updateProduct, 'body'), updateProductCon);
+
+
+module.exports = router

@@ -28,6 +28,16 @@ class FaqsServices {
         }
     
     }
+
+    async updateQuestionServ(data, id) {
+        const refUser = db.collection('faqs').doc(id);
+        // console.log(`product => ${id} se actualiza con ${data}`);
+        const updater = await refUser.update(data);
+        if (updater._writeTime) {
+          return { message: `faqs ${id} update`, updater };
+        }
+        throw boom.notImplemented('not updated');
+      }
 }
 
 
