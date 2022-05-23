@@ -10,8 +10,7 @@ function routerApi (app) {
     app.use('/faqs', faqRouter)
     app.use('/categories', categoriesRouter);
     app.use('/carts', cartRouter);
-    
-
+   
 }
 
 module.exports = routerApi

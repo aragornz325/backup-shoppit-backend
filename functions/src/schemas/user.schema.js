@@ -1,11 +1,11 @@
 const joi = require("joi");
 
+const firstName = joi.string();
+const lastName = joi.string();
 const addresses = joi.array();
 const billing = joi.string();
 const cookie = joi.string();
-const firstName = joi.string();
-const lastName = joi.string();
-const id = joi.string();
+const id = joi.string().alphanum();
 const identification = joi.object({
   number: joi.number(),
   type: joi.string(),
@@ -22,7 +22,7 @@ const purchases = joi.array();
 const recentProducts = joi.array();
 const sheetsId = joi.string();
 const storeName = joi.string();
-const storePicture = joi.string();
+const storePicture = joi.string().uri();
 const url = joi.string();
 const username = joi.string();
 const wishList = joi.array();
@@ -31,11 +31,11 @@ const email = joi.string().email()
 
 
 const createUser = joi.object({
+firstName: firstName.required(), 
+lastName: lastName.required(),
 addresses: addresses.required(),
 billing: billing.required(),  
 cookie: cookie.required(),
-firstName: firstName.required(), 
-lastName: lastName.required(),
 identification: identification.required(),
 isConsultor: isConsultor.required(),
 isSocial: isSocial.required(),

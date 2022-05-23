@@ -13,9 +13,9 @@ const UserServices = require('./src/users/user.services');
 const swaggerUI = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc'); 
 // nombre
-const swaggerSpectTwo = require('./src/utils/swaggerSpec')
+const swaggerEdit = require('./src/utils/swaggerSpec')
 const userService = new UserServices
-const swaggerSpec = swaggerSpectTwo 
+const swaggerSpec = swaggerEdit 
 
 
 
@@ -25,10 +25,12 @@ const swaggerSpec = swaggerSpectTwo
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use('/doc', swaggerUI.serve, swaggerUI.setup(swaggerJsDoc(swaggerSpec)))
+app.use("/api-doc", swaggerUI.serve, swaggerUI.setup(swaggerJsDoc(swaggerSpec)))
+
 app.use(cors({ origin: true }));
 
 routerApi(app);
+
 
 exports.setCustomerClaim = functions.auth
 .user()
@@ -39,7 +41,6 @@ app.use(error404Handler);
 app.use(logErrors);
 app.use(boomErrorHandler);
 app.use(errorHandler);
-
 
 exports.api = functions.https.onRequest(app);
 
