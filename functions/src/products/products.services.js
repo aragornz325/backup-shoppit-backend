@@ -1,6 +1,3 @@
-/* eslint-disable class-methods-use-this */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/no-var-requires */
 const boom = require('@hapi/boom');
 const { serverTimestamp } = require('firebase-admin/firestore');
 const { db } = require("../../config/firebase");

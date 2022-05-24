@@ -33,8 +33,19 @@ const createUserWithEmailAndPassword = async (req, res, next) => {
   }
 };
 
+const GetChannelsAstro = async(req, res, next) => {
+  try {
+    const check = await service.checkChannelAstroselling();
+    res.status(200).send(check)
+  } catch(error) {
+    next(error)    
+  }
+}
+
+
 module.exports = {
   customerClaim,
   createUserWithEmailAndPassword,
-  decodeIdToken
+  decodeIdToken,
+  GetChannelsAstro
 };
