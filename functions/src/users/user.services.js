@@ -43,10 +43,10 @@ class UserServices {
   // }
 
   async checkChannelAstroselling() {
+    
     try {
-      const chanel = await axios.get(`https://nova-back.astroselling.com/jupiter/v1/channels?api_token={${apikey}`)
-      console.log(chanel)
-      return chanel
+      const channel = await axios.get(`https://nova-back.astroselling.com/jupiter/v1/channels?api_token=${apikey}`)
+      return channel.data
       
     } catch(error) {
       throw boom.badData(error)

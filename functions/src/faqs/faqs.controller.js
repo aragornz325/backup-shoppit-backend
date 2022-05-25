@@ -16,7 +16,9 @@ const createQuestion = async (req, res, next) => {
 
 const updateQuestion = async (req, res, next) => {
     try {
-        res.status(200).json({ msg: 'modifico faqs'})
+        const body = req.body
+        const uppdateFaq = await faqsServices.updateQuestionServ(body)
+        res.status(200).json(uppdateFaq)
     } catch (error) {
         next(error)
     }
@@ -24,7 +26,7 @@ const updateQuestion = async (req, res, next) => {
 
 const getQuestion = async (req, res, next) => {
     try {
-        res.status(200).json({msg: 'devuelvo todas las faqs'})
+        res.status(200).json({msg: 'will return all FAQs'}) //TODO: no esta implementado el servicio
     } catch(error) {
         next(error)
     }
@@ -32,7 +34,7 @@ const getQuestion = async (req, res, next) => {
 
 const getOneQuestion = async (req, res, next) => {
     try {
-        res.status(200).json({msg: 'devuelvo una faqs'})
+        res.status(200).json({msg: 'will return a FAQ'}) //TODO: no esta implementado el servicio
     } catch(error) {
         next(error)
     }
@@ -40,7 +42,7 @@ const getOneQuestion = async (req, res, next) => {
 
 const deleteQuestion = async (req, res, next) => {
     try {
-        res.status(200).json({msg: 'elimino una faqs'})
+        res.status(200).json({msg: 'will delete a FAQ'}) //TODO:no esta implementado el servicio
     } catch(error) {
         next(error)
     }

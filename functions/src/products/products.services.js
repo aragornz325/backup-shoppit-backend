@@ -1,6 +1,11 @@
 const boom = require('@hapi/boom');
 const { serverTimestamp } = require('firebase-admin/firestore');
 const { db } = require("../../config/firebase");
+const axios = require('axios')
+require('dotenv').config();
+
+const apikey = process.env.apikey
+const IdMLAstro = process.env.IdMLAstro 
 
 class ProductServices {
   async getAllSer() {
@@ -28,7 +33,7 @@ class ProductServices {
     const newProduct = await db.collection('products').add({
       body,
     });
-    console.log(newProduct)
+    
     return {
       message: 'product created sucssefully',
       newProduct
@@ -37,12 +42,34 @@ class ProductServices {
 
   async updateProductServ(data, id) {
     const refUser = db.collection('products').doc(id);
-    console.log(`product => ${id} se actualiza con ${data}`);
+    
     const updater = await refUser.update(data);
     if (updater._writeTime) {
       return { message: `product ${id} update`, updater };
     }
     throw boom.notImplemented('not updated');
   }
+
+  async createAstroProduct(body){
+   
+    let newAstro = []
+    await axios.post( `https://nova-back.astroselling.com/jupiter/v1/channels/${IdMLAstro}/products?api_token=${apikey}`, {...body})
+    .then(function (response) {
+    newAstro.push(response.data)
+    })
+    .catch(function (error) {
+     throw new Error(error)
+       
+    });  
+    return newAstro[0]
+
+  }
+async getAllAstroProduct () {
+
+  const allAstro = await axios.get(`https://nova-back.astroselling.com/jupiter/v1/channels/${IdMLAstro}/products?api_token=${apikey}&limit=20&offset=0`)
+  return allAstro.data
+}
 }
 module.exports = ProductServices;
+
+

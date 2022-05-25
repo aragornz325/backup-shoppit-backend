@@ -45,9 +45,33 @@ const updateProductCon = async (req, res, next) => {
   }
 };
 
+const createNewAstroProduct = async (req, res, next) => {
+  try {
+    const body = req.body
+    
+    const newInAstro = await productServices.createAstroProduct(body)
+    res.status(200).json(newInAstro)
+  } catch(error) {
+    next(error)
+  }
+}
+
+const getAllAstro = async (req, res, next) => {
+try {
+  const allAstro = await productServices.getAllAstroProduct()
+  res.status(200).json(allAstro)
+} catch(error) {
+  next(error)
+}
+
+}
+
+
 module.exports = {
   getAll,
   getProduct,
   addProduct,
   updateProductCon,
+  createNewAstroProduct,
+  getAllAstro
 };
