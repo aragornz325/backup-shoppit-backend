@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "ecommerce-mp"
-  }
+    "default": "ecommerce-mp",
+    "staging": "shoppit-app-stg"
+  },
+  "targets": {}
 }
