@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const joi = require('joi')
 
+const isAstroselling = joi.boolean();
 const available_colors = joi.string();
 const available_size = joi.string();
 const categories = joi.string();
@@ -10,7 +11,7 @@ const featured = joi.boolean();
 const featuredImage = joi.string().uri();
 const freeShipping = joi.boolean();
 const height = joi.number();
-const id = joi.string().alphanum().min(27).max(28);
+const id = joi.string().alphanum(); //TODO: requiere confirmacion del largo del ID
 const images = joi.array().items(joi.string().uri());
 const in_stock = joi.boolean();
 const is_published = joi.boolean();
@@ -51,6 +52,7 @@ const withError = joi.boolean();
 
 
 const createProduct = joi.object({
+  isAstroselling: isAstroselling.required(),
   available_colors: available_colors.required(),
   available_size: available_size.required(),
   categories: categories.required(),
@@ -94,6 +96,7 @@ const createProduct = joi.object({
 });
 
 const updateProduct = joi.object({
+  isAstroselling,
   available_colors,
   available_size,
   categories,

@@ -1,6 +1,6 @@
 const boom = require('@hapi/boom');
 const ProductServices = require('./products.services');
-const productServices = new ProductServices;
+const productServices = new ProductServices();
 
 const getAll = async (req, res, next) => {
   try {
@@ -9,7 +9,7 @@ const getAll = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}
+};
 
 const getProduct = async (req, res, next) => {
   try {
@@ -26,7 +26,6 @@ const getProduct = async (req, res, next) => {
 
 const addProduct = async (req, res, next) => {
   try {
-    
     const newProduct = await productServices.AddProductServ(req.body);
     res.status(200).json(newProduct);
   } catch (error) {
@@ -47,25 +46,33 @@ const updateProductCon = async (req, res, next) => {
 
 const createNewAstroProduct = async (req, res, next) => {
   try {
-    const body = req.body
-    
-    const newInAstro = await productServices.createAstroProduct(body)
-    res.status(200).json(newInAstro)
-  } catch(error) {
-    next(error)
+    const body = req.body;
+
+    const newInAstro = await productServices.createAstroProduct(body);
+    res.status(200).json(newInAstro);
+  } catch (error) {
+    next(error);
   }
-}
+};
 
 const getAllAstro = async (req, res, next) => {
-try {
-  const allAstro = await productServices.getAllAstroProduct()
-  res.status(200).json(allAstro)
-} catch(error) {
-  next(error)
-}
+  try {
+    const allAstro = await productServices.getAllAstroProduct();
+    res.status(200).json(allAstro);
+  } catch (error) {
+    next(error);
+  }
+};
 
-}
-
+const getOneAstro = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const oneAstro = await productServices.getOneAstroProduct(id);
+    res.status(200).json(oneAstro);
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   getAll,
@@ -73,5 +80,6 @@ module.exports = {
   addProduct,
   updateProductCon,
   createNewAstroProduct,
-  getAllAstro
+  getAllAstro,
+  getOneAstro,
 };
