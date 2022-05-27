@@ -8,6 +8,7 @@ const {
   createNewAstroProduct,
   getAllAstro,
   getOneAstro,
+  deleteProduct,
 } = require('./products.controller');
 const validatorHandler = require('../middlewares/validatorHandler');
 const {
@@ -16,7 +17,7 @@ const {
   getOne,
 } = require('../schemas/prod.schema'); /* DTOs */
 
-//TODO: falta validacion de datos
+//TODO: falta validacion de datos en los endpoints porque estoy evaluando las condiciones de astrosellig
 
 router.get('/', getAll);
 router.post('/', validatorHandler(createProduct, 'body'), addProduct);
@@ -26,7 +27,7 @@ router.get('/astroselling', getAllAstro);
 router.get('/astroselling/:id', getOneAstro);
 
 router.get('/:id', validatorHandler(getOne, 'params'), getProduct);
-router.get('/:id', validatorHandler(getOne, 'params'), getProduct);
 router.patch('/:id', validatorHandler(updateProduct, 'body'), updateProductCon);
+router.delete('/:id', validatorHandler(getOne, 'params'), deleteProduct);
 
 module.exports = router;

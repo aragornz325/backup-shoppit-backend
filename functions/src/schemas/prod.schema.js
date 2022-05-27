@@ -1,11 +1,12 @@
-/* eslint-disable camelcase */
-/* eslint-disable @typescript-eslint/no-var-requires */
-const joi = require('joi')
+const joi = require('joi');
 
 const isAstroselling = joi.boolean();
+const channel_id = joi.number().integer();
 const available_colors = joi.string();
 const available_size = joi.string();
 const categories = joi.string();
+const currency = joi.string().min(3).max(3).default('ARS');
+const stock = joi.number().integer();
 const description = joi.string();
 const featured = joi.boolean();
 const featuredImage = joi.string().uri();
@@ -23,7 +24,7 @@ const name = joi.string().max(40);
 const origin = joi.string().max(20);
 const permalink = joi.string().uri();
 const plataform = joi.string().max(5);
-const price = joi.number().integer().positive();
+const price = joi.any();
 const productAttributes = joi.string();
 const quantity_to_cart = joi.string();
 const regular_price = joi.number().integer().positive();
@@ -38,6 +39,7 @@ const total_sales = joi.number();
 const type = joi.string();
 const updated = joi.array();
 const variable_products = joi.array();
+const variations = joi.any();
 const vendor = joi.object({
   minimum_purchase: joi.number(),
   name: joi.string(),
@@ -50,12 +52,13 @@ const weight = joi.number();
 const width = joi.number();
 const withError = joi.boolean();
 
-
 const createProduct = joi.object({
   isAstroselling: isAstroselling.required(),
+  channel_id: channel_id,
   available_colors: available_colors.required(),
   available_size: available_size.required(),
   categories: categories.required(),
+  currency: currency.required(),
   description: description.required(),
   featured: featured.required(),
   featuredImage: featuredImage.required(),
@@ -88,6 +91,7 @@ const createProduct = joi.object({
   type: type.required(),
   updated: updated.required(),
   variable_products: variable_products.required(),
+  variations: variations,
   vendor: vendor.required(),
   volumen: volumen.required(),
   weight: weight.required(),
@@ -97,9 +101,11 @@ const createProduct = joi.object({
 
 const updateProduct = joi.object({
   isAstroselling,
+  channel_id,
   available_colors,
   available_size,
   categories,
+  currency,
   description,
   featured,
   featuredImage,
@@ -124,6 +130,7 @@ const updateProduct = joi.object({
   sale_price,
   selected_variation,
   sku,
+  stock,
   status,
   stock_quantity,
   short_description,
@@ -132,6 +139,7 @@ const updateProduct = joi.object({
   type,
   updated,
   variable_products,
+  variations,
   vendor,
   volumen,
   weight,

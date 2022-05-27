@@ -44,6 +44,16 @@ const updateProductCon = async (req, res, next) => {
   }
 };
 
+const deleteProduct = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const deleted = await productServices.deleteProductServ(id);
+    res.status(200).json(deleted);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const createNewAstroProduct = async (req, res, next) => {
   try {
     const body = req.body;
@@ -82,4 +92,5 @@ module.exports = {
   createNewAstroProduct,
   getAllAstro,
   getOneAstro,
+  deleteProduct,
 };

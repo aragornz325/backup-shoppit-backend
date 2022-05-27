@@ -10,7 +10,10 @@ const IdMLAstro = process.env.IdMLAstro;
 class ProductServices {
   async getAllSer() {
     const productsArray = [];
-    const products = await db.collection('products').get();
+    const productsRef = db.collection('products');
+    const products = await productsRef
+      .where('isAstroselling', '!=', true)
+      .get();
 
     if (!products.docs || products.docs.length == 0) {
       throw boom.notFound('no products found');
@@ -27,26 +30,43 @@ class ProductServices {
     const doc = await prodRef.get();
     if (!doc.exists) {
       throw boom.notFound('product not found');
+    }
+    if (doc.data().isAstroselling) {
+      const product = await this.getOneAstroProduct(id);
+      return {
+        ...doc.data(),
+        ...product,
+      };
     } else {
-      return doc.data().body;
+      return doc.data();
     }
   }
 
   async updateProductServ(data, id) {
     const refUser = db.collection('products').doc(id);
-
-    const updater = await refUser.update(data);
-    if (updater._writeTime) {
-      return { message: `product ${id} update`, updater };
+    const doc = await refUser.get();
+    if (doc.data().isAstroselling) {
+      const updAstro = await this.updateAstroProduct(
+        data,
+        id,
+        doc.data().channel_id
+      );
+      return updAstro;
+    } else {
+      const updater = await refUser.update(data);
+      if (updater._writeTime) {
+        return { message: `product ${id} update`, updater };
+      }
+      throw boom.notImplemented('not updated');
     }
-    throw boom.notImplemented('not updated');
   }
 
   async AddProductServ(body) {
-    const newProduct = await db.collection('products').add({
-      body,
-    });
-    if (body.isAstroselling) {
+    if (body.isAstroselling && body.channel_id) {
+      const newProduct = await db.collection('products').add({
+        isAstroselling: body.isAstroselling,
+        channel_id: body.channel_id,
+      });
       const dataAstro = {
         id_in_erp: newProduct._path.segments[1],
         sku: newProduct._path.segments[1],
@@ -82,20 +102,27 @@ class ProductServices {
         }),
       };
 
-      const toAstro = await this.createAstroProduct(dataAstro);
-      console.log(toAstro);
+      await this.createAstroProduct(dataAstro, body.channel_id);
+      return {
+        message: 'product created sucssefully',
+        id: newProduct._path.segments[1],
+      };
+    } else {
+      const newProduct = await db.collection('products').add({
+        ...body,
+      });
+      return {
+        message: 'product created sucssefully',
+        id: newProduct._path.segments[1],
+      };
     }
-    return {
-      message: 'product created sucssefully',
-      id: newProduct._path.segments[1],
-    };
   }
 
-  async createAstroProduct(body) {
+  async createAstroProduct(body, channel_id) {
     let newAstro = [];
     await axios
       .post(
-        `https://nova-back.astroselling.com/jupiter/v1/channels/${IdMLAstro}/products?api_token=${apikey}`,
+        `https://nova-back.astroselling.com/jupiter/v1/channels/${channel_id}/products?api_token=${apikey}`,
         { ...body }
       )
       .then(function (response) {
@@ -135,6 +162,55 @@ class ProductServices {
     } else {
       return allAstro.data;
     }
+  }
+
+  async updateAstroProduct(data, id, channel_id) {
+    const resposse = [];
+    console.log(data);
+    await axios
+      .put(
+        `https://nova-back.astroselling.com/jupiter/v1/channels/${channel_id}/products/${id}?api_token=${apikey}`,
+        { data }
+      )
+      .then(function (response) {
+        resposse.push(response.data);
+      })
+      .catch(function (error) {
+        throw new Error(error);
+      });
+    return resposse[0];
+  }
+
+  async deleteProductServ(id) {
+    const refUser = db.collection('products').doc(id);
+    const doc = await refUser.get();
+    if (doc.data().isAstroselling) {
+      try {
+        await this.deleteAstroProduct(id, doc.data().channel_id);
+        await refUser.delete();
+      } catch (error) {
+        throw new Error(error);
+      }
+    }
+    const deleter = await refUser.delete();
+    if (deleter._writeTime) {
+      return { message: `product ${id} deleted`, deleter };
+    }
+    throw boom.notImplemented('not deleted');
+  }
+
+  async deleteAstroProduct(id, channel_id) {
+    const resposse = [];
+    await axios
+      .delete(
+        `https://nova-back.astroselling.com/jupiter/v1/channels/${channel_id}/products/${id}?api_token=${apikey}`
+      )
+      .then(function (response) {
+        resposse.push(response.data);
+      })
+      .catch(function (error) {
+        throw new Error(error);
+      });
   }
 }
 module.exports = ProductServices;
