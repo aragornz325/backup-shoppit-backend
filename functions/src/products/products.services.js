@@ -1,27 +1,41 @@
 const boom = require('@hapi/boom');
-const { serverTimestamp } = require('firebase-admin/firestore');
 const { db } = require('../../config/firebase');
 const axios = require('axios');
 require('dotenv').config();
 
-const apikey = process.env.apikey;
-const IdMLAstro = process.env.IdMLAstro;
+const APIKEY = process.env.APIKEY;
+const IDMLASTRO = process.env.IDMLASTRO;
 
 class ProductServices {
-  async getAllSer() {
-    const productsArray = [];
-    const productsRef = db.collection('products');
-    const products = await productsRef
-      .where('isAstroselling', '!=', true)
+  async getAllSer(limitt, offset) {
+    let allProd = [];
+
+    const prodRef = db
+      .collection('products')
+      .where('isAstroselling', '==', false)
+      .offset(parseInt(offset, 10));
+
+    const products = await prodRef
+      .limit(parseInt(limitt, 10))
+      .orderBy('name')
       .get();
 
-    if (!products.docs || products.docs.length == 0) {
+    products.docs.map((doc) => {
+      allProd.push({ id: doc.id, ...doc.data() });
+    });
+    const astros = await this.getAllAstroProduct();
+    console.log(astros);
+
+    astros.map((doc) => {
+      allProd.push(doc);
+    });
+    allProd = allProd.sort(function () {
+      return Math.random() - 0.5;
+    });
+    if (allProd.length <= 0) {
       throw boom.notFound('no products found');
     }
-    products.docs.map((prod) => {
-      productsArray.push({ id: prod.id, ...prod.data() });
-    });
-    return productsArray;
+    return allProd;
   }
 
   async getProductServ(id) {
@@ -122,7 +136,7 @@ class ProductServices {
     let newAstro = [];
     await axios
       .post(
-        `https://nova-back.astroselling.com/jupiter/v1/channels/${channel_id}/products?api_token=${apikey}`,
+        `https://nova-back.astroselling.com/jupiter/v1/channels/${channel_id}/products?api_token=${APIKEY}`,
         { ...body }
       )
       .then(function (response) {
@@ -136,7 +150,7 @@ class ProductServices {
 
   async getOneAstroProduct(id) {
     const oneAstro = await axios.get(
-      `https://nova-back.astroselling.com/jupiter/v1/channels/${IdMLAstro}/products/${id}?api_token=${apikey}`
+      `https://nova-back.astroselling.com/jupiter/v1/channels/${IDMLASTRO}/products/${id}?api_token=${APIKEY}`
     );
     const response = {
       ...oneAstro.data,
@@ -152,24 +166,29 @@ class ProductServices {
     return response;
   }
 
-  async getAllAstroProduct() {
+  async getAllAstroProduct(limit, offset) {
     const allAstro = await axios.get(
-      `https://nova-back.astroselling.com/jupiter/v1/channels/${IdMLAstro}/products?api_token=${apikey}&limit=20&offset=0`
+      `https://nova-back.astroselling.com/jupiter/v1/channels/${IDMLASTRO}/products?api_token=${APIKEY}&limit=20&offset=0`
     );
 
     if (allAstro.data.data.length <= 0) {
       throw boom.notFound('no products found');
+    }
+    if (limit && offset) {
+      return allAstro.data.data.slice(
+        parseInt(offset, 10),
+        parseInt(limit, 10)
+      );
     } else {
-      return allAstro.data;
+      return allAstro.data.data;
     }
   }
 
   async updateAstroProduct(data, id, channel_id) {
     const resposse = [];
-    console.log(data);
     await axios
       .put(
-        `https://nova-back.astroselling.com/jupiter/v1/channels/${channel_id}/products/${id}?api_token=${apikey}`,
+        `https://nova-back.astroselling.com/jupiter/v1/channels/${channel_id}/products/${id}?api_token=${APIKEY}`,
         { data }
       )
       .then(function (response) {
@@ -203,7 +222,7 @@ class ProductServices {
     const resposse = [];
     await axios
       .delete(
-        `https://nova-back.astroselling.com/jupiter/v1/channels/${channel_id}/products/${id}?api_token=${apikey}`
+        `https://nova-back.astroselling.com/jupiter/v1/channels/${channel_id}/products/${id}?api_token=${APIKEY}`
       )
       .then(function (response) {
         resposse.push(response.data);

@@ -4,8 +4,10 @@ const productServices = new ProductServices();
 
 const getAll = async (req, res, next) => {
   try {
-    const products = await productServices.getAllSer();
-    res.status(200).json(products);
+    const limitt = req.query.limit || 10;
+    const offset = req.query.offset || 0;
+    const allProducts = await productServices.getAllSer(limitt, offset);
+    res.status(200).json(allProducts);
   } catch (error) {
     next(error);
   }
@@ -67,7 +69,9 @@ const createNewAstroProduct = async (req, res, next) => {
 
 const getAllAstro = async (req, res, next) => {
   try {
-    const allAstro = await productServices.getAllAstroProduct();
+    const limit = req.query.limit || 50;
+    const offset = req.query.offset || 0;
+    const allAstro = await productServices.getAllAstroProduct(limit, offset);
     res.status(200).json(allAstro);
   } catch (error) {
     next(error);
