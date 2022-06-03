@@ -2,6 +2,7 @@ const boom = require('@hapi/boom');
 const { db } = require('../../config/firebase');
 const axios = require('axios');
 require('dotenv').config();
+const functions = require('firebase-functions');
 
 const APIKEY = process.env.APIKEY;
 const IDMLASTRO = process.env.IDMLASTRO;
@@ -9,23 +10,17 @@ const IDMLASTRO = process.env.IDMLASTRO;
 class ProductServices {
   async getAllSer(limitt, offset) {
     let allProd = [];
-
     const prodRef = db
       .collection('products')
       .where('isAstroselling', '==', false)
-      .offset(parseInt(offset, 10));
+      .offset(offset);
 
-    const products = await prodRef
-      .limit(parseInt(limitt, 10))
-      .orderBy('name')
-      .get();
+    const products = await prodRef.limit(limitt).orderBy('name').get();
 
     products.docs.map((doc) => {
       allProd.push({ id: doc.id, ...doc.data() });
     });
     const astros = await this.getAllAstroProduct();
-    console.log(astros);
-
     astros.map((doc) => {
       allProd.push(doc);
     });
@@ -35,7 +30,16 @@ class ProductServices {
     if (allProd.length <= 0) {
       throw boom.notFound('no products found');
     }
-    return allProd;
+
+    return {
+      data: allProd,
+      metadata: {
+        limit: limitt,
+        offset: offset,
+        ShoppitProduct: products.docs.length,
+        AstrosellingProduct: astros.length,
+      },
+    };
   }
 
   async getProductServ(id) {
@@ -68,10 +72,10 @@ class ProductServices {
       return updAstro;
     } else {
       const updater = await refUser.update(data);
-      if (updater._writeTime) {
-        return { message: `product ${id} update`, updater };
+      if (!updater._writeTime) {
+        throw boom.notImplemented('not updated');
       }
-      throw boom.notImplemented('not updated');
+      return { message: `product ${id} update`, updater };
     }
   }
 
@@ -184,11 +188,14 @@ class ProductServices {
     }
   }
 
-  async updateAstroProduct(data, id, channel_id) {
+  async updateAstroProduct(data, id) {
+    const prodRef = db.collection('products').doc(id);
+    const prodDoc = await prodRef.get();
     const resposse = [];
+    functions.logger.info(data);
     await axios
       .put(
-        `https://nova-back.astroselling.com/jupiter/v1/channels/${channel_id}/products/${id}?api_token=${APIKEY}`,
+        `https://nova-back.astroselling.com/jupiter/v1/channels/${IDMLASTRO}/products/${id}?api_token=${APIKEY}`,
         { data }
       )
       .then(function (response) {

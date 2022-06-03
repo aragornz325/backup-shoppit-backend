@@ -9,6 +9,7 @@ const {
   getAllAstro,
   getOneAstro,
   deleteProduct,
+  updateAstroProductCon,
 } = require('./products.controller');
 const validatorHandler = require('../middlewares/validatorHandler');
 const {
@@ -25,6 +26,7 @@ router.post('/', validatorHandler(createProduct, 'body'), addProduct);
 router.post('/astroselling', createNewAstroProduct);
 router.get('/astroselling', getAllAstro);
 router.get('/astroselling/:id', getOneAstro);
+router.patch('/astroselling/:id', updateAstroProductCon);
 
 router.get('/:id', validatorHandler(getOne, 'params'), getProduct);
 router.patch('/:id', validatorHandler(updateProduct, 'body'), updateProductCon);

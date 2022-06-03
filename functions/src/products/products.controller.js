@@ -4,10 +4,12 @@ const productServices = new ProductServices();
 
 const getAll = async (req, res, next) => {
   try {
-    const limitt = req.query.limit || 10;
-    const offset = req.query.offset || 0;
+    const limitt = Number(req.query.limit) || 10;
+    const offset = Number(req.query.offset) || 0;
     const allProducts = await productServices.getAllSer(limitt, offset);
-    res.status(200).json(allProducts);
+    res.status(200).json({
+      ...allProducts,
+    });
   } catch (error) {
     next(error);
   }
@@ -88,6 +90,17 @@ const getOneAstro = async (req, res, next) => {
   }
 };
 
+const updateAstroProductCon = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { body } = req;
+    const updateAstro = await productServices.updateAstroProduct(body, id);
+    res.status(200).json(updateAstro);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getAll,
   getProduct,
@@ -97,4 +110,5 @@ module.exports = {
   getAllAstro,
   getOneAstro,
   deleteProduct,
+  updateAstroProductCon,
 };
