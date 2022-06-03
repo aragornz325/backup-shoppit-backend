@@ -43,21 +43,29 @@ class ProductServices {
   }
 
   async getProductServ(id) {
+    let astroProduct = {};
     const prodRef = db.collection('products').doc(id);
 
-    const doc = await prodRef.get();
+    let doc = await prodRef.get();
+
     if (!doc.exists) {
       throw boom.notFound('product not found');
     }
-    if (doc.data().isAstroselling) {
+
+    if (doc.data().isAstroselling === true) {
       const product = await this.getOneAstroProduct(id);
-      return {
-        ...doc.data(),
-        ...product,
-      };
-    } else {
-      return doc.data();
+      astroProduct = product;
     }
+    if (
+      doc.data().isAstroselling &&
+      doc.data().stock_quantity !== astroProduct.stock
+    ) {
+      await prodRef.update({ stock_quantity: astroProduct.stock });
+      const prodUpd = await prodRef.get();
+      return prodUpd.data();
+    }
+
+    return doc.data();
   }
 
   async updateProductServ(data, id) {
