@@ -196,6 +196,8 @@ class ProductServices {
     }
   }
 
+  //! no funvciona el endpoint de la plataforma de astroselling para actualizar, se implement la logica
+  //! pero aun no esta completa
   async updateAstroProduct(data, id) {
     const prodRef = db.collection('products').doc(id);
     const prodDoc = await prodRef.get();
