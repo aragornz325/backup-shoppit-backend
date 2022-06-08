@@ -1,5 +1,5 @@
 const UserServices = require('./user.services');
-const service = new UserServices;
+const service = new UserServices();
 
 const customerClaim = async (req, res, next) => {
   try {
@@ -10,17 +10,17 @@ const customerClaim = async (req, res, next) => {
   }
 };
 
-const decodeIdToken = async(req, res, next) => {
+const decodeIdToken = async (req, res, next) => {
   try {
-    const {idToken} = req.body;  
+    const { idToken } = req.body;
     const decoded = await service.verifyIdToken(idToken);
     //TODO: Sacar esta funcion, es solo de prueba
     await service.customerClaimServ(decoded.uid);
     res.json(decoded);
   } catch (error) {
-    next(error) 
+    next(error);
   }
-}
+};
 
 //!No se pueden crear usuarios desde el backend
 //TODO: Revisar si hay alguna forma o sacarlo
@@ -33,19 +33,29 @@ const createUserWithEmailAndPassword = async (req, res, next) => {
   }
 };
 
-const getChannelsAstro = async(req, res, next) => {
+const getChannelsAstro = async (req, res, next) => {
   try {
     const check = await service.checkChannelAstroselling();
-    res.status(200).send(check)
-  } catch(error) {
-    next(error)    
+    res.status(200).send(check);
+  } catch (error) {
+    next(error);
   }
-}
+};
 
+const updateSeller = async (req, res, next) => {
+  try {
+    const { body } = req.body;
+    const update = await service.updateSellerServ(body);
+    res.status(200).send(update);
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   customerClaim,
   createUserWithEmailAndPassword,
   decodeIdToken,
-  getChannelsAstro
+  getChannelsAstro,
+  updateSeller,
 };
