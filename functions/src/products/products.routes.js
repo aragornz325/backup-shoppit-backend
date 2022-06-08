@@ -10,6 +10,8 @@ const {
   getOneAstro,
   deleteProduct,
   updateAstroProductCon,
+  creteInBatcher,
+  deleteInBatcher,
 } = require('./products.controller');
 const validatorHandler = require('../middlewares/validatorHandler');
 const {
@@ -25,6 +27,9 @@ router.post('/', validatorHandler(createProduct, 'body'), addProduct);
 
 router.post('/astroselling', createNewAstroProduct);
 router.get('/astroselling', getAllAstro);
+router.post('/batch', creteInBatcher);
+router.delete('/batch', deleteInBatcher);
+
 router.get('/astroselling/:id', getOneAstro);
 router.patch('/astroselling/:id', updateAstroProductCon);
 

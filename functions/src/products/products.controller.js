@@ -101,6 +101,26 @@ const updateAstroProductCon = async (req, res, next) => {
   }
 };
 
+const creteInBatcher = async (req, res, next) => {
+  try {
+    const { body } = req;
+    const newProduct = await productServices.batchCreateProduct(body);
+    res.status(200).json(newProduct);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteInBatcher = async (req, res, next) => {
+  try {
+    const { body } = req;
+    const deleted = await productServices.batchDeleteProduct(body);
+    res.status(200).json(deleted);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getAll,
   getProduct,
@@ -111,4 +131,6 @@ module.exports = {
   getOneAstro,
   deleteProduct,
   updateAstroProductCon,
+  creteInBatcher,
+  deleteInBatcher,
 };

@@ -6,6 +6,7 @@ const functions = require('firebase-functions');
 
 const APIKEY = process.env.APIKEY;
 const IDMLASTRO = process.env.IDMLASTRO;
+const URL = process.env.URL_ASTRO;
 
 class ProductServices {
   async getAllSer(limitt, offset) {
@@ -90,17 +91,16 @@ class ProductServices {
   async AddProductServ(body) {
     if (body.isAstroselling && body.channel_id) {
       const newProduct = await db.collection('products').add({
-        isAstroselling: body.isAstroselling,
-        channel_id: body.channel_id,
+        ...body,
       });
       const dataAstro = {
         id_in_erp: newProduct._path.segments[1],
         sku: newProduct._path.segments[1],
         title: body.name,
         description: body.description,
-        currency: 'ARS',
-        price: 152,
-        stock: 10,
+        currency: 'ARS', //TODO cambiar cuando se implemente el pago
+        price: 152, //TODO cambiar cuando se implemente el pago
+        stock: 10, //TODO cambiar cuando se implemente actualizar en astroselling
         variations: body.variable_products.map((variation) => {
           return {
             id_in_erp:
@@ -147,10 +147,7 @@ class ProductServices {
   async createAstroProduct(body, channel_id) {
     let newAstro = [];
     await axios
-      .post(
-        `https://nova-back.astroselling.com/jupiter/v1/channels/${channel_id}/products?api_token=${APIKEY}`,
-        { ...body }
-      )
+      .post(`${URL}/${channel_id}/products?api_token=${APIKEY}`, { ...body })
       .then(function (response) {
         newAstro.push(response.data);
       })
@@ -162,7 +159,7 @@ class ProductServices {
 
   async getOneAstroProduct(id) {
     const oneAstro = await axios.get(
-      `https://nova-back.astroselling.com/jupiter/v1/channels/${IDMLASTRO}/products/${id}?api_token=${APIKEY}`
+      `${URL}/${IDMLASTRO}/products/${id}?api_token=${APIKEY}`
     );
     const response = {
       ...oneAstro.data,
@@ -247,6 +244,24 @@ class ProductServices {
       .catch(function (error) {
         throw new Error(error);
       });
+  }
+
+  async batchCreateProduct(body) {
+    for (let i = 0; i < body.length; i++) {
+      await this.AddProductServ(body[i], body[i].channel_id);
+    }
+
+    return { message: 'products created sucssefully' };
+  }
+
+  async batchDeleteProduct(body) {
+    const batch = db.batch();
+    for (let i = 0; i < body.length; i++) {
+      const ref = db.collection('products').doc(body[i]);
+      batch.delete(ref);
+    }
+    await batch.commit();
+    return { message: 'products deleted sucssefully' };
   }
 }
 module.exports = ProductServices;
