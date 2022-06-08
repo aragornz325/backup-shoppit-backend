@@ -38,7 +38,6 @@ class PushServices {
         room_id: room.data().id,
       },
     };
-    console.log('que paso?');
     const pushSender = await axios.post(pushUrl, data, {
       headers: {
         Authorization: `bearer ${pushToken}`,
