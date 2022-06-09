@@ -7,6 +7,7 @@ const functions = require('firebase-functions');
 const { auth } = require('firebase-admin');
 
 const apikey = process.env.apikey;
+const URL = process.env.URL_ASTRO;
 
 class UserServices {
   async customerClaimServ(id) {
@@ -50,9 +51,7 @@ class UserServices {
 
   async checkChannelAstroselling() {
     try {
-      const channel = await axios.get(
-        `https://nova-back.astroselling.com/jupiter/v1/channels?api_token=${apikey}`
-      );
+      const channel = await axios.get(`${URL}?api_token=${apikey}`);
       return channel.data;
     } catch (error) {
       throw boom.badData(error);
@@ -62,6 +61,8 @@ class UserServices {
   async updateSellerServ(body) {
     functions.logger.info(body);
     const userRef = db.collection('users').doc(body.id);
+    const planRef = db.collection('configurations').doc('planes');
+    const plan = await planRef.get();
     const user = await userRef.get();
     if (!user.exists) {
       throw boom.badData('user not found');
@@ -69,10 +70,29 @@ class UserServices {
     const updSellerInfo = await userRef.update({
       isVender: true,
       activeVender: false,
-      billing: { ...body },
+      billing: {
+        ...body,
+      },
     });
 
+    let planValue = '';
+    switch (body.plan) {
+      case 'planBasic':
+        planValue = plan.data().planBasic;
+        break;
+      case 'planPro':
+        planValue = plan.data().planPro;
+        break;
+      case 'planPremium':
+        planValue = plan.data().planPremium;
+        break;
+      default:
+        planValue = plan.data().planBasic;
+    }
+
     return {
+      msg: 'customer status is seller: inactive',
+      planValue,
       ...updSellerInfo,
     };
   }
@@ -88,7 +108,7 @@ class UserServices {
         'the user does not meet the requirements to be a seller'
       );
     }
-    const setClaim = await auth.setCustomUserClaims(body.id, {
+    await auth.setCustomUserClaims(body.id, {
       seller: true,
     });
     const updSellerInfo = await userRef.update({

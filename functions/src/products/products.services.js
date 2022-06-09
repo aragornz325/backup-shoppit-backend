@@ -177,7 +177,7 @@ class ProductServices {
 
   async getAllAstroProduct(limit, offset) {
     const allAstro = await axios.get(
-      `https://nova-back.astroselling.com/jupiter/v1/channels/${IDMLASTRO}/products?api_token=${APIKEY}&limit=20&offset=0`
+      `${URL}/${IDMLASTRO}/products?api_token=${APIKEY}&limit=20&offset=0`
     );
 
     if (allAstro.data.data.length <= 0) {
@@ -201,10 +201,7 @@ class ProductServices {
     const resposse = [];
     functions.logger.info(data);
     await axios
-      .put(
-        `https://nova-back.astroselling.com/jupiter/v1/channels/${IDMLASTRO}/products/${id}?api_token=${APIKEY}`,
-        { data }
-      )
+      .put(`${URL}/${IDMLASTRO}/products/${id}?api_token=${APIKEY}`, { data })
       .then(function (response) {
         resposse.push(response.data);
       })
@@ -235,9 +232,7 @@ class ProductServices {
   async deleteAstroProduct(id, channel_id) {
     const resposse = [];
     await axios
-      .delete(
-        `https://nova-back.astroselling.com/jupiter/v1/channels/${channel_id}/products/${id}?api_token=${APIKEY}`
-      )
+      .delete(`${URL}/${channel_id}/products/${id}?api_token=${APIKEY}`)
       .then(function (response) {
         resposse.push(response.data);
       })
