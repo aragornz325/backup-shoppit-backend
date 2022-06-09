@@ -3,6 +3,8 @@ const { db } = require('../../config/firebase');
 require('dotenv').config();
 const axios = require('axios');
 const boom = require('@hapi/boom');
+const functions = require('firebase-functions');
+const { auth } = require('firebase-admin');
 
 const apikey = process.env.apikey;
 
@@ -58,7 +60,8 @@ class UserServices {
   }
 
   async updateSellerServ(body) {
-    const userRef = db.collection('users').doc(body.uid);
+    functions.logger.info(body);
+    const userRef = db.collection('users').doc(body.id);
     const user = await userRef.get();
     if (!user.exists) {
       throw boom.badData('user not found');
@@ -70,6 +73,29 @@ class UserServices {
     });
 
     return {
+      ...updSellerInfo,
+    };
+  }
+
+  async activeSellerServ(body) {
+    functions.logger.info(body);
+    const auth = getAuth();
+    const userRef = db.collection('users').doc(body.id);
+    const user = await userRef.get();
+    functions.logger.info(user.data());
+    if (!user.data().isVender || !body.pagoOk) {
+      throw boom.notAcceptable(
+        'the user does not meet the requirements to be a seller'
+      );
+    }
+    const setClaim = await auth.setCustomUserClaims(body.id, {
+      seller: true,
+    });
+    const updSellerInfo = await userRef.update({
+      activeVender: true,
+    });
+    return {
+      msg: 'the user was set as an active seller',
       ...updSellerInfo,
     };
   }

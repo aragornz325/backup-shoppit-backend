@@ -44,8 +44,18 @@ const getChannelsAstro = async (req, res, next) => {
 
 const updateSeller = async (req, res, next) => {
   try {
-    const { body } = req.body;
+    const body = req.body;
     const update = await service.updateSellerServ(body);
+    res.status(200).send(update);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const activeSeller = async (req, res, next) => {
+  try {
+    const body = req.body;
+    const update = await service.activeSellerServ(body);
     res.status(200).send(update);
   } catch (error) {
     next(error);
@@ -58,4 +68,5 @@ module.exports = {
   decodeIdToken,
   getChannelsAstro,
   updateSeller,
+  activeSeller,
 };

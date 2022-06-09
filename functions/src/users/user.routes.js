@@ -3,6 +3,7 @@ const {
   customerClaim,
   getChannelsAstro,
   updateSeller,
+  activeSeller,
 } = require('./user.controller');
 const validatorHandler = require('../middlewares/validatorHandler');
 const { verifyIdToken } = require('../schemas/user.schema'); /* DTOs */
@@ -18,7 +19,7 @@ router.post(
 router.get('/astroselling', getChannelsAstro);
 
 router.post('/sellerUpdate', updateSeller);
-//router.post('sellerSetClaim', customerClaim);
+router.post('/sellerSetClaim', activeSeller);
 
 //!No se pueden crear usuarios desde el backend
 //TODO: Revisar si hay alguna forma o sacarlo
