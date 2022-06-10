@@ -76,7 +76,7 @@ class UserServices {
     });
 
     let planValue = '';
-    switch (body.plan) {
+    switch (body.suscription) {
       case 'planBasic':
         planValue = plan.data().planBasic;
         break;
