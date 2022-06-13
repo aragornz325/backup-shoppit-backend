@@ -3,29 +3,39 @@ const { db } = require("../../config/firebase");
 require('dotenv').config();
 const axios = require('axios');
 const boom = require('@hapi/boom')
-
+const functions = require('firebase-functions')
 const apikey = process.env.apikey
 
 
 class UserServices {
-  async customerClaimServ(id) {
+  async customerClaimServ(id, user) {
     const auth = getAuth();
     await auth.setCustomUserClaims(id, {
       customer: true
     });
     const userRecord = await auth.getUser(id);
-    const check = db.collection('users').doc(userRecord).get()
-    if(check){
-      console.log('usuario ya existe en la DB')
-    }else{
-      db.collection('user').add({
-        ...userRecord
-      })
-      .then((data)=>{console.log( `user created successfully ${data}` )})
-      .catch((error)=>{console.log(error)})
-    }
-
+    functions.logger.info(userRecord);
+    await this.addUserToFirestore(user);
+    functions.logger.info('seteando custom claim')
     return { data: userRecord.customClaims };
+  }
+
+  async addUserToFirestore(user) {
+    try {
+      const userRecord = await db.collection('users').doc(user.uid).get()
+      if (userRecord.exists) {
+        functions.logger.info('usuario ya existe en la DB')
+      } else {
+        //Agregar el usuario a la base de datos
+        db.collection('users').doc(user.uid).set({
+          email: user.email,
+          id: user.uid
+        }).then((data) => { functions.logger.info(`user created successfully ${data}`) })
+          .catch((error) => { functions.logger.info(error) })
+      }
+    } catch (error) {
+      throw boom.badData(error)
+    }
   }
 
   async verifyIdToken(idToken) {
