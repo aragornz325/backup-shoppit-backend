@@ -3,6 +3,7 @@ import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, get
 import axios from 'axios';
 import {app} from './firebase'
 import './App.css';
+import SubscriptionForm from './components/SubscriptionForm';
 const apiURL = "http://localhost:5001/shoppit-app-stg/us-central1/api";
 
 function App() {
@@ -52,6 +53,7 @@ function App() {
         <button onClick={createUser}>Crear Cuenta</button>
         <br></br>
         <button onClick={signIn}>Iniciar Sesion</button>
+      <SubscriptionForm/>
       </header>
     </div>
   );

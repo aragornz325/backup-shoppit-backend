@@ -2,23 +2,30 @@ const { getAuth } = require('firebase-admin/auth');
 const { db } = require('../../config/firebase');
 require('dotenv').config();
 const axios = require('axios');
+<<<<<<< HEAD
 const boom = require('@hapi/boom');
 const functions = require('firebase-functions');
 const { auth } = require('firebase-admin');
 const { sendEmail } = require('../utils/mailer');
 const { activeSeller } = require('../utils/baseMails.js');
 const { info } = require('firebase-functions/logger');
+=======
+const boom = require('@hapi/boom')
+const functions = require('firebase-functions')
+const apikey = process.env.apikey
+>>>>>>> a73143b7075765ea44a251719510c555212c1bb7
 
 const apikey = process.env.apikey;
 const URL = process.env.URL_ASTRO;
 
 class UserServices {
-  async customerClaimServ(id) {
+  async customerClaimServ(id, user) {
     const auth = getAuth();
     await auth.setCustomUserClaims(id, {
       customer: true,
     });
     const userRecord = await auth.getUser(id);
+<<<<<<< HEAD
     const check = db.collection('users').doc(userRecord).get();
     if (check) {
       console.log('usuario ya existe en la DB');
@@ -35,7 +42,30 @@ class UserServices {
         });
     }
 
+=======
+    functions.logger.info(userRecord);
+    await this.addUserToFirestore(user);
+    functions.logger.info('seteando custom claim')
+>>>>>>> a73143b7075765ea44a251719510c555212c1bb7
     return { data: userRecord.customClaims };
+  }
+
+  async addUserToFirestore(user) {
+    try {
+      const userRecord = await db.collection('users').doc(user.uid).get()
+      if (userRecord.exists) {
+        functions.logger.info('usuario ya existe en la DB')
+      } else {
+        //Agregar el usuario a la base de datos
+        db.collection('users').doc(user.uid).set({
+          email: user.email,
+          id: user.uid
+        }).then((data) => { functions.logger.info(`user created successfully ${data}`) })
+          .catch((error) => { functions.logger.info(error) })
+      }
+    } catch (error) {
+      throw boom.badData(error)
+    }
   }
 
   async verifyIdToken(idToken) {
