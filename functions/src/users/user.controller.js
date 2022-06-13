@@ -46,7 +46,7 @@ const updateSeller = async (req, res, next) => {
   try {
     const body = req.body;
     const update = await service.updateSellerServ(body);
-    res.status(200).send(update);
+    res.status(202).send(update);
   } catch (error) {
     next(error);
   }
@@ -62,6 +62,16 @@ const activeSeller = async (req, res, next) => {
   }
 };
 
+const setAdmin = async (req, res, next) => {
+  try {
+    const body = req.body;
+    const update = await service.setAdminServ(body);
+    res.status(200).send(update);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   customerClaim,
   createUserWithEmailAndPassword,
@@ -69,4 +79,5 @@ module.exports = {
   getChannelsAstro,
   updateSeller,
   activeSeller,
+  setAdmin,
 };

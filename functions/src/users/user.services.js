@@ -5,6 +5,9 @@ const axios = require('axios');
 const boom = require('@hapi/boom');
 const functions = require('firebase-functions');
 const { auth } = require('firebase-admin');
+const { sendEmail } = require('../utils/mailer');
+const { activeSeller } = require('../utils/baseMails.js');
+const { info } = require('firebase-functions/logger');
 
 const apikey = process.env.apikey;
 const URL = process.env.URL_ASTRO;
@@ -93,7 +96,6 @@ class UserServices {
     return {
       msg: 'customer status is seller: inactive',
       planValue,
-      ...updSellerInfo,
     };
   }
 
@@ -114,8 +116,38 @@ class UserServices {
     const updSellerInfo = await userRef.update({
       activeVender: true,
     });
+    const mail = {
+      from: 'shoppit info',
+      to: user.data().email,
+      subject: 'tu cuenta ha sido activada',
+      html: activeSeller(),
+    };
+    const send = await sendEmail(mail);
+    functions.logger.info(send);
     return {
       msg: 'the user was set as an active seller',
+      ...updSellerInfo,
+    };
+  }
+
+  async setAdminServ(body) {
+    const auth = getAuth();
+    const userRef = db.collection('users').doc(body.id);
+    const user = await userRef.get();
+    if (!user.data().isVender) {
+      /* se debe cambiar por la evaluacion necesaria para ser admin*/
+      throw boom.notAcceptable(
+        'the user does not meet the requirements to be a Admin'
+      );
+    }
+    await auth.setCustomUserClaims(body.id, {
+      admin: true,
+    });
+    const updSellerInfo = await userRef.update({
+      isAdmin: true,
+    });
+    return {
+      msg: 'the user was set as an admin',
       ...updSellerInfo,
     };
   }
