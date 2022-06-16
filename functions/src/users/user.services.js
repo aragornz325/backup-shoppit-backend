@@ -79,24 +79,28 @@ class UserServices {
     }
   }
 
-  async updateSellerServ(body) {
-    functions.logger.info(body);
-    const userRef = db.collection('users').doc(body.id);
+  async updateSellerServ(body, id) {
+    const userRef = db.collection('users').doc(id);
     const planRef = db.collection('configurations').doc('planes');
     const plan = await planRef.get();
     const user = await userRef.get();
     if (!user.exists) {
       throw boom.badData('user not found');
     }
-    const token = jwtSign(body.id, user.data().name, user.data().email);
-    const updSellerInfo = await userRef.update({
-      isVender: true,
-      activeVender: false,
-      billing: {
-        tokenVerification: token,
-        ...body,
+    const token = jwtSign(id, user.data().name, user.data().email);
+
+    const updSellerInfo = await userRef.set(
+      {
+        isVender: true,
+        status: 'pending',
+        activeVender: false,
+        billing: {
+          tokenVerification: token,
+          ...body,
+        },
       },
-    });
+      { merge: true }
+    );
 
     // let planValue = '';
     // switch (body.suscription) {
@@ -124,12 +128,11 @@ class UserServices {
     };
   }
 
-  async activeSellerServ(body) {
+  async activeSellerServ(body, id) {
     const payload = jwt.verify(body.tokenVerification, config.secretJWT);
     const auth = getAuth();
-    const userRef = db.collection('users').doc(body.id);
+    const userRef = db.collection('users').doc(id);
     const user = await userRef.get();
-    console.log(user.data());
     if (body.tokenVerification !== user.data().billing.tokenVerification) {
       throw boom.badData('token invalid');
     }
@@ -139,13 +142,13 @@ class UserServices {
       );
     }
     //await mercadopago.consultSubscription(body.pagoId);
-    await auth.setCustomUserClaims(body.id, {
+    await auth.setCustomUserClaims(id, {
       seller: true,
     });
     const updSellerInfo = await userRef.set(
       {
         billing: { tokenVerification: null },
-        activeVender: true,
+        status: 'active',
       },
       { merge: true }
     );

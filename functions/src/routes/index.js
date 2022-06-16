@@ -8,12 +8,12 @@ const pushRouter = require('../notifications/push/push.router');
 
 function routerApi(app) {
   app.use('/users', useRouter);
-  app.use('/products', productRouter);
-  app.use('/faqs', faqRouter);
-  app.use('/categories', categoriesRouter);
-  app.use('/carts', cartRouter);
-  app.use('/sales', salesRouter);
-  app.use('/push', pushRouter);
+  //app.use('/products', productRouter);
+  //app.use('/faqs', faqRouter);
+  //app.use('/categories', categoriesRouter);
+  //app.use('/carts', cartRouter);
+  //app.use('/sales', salesRouter);
+  //app.use('/push', pushRouter);
 }
 
 module.exports = routerApi;

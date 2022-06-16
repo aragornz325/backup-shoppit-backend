@@ -12,19 +12,12 @@ const { decodeIdToken } = require('./user.controller');
 const router = express.Router();
 
 router.get('/', customerClaim);
-router.post(
-  '/verify-token',
+//router.post('/verify-token', validatorHandler(verifyIdToken, 'body'), decodeIdToken );
+//router.get('/astroselling', getChannelsAstro);
 
-  validatorHandler(verifyIdToken, 'body'),
-  decodeIdToken
-);
-router.get('/astroselling', getChannelsAstro);
+router.put('/:id/seller', updateSeller);
+router.post('/:id/verify-payment', activeSeller);
 
-router.post('/sellerUpdate', updateSeller);
-router.post('/sellerSetClaim', activeSeller);
-
-//!No se pueden crear usuarios desde el backend
-//TODO: Revisar si hay alguna forma o sacarlo
 // app.post('/sign-in', validatorHandler(createUssAndPass, 'body'),
 //   createUserWithEmailAndPassword);
 

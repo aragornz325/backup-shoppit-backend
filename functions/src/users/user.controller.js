@@ -45,7 +45,9 @@ const getChannelsAstro = async (req, res, next) => {
 const updateSeller = async (req, res, next) => {
   try {
     const body = req.body;
-    const update = await service.updateSellerServ(body);
+    const { id } = req.params;
+    console.log(id);
+    const update = await service.updateSellerServ(body, id);
     res.status(202).send(update);
   } catch (error) {
     next(error);
@@ -55,7 +57,8 @@ const updateSeller = async (req, res, next) => {
 const activeSeller = async (req, res, next) => {
   try {
     const body = req.body;
-    const update = await service.activeSellerServ(body);
+    const { id } = req.params;
+    const update = await service.activeSellerServ(body, id);
     res.status(200).send(update);
   } catch (error) {
     next(error);
