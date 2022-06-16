@@ -6,9 +6,9 @@ require('dotenv').config();
 //credenciales
 initializeApp({
   credential: cert({
-    clientEmail: process.env.CLIENT_EMAIL,
-    privateKey: process.env.PRIVATE_KEY,
-    projectId: process.env.PROJECT_ID,
+    clientEmail: process.env.PROD_CLIENT_EMAIL,
+    privateKey: process.env.PROD_PRIVATE_KEY,
+    projectId: process.env.PROD_PROJECT_ID,
   }),
   databaseURL: process.env.DATABASE_URL,
 });

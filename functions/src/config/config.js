@@ -9,6 +9,9 @@ const config = {
   email: process.env.EMAIL,
   passEmail: process.env.PASSWORDEMAIL,
   userEmail: process.env.USEREMAIL,
+  tokenMP: process.env.ACCESS_TOKEN_MP,
+  apiKeyShoppit: process.env.APIKEYSHOPPIT,
+  secretJWT: process.env.AUTH_JWT_SECRET,
 };
 
 module.exports = { config };

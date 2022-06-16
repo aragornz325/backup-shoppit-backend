@@ -1,8 +1,8 @@
-const boom = require("@hapi/boom");
+const boom = require('@hapi/boom');
+const { config } = require('../config/config');
 
 function chequearRoles(...roles) {
   return (req, res, next) => {
-
     const token = res.locals.decoded;
     console.log(token);
     roles.map((rol) => {
@@ -13,8 +13,18 @@ function chequearRoles(...roles) {
       }
     });
 
-    next(boom.unauthorized(`you do not have the permissions for this resource`))
+    next(
+      boom.unauthorized(`you do not have the permissions for this resource`)
+    );
+  };
+}
+function checkApiKey(req, res, next) {
+  const apiKey = req.headers['api'];
+  if (apiKey === config.apiKeyShoppit) {
+    next();
+  } else {
+    next(boom.unauthorized('need API KEY'));
   }
 }
 
-module.exports = chequearRoles;
+module.exports = { chequearRoles, checkApiKey };

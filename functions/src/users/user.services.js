@@ -2,18 +2,17 @@ const { getAuth } = require('firebase-admin/auth');
 const { db } = require('../../config/firebase');
 require('dotenv').config();
 const axios = require('axios');
-<<<<<<< HEAD
 const boom = require('@hapi/boom');
 const functions = require('firebase-functions');
 const { auth } = require('firebase-admin');
 const { sendEmail } = require('../utils/mailer');
 const { activeSeller } = require('../utils/baseMails.js');
 const { info } = require('firebase-functions/logger');
-=======
-const boom = require('@hapi/boom')
-const functions = require('firebase-functions')
-const apikey = process.env.apikey
->>>>>>> a73143b7075765ea44a251719510c555212c1bb7
+const Mercadopago = require('../MercadoPago/mercadopago');
+const mercadopago = new Mercadopago();
+const { jwtSign } = require('../utils/jwtSign');
+const jwt = require('jsonwebtoken');
+const { config } = require('../config/config');
 
 const apikey = process.env.apikey;
 const URL = process.env.URL_ASTRO;
@@ -24,47 +23,36 @@ class UserServices {
     await auth.setCustomUserClaims(id, {
       customer: true,
     });
-    const userRecord = await auth.getUser(id);
-<<<<<<< HEAD
-    const check = db.collection('users').doc(userRecord).get();
-    if (check) {
-      console.log('usuario ya existe en la DB');
-    } else {
-      db.collection('user')
-        .add({
-          ...userRecord,
-        })
-        .then((data) => {
-          console.log(`user created successfully ${data}`);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-
-=======
-    functions.logger.info(userRecord);
     await this.addUserToFirestore(user);
-    functions.logger.info('seteando custom claim')
->>>>>>> a73143b7075765ea44a251719510c555212c1bb7
-    return { data: userRecord.customClaims };
+    functions.logger.info('seteando custom claim');
+    return { msg: 'ok' };
   }
 
   async addUserToFirestore(user) {
     try {
-      const userRecord = await db.collection('users').doc(user.uid).get()
-      if (userRecord.exists) {
-        functions.logger.info('usuario ya existe en la DB')
+      const userRef = await db
+        .collection('users')
+        .where('email', '==', user.email)
+        .get();
+      if (userRef.exists) {
+        functions.logger.info('usuario ya existe en la DB');
       } else {
         //Agregar el usuario a la base de datos
-        db.collection('users').doc(user.uid).set({
-          email: user.email,
-          id: user.uid
-        }).then((data) => { functions.logger.info(`user created successfully ${data}`) })
-          .catch((error) => { functions.logger.info(error) })
+        db.collection('users')
+          .doc(user.uid)
+          .set({
+            email: user.email,
+            id: user.uid,
+          })
+          .then((data) => {
+            functions.logger.info(`user created successfully ${data}`);
+          })
+          .catch((error) => {
+            functions.logger.info(error);
+          });
       }
     } catch (error) {
-      throw boom.badData(error)
+      throw boom.badData(error);
     }
   }
 
@@ -100,52 +88,67 @@ class UserServices {
     if (!user.exists) {
       throw boom.badData('user not found');
     }
+    const token = jwtSign(body.id, user.data().name, user.data().email);
     const updSellerInfo = await userRef.update({
       isVender: true,
       activeVender: false,
       billing: {
+        tokenVerification: token,
         ...body,
       },
     });
 
-    let planValue = '';
-    switch (body.suscription) {
-      case 'planBasic':
-        planValue = plan.data().planBasic;
-        break;
-      case 'planPro':
-        planValue = plan.data().planPro;
-        break;
-      case 'planPremium':
-        planValue = plan.data().planPremium;
-        break;
-      default:
-        planValue = plan.data().planBasic;
-    }
+    // let planValue = '';
+    // switch (body.suscription) {
+    //   case 'planBasic':
+    //     planValue = plan.data().planBasic;
+    //     break;
+    //   case 'planPro':
+    //     planValue = plan.data().planPro;
+    //     break;
+    //   case 'planPremium':
+    //     planValue = plan.data().planPremium;
+    //     break;
+    //   default:
+    //     planValue = plan.data().planBasic;
+    //}
 
+    //const reason = body.suscription;
+    //const amount = planValue;
+    //const frequency = 1;
+
+    //const payment = await mercadopago.createPlan(reason, amount, frequency);
     return {
       msg: 'customer status is seller: inactive',
-      planValue,
+      tokenVerification: token,
     };
   }
 
   async activeSellerServ(body) {
-    functions.logger.info(body);
+    const payload = jwt.verify(body.tokenVerification, config.secretJWT);
     const auth = getAuth();
     const userRef = db.collection('users').doc(body.id);
     const user = await userRef.get();
-    functions.logger.info(user.data());
-    if (!user.data().isVender || !body.pagoOk) {
+    console.log(user.data());
+    if (body.tokenVerification !== user.data().billing.tokenVerification) {
+      throw boom.badData('token invalid');
+    }
+    if (!user.data().isVender || !body.pagoId) {
       throw boom.notAcceptable(
         'the user does not meet the requirements to be a seller'
       );
     }
+    //await mercadopago.consultSubscription(body.pagoId);
     await auth.setCustomUserClaims(body.id, {
       seller: true,
     });
-    const updSellerInfo = await userRef.update({
-      activeVender: true,
-    });
+    const updSellerInfo = await userRef.set(
+      {
+        billing: { tokenVerification: null },
+        activeVender: true,
+      },
+      { merge: true }
+    );
     const mail = {
       from: 'shoppit info',
       to: user.data().email,
