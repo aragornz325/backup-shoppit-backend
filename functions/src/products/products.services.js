@@ -11,20 +11,17 @@ const URL = process.env.URL_ASTRO;
 class ProductServices {
   async getAllSer(limitt, offset) {
     let allProd = [];
-    const prodRef = db
-      .collection('products')
-      .where('isAstroselling', '==', false)
-      .offset(offset);
+    const prodRef = db.collection('products').offset(offset);
 
     const products = await prodRef.limit(limitt).orderBy('name').get();
 
     products.docs.map((doc) => {
       allProd.push({ id: doc.id, ...doc.data() });
     });
-    const astros = await this.getAllAstroProduct();
-    astros.map((doc) => {
-      allProd.push(doc);
-    });
+    // const astros = await this.getAllAstroProduct();
+    // astros.map((doc) => {
+    //   allProd.push(doc);
+    // });
     allProd = allProd.sort(function () {
       return Math.random() - 0.5;
     });
@@ -38,7 +35,7 @@ class ProductServices {
         limit: limitt,
         offset: offset,
         ShoppitProduct: products.docs.length,
-        AstrosellingProduct: astros.length,
+        //AstrosellingProduct: astros.length,
       },
     };
   }
