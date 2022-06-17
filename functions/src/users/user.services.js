@@ -141,7 +141,12 @@ class UserServices {
         'the user does not meet the requirements to be a seller'
       );
     }
-    //await mercadopago.consultSubscription(body.pagoId);
+    const response = await mercadopago.consultSubscription(body.pagoId);
+    console.log('esto es response------------------->', response);
+    if (response.status !== 'authorized') {
+      throw boom.badData('the payment is not authorized');
+    }
+
     await auth.setCustomUserClaims(id, {
       seller: true,
     });

@@ -46,13 +46,18 @@ class Mercadopago {
     if (!id) {
       throw boom.badRequest('missing required fields');
     }
-    console.log('entrando en el pago');
-    let consult = await axios.get(`${urlConsult}/${id}?`, {
-      headers: {
-        Authorization: `Bearer ` + tokenConsult,
-      },
-    });
-    functions.logger.info(consult.data);
+    console.log(id);
+    try {
+      let consult = await axios.get(`${urlConsult}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${tokenConsult}`,
+        },
+      });
+      console.log('esto es la consulta----------->', consult);
+      return consult;
+    } catch (error) {
+      throw boom.badRequest(error);
+    }
   }
 }
 
