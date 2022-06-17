@@ -24,7 +24,7 @@ class Mercadopago {
         currency_id: 'ARS',
       },
     };
-    console.log(tokenMP);
+
     try {
       let result = await axios.post(
         'https://api.mercadopago.com/preapproval_plan',
@@ -46,17 +46,15 @@ class Mercadopago {
     if (!id) {
       throw boom.badRequest('missing required fields');
     }
-    console.log(id);
     try {
       let consult = await axios.get(`${urlConsult}/${id}`, {
         headers: {
           Authorization: `Bearer ${tokenConsult}`,
         },
       });
-      console.log('esto es la consulta----------->', consult);
       return consult;
     } catch (error) {
-      throw boom.badRequest(error);
+      throw new Error(error);
     }
   }
 }
