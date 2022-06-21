@@ -42,7 +42,7 @@ routerApi(app);
 
 exports.setCustomerClaim = functions.auth
   .user()
-  .onCreate((user) => userService.customerClaimServ(user.uid, user));
+  .onCreate((user) => userService.setCustomerClaim(user.uid, user));
 app.use(error404Handler);
 app.use(logErrors);
 app.use(boomErrorHandler);

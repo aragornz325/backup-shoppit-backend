@@ -9,21 +9,24 @@ const { sendEmail } = require('../utils/mailer');
 const { activeSeller } = require('../utils/baseMails.js');
 const { info } = require('firebase-functions/logger');
 const Mercadopago = require('../MercadoPago/mercadopago');
+const UserRepository = require('./user.repository');
+const userRepository = new UserRepository();
 const mercadopago = new Mercadopago();
 const { jwtSign } = require('../utils/jwtSign');
 const jwt = require('jsonwebtoken');
 const { config } = require('../config/config');
 
-const apikey = process.env.apikey;
-const URL = process.env.URL_ASTRO;
+class UserService {
+  // constructor(userRepository) {
+  //   this.repository = UserRepository;
+  // }
 
-class UserServices {
-  async customerClaimServ(id, user) {
+  async setCustomerClaim(id, user) {
     const auth = getAuth();
     await auth.setCustomUserClaims(id, {
       customer: true,
     });
-    await this.addUserToFirestore(user);
+    await userRepository.createUser(user);
     functions.logger.info('seteando custom claim');
     return { msg: 'ok' };
   }
@@ -69,15 +72,6 @@ class UserServices {
   //   if (!user) throw boom.unauthorized("User already exists");
   //   return user;
   // }
-
-  async checkChannelAstroselling() {
-    try {
-      const channel = await axios.get(`${URL}?api_token=${apikey}`);
-      return channel.data;
-    } catch (error) {
-      throw boom.badData(error);
-    }
-  }
 
   async updateSellerServ(body, id) {
     const userRef = db.collection('users').doc(id);
@@ -129,20 +123,20 @@ class UserServices {
   }
 
   async activeSellerServ(body, id) {
-    const payload = jwt.verify(body.tokenVerification, config.secretJWT);
+    //const payload = jwt.verify(body.tokenVerification, config.secretJWT);
     const auth = getAuth();
     const userRef = db.collection('users').doc(id);
     const user = await userRef.get();
-    if (body.tokenVerification !== user.data().billing.tokenVerification) {
-      throw boom.badData('token invalid');
-    }
+    // if (body.tokenVerification !== user.data().billing.tokenVerification) {
+    //   throw boom.badData('token invalid');
+    // }
     if (!user.data().isVender || !body.pagoId) {
       throw boom.notAcceptable(
         'the user does not meet the requirements to be a seller'
       );
     }
     const response = await mercadopago.consultSubscription(body.pagoId);
-    console.log('esto es response------------------->', response);
+
     if (response.status !== 'authorized') {
       throw boom.badData('the payment is not authorized');
     }
@@ -194,4 +188,4 @@ class UserServices {
   }
 }
 
-module.exports = UserServices;
+module.exports = UserService;
