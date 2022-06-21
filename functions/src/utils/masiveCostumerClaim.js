@@ -3,6 +3,9 @@ const { db } = require('../../config/firebase');
 const functions = require('firebase-functions');
 const boom = require('@hapi/boom');
 
+//! esta funcion convertirar todos los usuarios en customer
+//!se ejecutara a travez de un endpoint en la api, no con un script
+
 const masivecustomClaim = async (req, res, next) => {
   try {
     const auth = getAuth();
