@@ -23,7 +23,7 @@ function checkApiKey(req, res, next) {
   if (apiKey === config.apiKeyShoppit) {
     next();
   } else {
-    next(boom.unauthorized('need API KEY'));
+    next(boom.unauthorized('unauthorized'));
   }
 }
 
