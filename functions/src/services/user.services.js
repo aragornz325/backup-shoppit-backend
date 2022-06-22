@@ -14,9 +14,9 @@ const jwt = require('jsonwebtoken');
 const { config } = require('../config/config');
 
 class UserServices {
-  async customerClaimServ(id, user) {
+  async setCustomerClaimToUser(user) {
     const auth = getAuth();
-    await auth.setCustomUserClaims(id, {
+    await auth.setCustomUserClaims(user.uid, {
       customer: true,
     });
     await userRepository.createUser(user);
@@ -24,22 +24,12 @@ class UserServices {
     return { msg: 'ok' };
   }
 
-  async verifyIdToken(idToken) {
-    const token = await getAuth().verifyIdToken(idToken);
-    return token;
-  }
+  async transformCustomerToSeller(body, id) {
+    const user = await userRepository.getUserById(id);
+    const token = jwtSign(id, user.name, user.email);
 
-  async updateSellerServ(body, id) {
-    const userRef = db.collection('users').doc(id);
-    const planRef = db.collection('configurations').doc('planes');
-    const plan = await planRef.get();
-    const user = await userRef.get();
-    if (!user.exists) {
-      throw boom.badData('user not found');
-    }
-    const token = jwtSign(id, user.data().name, user.data().email);
-
-    const updSellerInfo = await userRef.set(
+    await userRepository.updateUser(
+      id,
       {
         isVender: true,
         status: 'pending',
@@ -49,44 +39,27 @@ class UserServices {
           ...body,
         },
       },
-      { merge: true }
+      true
     );
 
-    // let planValue = '';
-    // switch (body.suscription) {
-    //   case 'planBasic':
-    //     planValue = plan.data().planBasic;
-    //     break;
-    //   case 'planPro':
-    //     planValue = plan.data().planPro;
-    //     break;
-    //   case 'planPremium':
-    //     planValue = plan.data().planPremium;
-    //     break;
-    //   default:
-    //     planValue = plan.data().planBasic;
-    //}
-
-    //const reason = body.suscription;
-    //const amount = planValue;
-    //const frequency = 1;
-
-    //const payment = await mercadopago.createPlan(reason, amount, frequency);
     return {
-      msg: 'customer status is seller: inactive',
+      message: 'ok',
       tokenVerification: token,
     };
   }
 
-  async activeSellerServ(body, id) {
-    const payload = jwt.verify(body.tokenVerification, config.secretJWT);
+  async verifySellerPayment(body, id) {
+    jwt.verify(body.tokenVerification, config.secretJWT);
     const auth = getAuth();
-    const userRef = db.collection('users').doc(id);
-    const user = await userRef.get();
-    if (body.tokenVerification !== user.data().billing.tokenVerification) {
-      throw boom.badData('token invalid');
+    const user = await userRepository.getUserById(id);
+    if (body.tokenVerification !== user.billing.tokenVerification) {
+      functions.logger.error('invalid token');
+      throw boom.badData('invalid token');
     }
-    if (!user.data().isVender || !body.pagoId) {
+    if (!user.isVender || !body.pagoId) {
+      functions.logger.warn(
+        'the user does not meet the requirements to be a seller'
+      );
       throw boom.notAcceptable(
         'the user does not meet the requirements to be a seller'
       );
@@ -95,52 +68,32 @@ class UserServices {
     functions.logger.info(response.data);
 
     if (response.data.status !== 'authorized') {
+      functions.logger.warn('the payment is not authorizedt');
       throw boom.badData('the payment is not authorized');
     }
 
     await auth.setCustomUserClaims(id, {
       seller: true,
     });
-    const updSellerInfo = await userRef.set(
+
+    await userRepository.updateUser(
+      id,
       {
         billing: { tokenVerification: null },
         status: 'active',
       },
-      { merge: true }
+      true
     );
+
     const mail = {
       from: 'shoppit info',
       to: user.data().email,
       subject: 'tu cuenta ha sido activada',
       html: activeSeller(),
     };
-    const send = await sendEmail(mail);
-    functions.logger.info(send);
+    await sendEmail(mail);
     return {
-      msg: 'the user was set as an active seller',
-      ...updSellerInfo,
-    };
-  }
-
-  async setAdminServ(body) {
-    const auth = getAuth();
-    const userRef = db.collection('users').doc(body.id);
-    const user = await userRef.get();
-    if (!user.data().isVender) {
-      /* se debe cambiar por la evaluacion necesaria para ser admin*/
-      throw boom.notAcceptable(
-        'the user does not meet the requirements to be a Admin'
-      );
-    }
-    await auth.setCustomUserClaims(body.id, {
-      admin: true,
-    });
-    const updSellerInfo = await userRef.update({
-      isAdmin: true,
-    });
-    return {
-      msg: 'the user was set as an admin',
-      ...updSellerInfo,
+      msg: 'ok',
     };
   }
 }

@@ -30,6 +30,28 @@ class UserRepository {
       throw boom.badData(error);
     }
   }
+
+  async getUserById(id) {
+    const userRef = db.collection('users').doc(id);
+    const user = await userRef.get();
+    if (!user.exists) {
+      functions.logger.error(`user with ID ${id} not found`);
+      throw boom.badData(`user with ID ${id} not found`);
+    }
+    return user.data();
+  }
+
+  async updateUser(id, payload, merge) {
+    const userRef = db.collection('users').doc(id);
+    const user = await userRef.get();
+    if (!user.exists) {
+      functions.logger.error(`user with ID ${id} not found`);
+      throw boom.badData(`user with ID ${id} not found`);
+    }
+    await userRef.set(payload, { merge: merge });
+    functions.logger.info(`update ok`);
+    return;
+  }
 }
 
 module.exports = UserRepository;

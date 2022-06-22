@@ -10,14 +10,14 @@ const {
   error404Handler,
 } = require('./src/middlewares/error.handler');
 const routerApi = require('./src/routers/index');
-const UserServices = require('./src/services/user.services');
+const UserController = require('./src/controllers/user.controller');
+const userController = new UserController();
 const swaggerUI = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const { checkApiKey } = require('./src/middlewares/auth.handler');
 const swaggerEdit = require('./src/utils/swaggerSpec');
-const userService = new UserServices();
 const swaggerSpec = swaggerEdit;
 
 const app = express();
@@ -33,12 +33,17 @@ app.use(cors({ origin: true }));
 app.use(checkApiKey);
 app.use(morgan('dev'));
 app.use(helmet());
-
+app.get('/status', (req, res) => {
+  res.status(200).end();
+});
+app.head('/status', (req, res) => {
+  res.status(200).end();
+});
 routerApi(app);
 
 exports.setCustomerClaim = functions.auth
   .user()
-  .onCreate((user) => userService.setCustomerClaim(user.uid, user));
+  .onCreate((user) => userController.setcustomerClaimToNewUser(user));
 app.use(error404Handler);
 app.use(logErrors);
 app.use(boomErrorHandler);

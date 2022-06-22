@@ -10,10 +10,7 @@ const router = express.Router();
 
 router.get('/masiveclaims', masivecustomClaim);
 
-router.put('/:id/seller', usercontroller.updateSeller);
-router.post('/:id/verify-payment', usercontroller.activeSeller);
-
-// app.post('/sign-in', validatorHandler(createUssAndPass, 'body'),
-//   createUserWithEmailAndPassword);
+router.put('/:id/seller', usercontroller.transformCustomerToSeller);
+router.post('/:id/verify-payment', usercontroller.verifySellerPayment);
 
 module.exports = router;

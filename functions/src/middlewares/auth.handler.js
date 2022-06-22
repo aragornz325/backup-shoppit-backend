@@ -1,13 +1,14 @@
 const boom = require('@hapi/boom');
 const { config } = require('../config/config');
+const functions = require('firebase-functions');
 
 function chequearRoles(...roles) {
   return (req, res, next) => {
     const token = res.locals.decoded;
-    console.log(token);
+    functions.logger.info(token);
     roles.map((rol) => {
       const hasRole = token.hasOwnProperty(rol);
-      console.log(hasRole);
+      functions.logger.info(hasRole);
       if (hasRole) {
         next();
       }
