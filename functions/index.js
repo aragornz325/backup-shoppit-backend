@@ -9,17 +9,13 @@ const {
   boomErrorHandler,
   error404Handler,
 } = require('./src/middlewares/error.handler');
-//modulos personalizados
-
-const routerApi = require('./src/routes/index');
-const UserServices = require('./src/users/user.services');
+const routerApi = require('./src/routers/index');
+const UserServices = require('./src/services/user.services');
 const swaggerUI = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const { checkApiKey } = require('./src/middlewares/auth.handler');
-//const { rateLimiterMiddleware } = require('./src/middlewares/security.handler');
-// nombre
 const swaggerEdit = require('./src/utils/swaggerSpec');
 const userService = new UserServices();
 const swaggerSpec = swaggerEdit;

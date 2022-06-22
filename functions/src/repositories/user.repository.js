@@ -3,10 +3,6 @@ const functions = require('firebase-functions');
 const boom = require('@hapi/boom');
 
 class UserRepository {
-  constructor(db) {
-    this.db = db;
-  }
-
   async createUser(user) {
     try {
       const userRef = await db

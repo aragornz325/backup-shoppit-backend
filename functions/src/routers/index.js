@@ -1,4 +1,4 @@
-const useRouter = require('../users/user.routes');
+const useRouter = require('./user.routes');
 
 function routerApi(app) {
   app.use('/users', useRouter);

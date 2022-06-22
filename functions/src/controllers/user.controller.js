@@ -1,5 +1,6 @@
-const UserServices = require('./user.services');
+const UserServices = require('../services/user.services');
 const service = new UserServices();
+const functions = require('firebase-functions');
 
 class UserController {
   async customerClaim(req, res, next) {
@@ -15,7 +16,6 @@ class UserController {
     try {
       const { idToken } = req.body;
       const decoded = await service.verifyIdToken(idToken);
-      //TODO: Sacar esta funcion, es solo de prueba
       await service.setCustomerClaim(decoded.uid);
       res.json(decoded);
     } catch (error) {
@@ -23,8 +23,6 @@ class UserController {
     }
   }
 
-  //!No se pueden crear usuarios desde el backend
-  //TODO: Revisar si hay alguna forma o sacarlo
   async createUserWithEmailAndPassword(req, res, next) {
     try {
       const user = service.createUserWithEmailAndPasswordsev(req.body);
@@ -47,7 +45,7 @@ class UserController {
     try {
       const body = req.body;
       const { id } = req.params;
-      console.log(id);
+      functions.logger.info(id);
       const update = await service.updateSellerServ(body, id);
       res.status(202).send(update);
     } catch (error) {

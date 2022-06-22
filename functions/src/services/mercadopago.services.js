@@ -1,12 +1,7 @@
 require('dotenv').config();
+const { config } = require('../config/config');
 const boom = require('@hapi/boom');
 const axios = require('axios');
-const config = require('../config/config');
-const functions = require('firebase-functions');
-
-const tokenMP = process.env.ACCESS_TOKEN_MP;
-const urlConsult = process.env.URL_CONSULTA_MP;
-const tokenConsult = process.env.TOKEN_CONSULTA_MP;
 
 class Mercadopago {
   async createPlan(reason, amount, frequency) {
@@ -15,7 +10,7 @@ class Mercadopago {
     }
 
     const body = {
-      back_url: 'https://shoppit.com.ar/suscripcion-request',
+      back_url: config.backUrlMp,
       reason: reason,
       auto_recurring: {
         frequency: frequency,
@@ -26,16 +21,12 @@ class Mercadopago {
     };
 
     try {
-      let result = await axios.post(
-        'https://api.mercadopago.com/preapproval_plan',
-        body,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ` + tokenMP,
-          },
-        }
-      );
+      let result = await axios.post(config.urlConsultaPagos, body, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ` + config.tokenMP,
+        },
+      });
       return result.data;
     } catch (error) {
       throw new Error(error);
@@ -47,9 +38,9 @@ class Mercadopago {
       throw boom.badRequest('missing required fields');
     }
     try {
-      let consult = await axios.get(`${urlConsult}/${id}`, {
+      let consult = await axios.get(`${config.urlConsult}/${id}`, {
         headers: {
-          Authorization: `Bearer ${tokenConsult}`,
+          Authorization: `Bearer ${config.tokenConsult}`,
         },
       });
       return consult;

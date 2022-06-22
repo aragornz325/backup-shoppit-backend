@@ -1,27 +1,20 @@
 const { getAuth } = require('firebase-admin/auth');
 const { db } = require('../../config/firebase');
 require('dotenv').config();
-const axios = require('axios');
 const boom = require('@hapi/boom');
 const functions = require('firebase-functions');
-const { auth } = require('firebase-admin');
 const { sendEmail } = require('../utils/mailer');
 const { activeSeller } = require('../utils/baseMails.js');
-const { info } = require('firebase-functions/logger');
-const Mercadopago = require('../MercadoPago/mercadopago');
-const UserRepository = require('./user.repository');
+const Mercadopago = require('./mercadopago.services');
+const UserRepository = require('../repositories/user.repository');
 const userRepository = new UserRepository();
 const mercadopago = new Mercadopago();
 const { jwtSign } = require('../utils/jwtSign');
 const jwt = require('jsonwebtoken');
 const { config } = require('../config/config');
 
-class UserService {
-  // constructor(userRepository) {
-  //   this.repository = UserRepository;
-  // }
-
-  async setCustomerClaim(id, user) {
+class UserServices {
+  async customerClaimServ(id, user) {
     const auth = getAuth();
     await auth.setCustomUserClaims(id, {
       customer: true,
@@ -31,47 +24,10 @@ class UserService {
     return { msg: 'ok' };
   }
 
-  async addUserToFirestore(user) {
-    try {
-      const userRef = await db
-        .collection('users')
-        .where('email', '==', user.email)
-        .get();
-      if (userRef.exists) {
-        functions.logger.info('usuario ya existe en la DB');
-      } else {
-        //Agregar el usuario a la base de datos
-        db.collection('users')
-          .doc(user.uid)
-          .set({
-            email: user.email,
-            id: user.uid,
-          })
-          .then((data) => {
-            functions.logger.info(`user created successfully ${data}`);
-          })
-          .catch((error) => {
-            functions.logger.info(error);
-          });
-      }
-    } catch (error) {
-      throw boom.badData(error);
-    }
-  }
-
   async verifyIdToken(idToken) {
     const token = await getAuth().verifyIdToken(idToken);
     return token;
   }
-
-  //! No se pueden crear usuarios dedsde el backend ya que este usa firebase-admin
-  //TODO: Revisar si hay alguna forma o sacarlo
-  // async createUserWithEmailAndPswd(email, password) {
-  //   const auth = getAuth();
-  //   const user = await createUserWithEmailAndPassword(getAuth(), email, password);
-  //   if (!user) throw boom.unauthorized("User already exists");
-  //   return user;
-  // }
 
   async updateSellerServ(body, id) {
     const userRef = db.collection('users').doc(id);
@@ -123,21 +79,22 @@ class UserService {
   }
 
   async activeSellerServ(body, id) {
-    //const payload = jwt.verify(body.tokenVerification, config.secretJWT);
+    const payload = jwt.verify(body.tokenVerification, config.secretJWT);
     const auth = getAuth();
     const userRef = db.collection('users').doc(id);
     const user = await userRef.get();
-    // if (body.tokenVerification !== user.data().billing.tokenVerification) {
-    //   throw boom.badData('token invalid');
-    // }
+    if (body.tokenVerification !== user.data().billing.tokenVerification) {
+      throw boom.badData('token invalid');
+    }
     if (!user.data().isVender || !body.pagoId) {
       throw boom.notAcceptable(
         'the user does not meet the requirements to be a seller'
       );
     }
     const response = await mercadopago.consultSubscription(body.pagoId);
+    functions.logger.info(response.data);
 
-    if (response.status !== 'authorized') {
+    if (response.data.status !== 'authorized') {
       throw boom.badData('the payment is not authorized');
     }
 
@@ -188,4 +145,4 @@ class UserService {
   }
 }
 
-module.exports = UserService;
+module.exports = UserServices;
