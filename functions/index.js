@@ -43,7 +43,7 @@ routerApi(app);
 
 exports.setCustomerClaim = functions.auth
   .user()
-  .onCreate((user) => userController.setcustomerClaimToNewUser(user));
+  .onCreate((user) => userController.setCustomerClaimToNewUser(user));
 app.use(error404Handler);
 app.use(logErrors);
 app.use(boomErrorHandler);

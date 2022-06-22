@@ -3,10 +3,10 @@ const service = new UserServices();
 const functions = require('firebase-functions');
 
 class UserController {
-  async setcustomerClaimToNewUser(user) {
+  async setCustomerClaimToNewUser(user) {
     try {
-      const setCC = await service.setCustomerClaimToUser(user);
-      return setCC;
+      await service.setCustomerClaimToUser(user);
+      return;
     } catch (error) {
       throw new Error(error);
     }

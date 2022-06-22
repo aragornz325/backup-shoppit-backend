@@ -10,7 +10,9 @@ class UserRepository {
         .where('email', '==', user.email)
         .get();
       if (userRef.exists) {
-        functions.logger.info('usuario ya existe en la DB');
+        functions.logger.info(
+          `the user with email ${user.email} already exists`
+        );
       } else {
         //Agregar el usuario a la base de datos
         db.collection('users')
