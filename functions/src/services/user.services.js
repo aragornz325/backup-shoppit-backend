@@ -68,6 +68,13 @@ class UserServices {
     functions.logger.info(response.data);
 
     if (response.data.status !== 'authorized') {
+      await userRepository.updateUser(
+        id,
+        {
+          isVender: false,
+        },
+        true
+      );
       functions.logger.warn('the payment is not authorizedt');
       throw boom.badData('the payment is not authorized');
     }
