@@ -7,3 +7,13 @@ typings/
 
 # Node.js dependency directory
 node_modules/
+
+.env
+.env.dev
+.env.prod
+
+firebase-debug.log
+ui-debug.log
+
+./functions/firebase-debug.log
+./functions/ui-debug.log
