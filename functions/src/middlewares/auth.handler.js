@@ -1,24 +1,49 @@
 const boom = require('@hapi/boom');
+const { getAuth } = require('firebase-admin/auth');
 const { config } = require('../config/config');
-const functions = require('firebase-functions');
 
-function chequearRoles(...roles) {
+async function isAuthenticated(req, res, next) {
+  const { authorization } = req.headers;
+  if (!authorization) {
+    next(boom.unauthorized('unauthorized + 1'));
+  }
+  if (!authorization.startsWith('Bearer ')) {
+    next(boom.unauthorized('unauthorized + 2'));
+  }
+  const split = authorization.split('Bearer ');
+  if (split.length !== 2) {
+    next(boom.unauthorized('unauthorized + 3'));
+  }
+  const token = split[1];
+  try {
+    const decodedToken = await getAuth().verifyIdToken(token);
+    res.locals = {
+      ...res.locals,
+      uid: decodedToken.uid,
+      role: decodedToken.role,
+      email: decodedToken.email,
+    };
+    return next();
+  } catch (error) {
+    next(boom.unauthorized('unauthorized'));
+  }
+}
+
+function isAuthorized({ hasRole, allowSameUser }) {
   return (req, res, next) => {
-    const token = res.locals.decoded;
-    functions.logger.info(token);
-    roles.map((rol) => {
-      const hasRole = token.hasOwnProperty(rol);
-      functions.logger.info(hasRole);
-      if (hasRole) {
-        next();
-      }
-    });
-
-    next(
-      boom.unauthorized(`you do not have the permissions for this resource`)
-    );
+    const { role, uid } = res.locals;
+    const id = req.headers['x-user-id'];
+    if (allowSameUser && id && uid === id) {
+      return next();
+    }
+    if (hasRole.includes(...role)) {
+      next();
+    } else {
+      next(boom.unauthorized('unauthorized'));
+    }
   };
 }
+
 function checkApiKey(req, res, next) {
   const apiKey = req.headers['api'];
   if (apiKey === config.apiKeyShoppit) {
@@ -28,4 +53,4 @@ function checkApiKey(req, res, next) {
   }
 }
 
-module.exports = { chequearRoles, checkApiKey };
+module.exports = { checkApiKey, isAuthenticated, isAuthorized };
