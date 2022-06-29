@@ -1,6 +1,4 @@
 const { getAuth } = require('firebase-admin/auth');
-const { db } = require('../../config/firebase');
-require('dotenv').config();
 const boom = require('@hapi/boom');
 const functions = require('firebase-functions');
 const { sendEmail } = require('../utils/mailer');
@@ -9,33 +7,23 @@ const Mercadopago = require('./mercadopago.services');
 const UserRepository = require('../repositories/user.repository');
 const userRepository = new UserRepository();
 const mercadopago = new Mercadopago();
-const { jwtSign } = require('../utils/jwtSign');
-const jwt = require('jsonwebtoken');
-const { config } = require('../config/config');
 
 class UserServices {
   async setCustomerClaimToUser(user) {
     const auth = getAuth();
-    await auth.setCustomUserClaims(user.uid, {
-      customer: true,
-    });
+    await auth.setCustomUserClaims(user.uid, { role: ['customer'] });
+    functions.logger.info(`seting claim to user ${JSON.stringify(user)}`);
     await userRepository.createUser(user);
-    functions.logger.info('seteando custom claim');
     return { msg: 'ok' };
   }
 
   async transformCustomerToSeller(body, id) {
-    const user = await userRepository.getUserById(id);
-    const token = jwtSign(id, user.name, user.email);
-
     await userRepository.updateUser(
       id,
       {
-        isVender: true,
         status: 'pending',
         activeVender: false,
         billing: {
-          tokenVerification: token,
           ...body,
         },
       },
@@ -44,18 +32,12 @@ class UserServices {
 
     return {
       message: 'ok',
-      tokenVerification: token,
     };
   }
 
   async verifySellerPayment(body, id) {
-    jwt.verify(body.tokenVerification, config.secretJWT);
     const auth = getAuth();
     const user = await userRepository.getUserById(id);
-    if (body.tokenVerification !== user.billing.tokenVerification) {
-      functions.logger.error('invalid token');
-      throw boom.badData('invalid token');
-    }
     if (!user.isVender || !body.pagoId) {
       functions.logger.warn(
         'the user does not meet the requirements to be a seller'
@@ -79,15 +61,14 @@ class UserServices {
       throw boom.badData('the payment is not authorized');
     }
 
-    await auth.setCustomUserClaims(id, {
-      seller: true,
-    });
+    await auth.setCustomUserClaims(id, { role: ['seller'] });
 
     await userRepository.updateUser(
       id,
       {
-        billing: { tokenVerification: null },
         status: 'active',
+        isVender: true,
+        activeVender: true,
       },
       true
     );
@@ -102,6 +83,21 @@ class UserServices {
     return {
       msg: 'ok',
     };
+  }
+
+  async getUserById(id) {
+    const user = await userRepository.getUserById(id);
+    return user;
+  }
+
+  async updateUser(id, body) {
+    const user = await userRepository.updateUser(id, body, true);
+    return user;
+  }
+
+  async getUserByEmail(email) {
+    const user = await userRepository.getUserByEmail(email);
+    return user;
   }
 }
 

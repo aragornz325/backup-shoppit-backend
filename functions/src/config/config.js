@@ -13,6 +13,7 @@ const config = {
   tokenConsult: process.env.TOKEN_CONSULTA_MP,
   urlConsultaPagos: process.env.URL_CONSULTA_PAGO_MP,
   backUrlMp: process.env.BACK_URL,
+  apiWeb: process.env.API_WEB_FIREBASE,
 };
 
 module.exports = { config };

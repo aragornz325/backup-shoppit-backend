@@ -44,11 +44,10 @@ routerApi(app);
 exports.setCustomerClaim = functions.auth
   .user()
   .onCreate((user) => userController.setCustomerClaimToNewUser(user));
+
 app.use(error404Handler);
 app.use(logErrors);
 app.use(boomErrorHandler);
 app.use(errorHandler);
 
 exports.api = functions.https.onRequest(app);
-
-//firebase emulators:start --only functions
