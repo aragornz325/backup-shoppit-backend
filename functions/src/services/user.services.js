@@ -5,6 +5,7 @@ const { sendEmail } = require('../utils/mailer');
 const { activeSeller } = require('../utils/baseMails.js');
 const Mercadopago = require('./mercadopago.services');
 const UserRepository = require('../repositories/user.repository');
+const { auth } = require('firebase-admin');
 const userRepository = new UserRepository();
 const mercadopago = new Mercadopago();
 
@@ -95,6 +96,42 @@ class UserServices {
   async getUserByEmail(email) {
     const user = await userRepository.getUserByEmail(email);
     return user;
+  }
+
+  async deactivateUser(id) {
+    await getAuth().updateUser(
+      id,
+      {
+        disabled: true,
+      }
+    )
+
+    await userRepository.updateUser(
+      id, 
+      {
+        status: 'deactivated',
+      }, 
+      true
+    )
+    functions.logger.info(`user with id:${id} has been deactivated`);
+  }
+
+  async activateUser(id) {
+    await getAuth().updateUser(
+      id,
+      {
+        disabled: false,
+      }
+    )
+
+    await userRepository.updateUser(
+      id, 
+      {
+        status: 'activated',
+      }, 
+      true
+    )
+    functions.logger.info(`user with id:${id} has been activated`);
   }
 }
 

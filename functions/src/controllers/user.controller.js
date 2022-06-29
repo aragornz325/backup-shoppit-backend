@@ -54,6 +54,26 @@ class UserController {
       next(error);
     }
   }
+
+  async deactivateUser(req, res, next){
+    try{
+      const { id } = req.params;
+      await service.deactivateUser(id);
+      res.status(200).send({ msg: 'Ok'})
+    } catch ( error ) {
+      next(error)
+    }
+  }
+
+  async activateUser(req, res, next){
+    try{
+      const { id } = req.params;
+      await service.activateUser(id);
+      res.status(200).send({ msg: 'Ok'})
+    } catch ( error ) {
+      next(error)
+    }
+  }
 }
 
 module.exports = UserController;

@@ -47,4 +47,28 @@ router.post(
   usercontroller.verifySellerPayment
 );
 
+
+router.patch(
+  '/:id/deactivate',
+  checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin'],
+    allowSameUser: false,
+  }),
+  usercontroller.deactivateUser
+)
+
+router.patch(
+  '/:id/activate',
+  checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin'],
+    allowSameUser: false,
+  }),
+  usercontroller.activateUser
+)
+
+
 module.exports = router;
