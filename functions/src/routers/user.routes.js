@@ -1,11 +1,11 @@
 const express = require('express');
 const UserController = require('../controllers/user.controller');
 const usercontroller = new UserController();
-const { updateUser } = require('../schemas/user.schema');
 
 const {
   isAuthenticated,
   isAuthorized,
+  checkApiKey,
 } = require('../middlewares/auth.handler');
 
 const validatorHandler = require('../middlewares/validatorHandler');
@@ -14,31 +14,37 @@ const router = express.Router();
 
 router.get('/masiveclaims', masivecustomClaim);
 
-router.get('/:id', usercontroller.getUserById);
+router.get('/:id', checkApiKey, usercontroller.getUserById);
 router.patch(
   '/:id',
-  validatorHandler(updateUser, 'body'),
+  checkApiKey,
+  isAuthenticated,
+  isAuthorized,
+  isAuthorized({
+    hasRole: ['admin'],
+    allowSameUser: true,
+  }),
   usercontroller.updateUser
 );
 router.put(
   '/:id/seller',
+  checkApiKey,
   isAuthenticated,
   isAuthorized({
     hasRole: ['admin'],
-    allowSameUser: false,
+    allowSameUser: true,
   }),
   usercontroller.transformCustomerToSeller
 );
 router.post(
   '/:id/verify-payment',
+  checkApiKey,
   isAuthenticated,
   isAuthorized({
     hasRole: ['admin'],
-    allowSameUser: false,
+    allowSameUser: true,
   }),
   usercontroller.verifySellerPayment
 );
-
-router.get('/', usercontroller.getUserByEmail);
 
 module.exports = router;

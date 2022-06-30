@@ -1,5 +1,6 @@
 const UserServices = require('../services/user.services');
 const service = new UserServices();
+const functions = require('firebase-functions');
 
 class UserController {
   async setCustomerClaimToNewUser(user) {
@@ -37,16 +38,6 @@ class UserController {
     try {
       const { id } = req.params;
       const user = await service.getUserById(id);
-      res.status(200).send(user);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async getUserByEmail(req, res, next) {
-    try {
-      const { email } = req.params;
-      const user = await service.getUserByEmail(email);
       res.status(200).send(user);
     } catch (error) {
       next(error);

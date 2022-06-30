@@ -38,13 +38,10 @@ class UserServices {
   async verifySellerPayment(body, id) {
     const auth = getAuth();
     const user = await userRepository.getUserById(id);
-    if (!user.isVender || !body.pagoId) {
-      functions.logger.warn(
-        'the user does not meet the requirements to be a seller'
-      );
-      throw boom.notAcceptable(
-        'the user does not meet the requirements to be a seller'
-      );
+
+    if (!user.id || !body.pagoId) {
+      functions.logger.warn('missing data to verify seller payment');
+      throw boom.notAcceptable('missing data to verify seller payment');
     }
     const response = await mercadopago.consultSubscription(body.pagoId);
     functions.logger.info(response.data);
@@ -75,7 +72,7 @@ class UserServices {
 
     const mail = {
       from: 'shoppit info',
-      to: user.data().email,
+      to: user.email,
       subject: 'tu cuenta ha sido activada',
       html: activeSeller(),
     };

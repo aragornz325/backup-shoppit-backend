@@ -1,7 +1,6 @@
 const { db } = require('../../config/firebase');
 const functions = require('firebase-functions');
 const boom = require('@hapi/boom');
-const { sendEmail } = require('../utils/mailer');
 
 class UserRepository {
   async createUser(user) {
@@ -65,10 +64,13 @@ class UserRepository {
   async getUserById(id) {
     const userRef = db.collection('users').doc(id);
     const user = await userRef.get();
+    functions.logger.info(user.data());
+
     if (!user.exists) {
       functions.logger.error(`user with ID ${id} not found`);
       throw boom.badData(`user with ID ${id} not found`);
     }
+
     return user.data();
   }
 
