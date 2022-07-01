@@ -43,6 +43,57 @@ module.exports = swaggerEdit;
  *     bearerFormat: JWT
  */
 
+// update seller
+/**
+ * @swagger
+ * path:
+ * /users/{id}:
+ *  patch:
+ *    summary: actualiza los datos de un usuario
+ *    tags: [Users]
+ *    description: actualiza los datos del usuario, se verifica el body con DTO
+ *    parameters:
+ *    - in: path
+ *      name: id
+ *      required: true
+ *      schema:
+ *       type: string
+ *       format: uuid
+ *       example: "QbcLwTdVEoRuGejmVKIu"
+ *    - in: header
+ *      name: x-user-id
+ *      required: true
+ *      schema:
+ *        type: string
+ *        format: uuid
+ *        example: "QbcLwTdVEoRuGejmVKIu"
+ *    requestBody:
+ *     required: true
+ *     content:
+ *      application/json:
+ *        schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Users'
+ *
+ *    security:
+ *     - ApiKeySecurity: []
+ *    responses:
+ *       200:
+ *         description: billing updated
+ *         content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  message:
+ *                    type: string
+ *                    example: ok
+ *
+ *
+ *    401:
+ *     description: "Error: Unauthorized"
+ */
+
 // set Seller
 /**
  * @swagger
@@ -247,7 +298,7 @@ module.exports = swaggerEdit;
  *        billing:
  *          type: object
  *          properties:
- *            $ref: '#/components/schemas/UpdateSellerBilling'
+ *          $ref: '#/components/schemas/UpdateSellerBilling'
  *        cookie:
  *          type: string
  *        id:
@@ -261,6 +312,42 @@ module.exports = swaggerEdit;
  *              format: int64
  *            type:
  *              type: string
+ *        isConsultor:
+ *          type: boolean
+ *        isSocial:
+ *          type: boolean
+ *        isVender:
+ *          type: boolean
+ *        loggedIn:
+ *          type: boolean
+ *        minimum_purchase:
+ *          type: integer
+ *        nicename:
+ *          type: string
+ *        picture:
+ *          type: string
+ *          format: url
+ *        product_id_selected_from_web:
+ *          type: string
+ *        purchases:
+ *          type: array
+ *        recentProducts:
+ *          type: array
+ *        sheetsId:
+ *          type: string
+ *        storeName:
+ *          type: string
+ *        storePicture:
+ *          type: string
+ *          format: url
+ *        url:
+ *          type: string
+ *        username:
+ *          type: string
+ *        wishList:
+ *          type: array
+ *        password:
+ *          type: string
  *    UpdateSellerBilling:
  *      type: object
  *      properties:
