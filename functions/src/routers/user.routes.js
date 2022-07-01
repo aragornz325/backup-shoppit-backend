@@ -14,7 +14,17 @@ const router = express.Router();
 
 router.get('/masiveclaims', masivecustomClaim);
 
-router.get('/:id', checkApiKey, usercontroller.getUserById);
+router.get(
+  '/:id',
+  checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin'],
+    allowSameUser: true,
+  }),
+  usercontroller.getUserById
+);
+
 router.patch(
   '/:id',
   checkApiKey,
@@ -47,7 +57,6 @@ router.post(
   usercontroller.verifySellerPayment
 );
 
-
 router.patch(
   '/:id/deactivate',
   checkApiKey,
@@ -57,7 +66,7 @@ router.patch(
     allowSameUser: false,
   }),
   usercontroller.deactivateUser
-)
+);
 
 router.patch(
   '/:id/activate',
@@ -68,7 +77,6 @@ router.patch(
     allowSameUser: false,
   }),
   usercontroller.activateUser
-)
-
+);
 
 module.exports = router;
