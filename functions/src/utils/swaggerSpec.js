@@ -52,6 +52,21 @@ module.exports = swaggerEdit;
  *    summary: envio de formulario para setear en vendedor
  *    tags: [Users]
  *    description: completa el billing del objeto usuario con los datos obtenidos del formulario, se validan con DTO,
+ *    parameters:
+ *    - in: path
+ *      name: id
+ *      required: true
+ *      schema:
+ *       type: string
+ *       format: uuid
+ *       example: "QbcLwTdVEoRuGejmVKIu"
+ *    - in: header
+ *      name: x-user-id
+ *      required: true
+ *      schema:
+ *        type: string
+ *        format: uuid
+ *        example: "QbcLwTdVEoRuGejmVKIu"
  *    requestBody:
  *     required: true
  *     content:
@@ -88,6 +103,21 @@ module.exports = swaggerEdit;
  *    summary: verifica el pago del vendedor
  *    tags: [Users]
  *    description: verifica el pago del vendedor en la API de mercado pago
+ *    parameters:
+ *    - in: path
+ *      name: id
+ *      required: true
+ *      schema:
+ *       type: string
+ *       format: uuid
+ *       example: "QbcLwTdVEoRuGejmVKIu"
+ *    - in: header
+ *      name: x-user-id
+ *      required: true
+ *      schema:
+ *        type: string
+ *        format: uuid
+ *        example: "QbcLwTdVEoRuGejmVKIu"
  *    requestBody:
  *      required: true
  *      content:
@@ -102,7 +132,93 @@ module.exports = swaggerEdit;
  *     - ApiKeySecurity: []
  *    responses:
  *       200:
- *         description: billing updated
+ *         description: pay verificated successfully and update user customClaim
+ *         content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  msg:
+ *                    type: string
+ *                    example: ok
+ *
+ *
+ *    401:
+ *     description: "Error: Unauthorized"
+ */
+
+// deactive user
+/**
+ * @swagger
+ * path:
+ * /users/{id}/deactivate:
+ *  patch:
+ *    summary: desactiva un usuario
+ *    tags: [Users]
+ *    description: desactiva un usuario impidiendo que pueda loguearse
+ *    parameters:
+ *    - in: path
+ *      name: id
+ *      required: true
+ *      schema:
+ *       type: string
+ *       format: uuid
+ *       example: "QbcLwTdVEoRuGejmVKIu"
+ *    - in: header
+ *      name: x-user-id
+ *      required: true
+ *      schema:
+ *        type: string
+ *        format: uuid
+ *        example: "QbcLwTdVEoRuGejmVKIu"
+ *    security:
+ *     - ApiKeySecurity: []
+ *    responses:
+ *       200:
+ *         description: user deactivated
+ *         content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  msg:
+ *                    type: string
+ *                    example: ok
+ *
+ *
+ *    401:
+ *     description: "Error: Unauthorized"
+ */
+
+// active user
+/**
+ * @swagger
+ * path:
+ * /users/{id}/activate:
+ *  patch:
+ *    summary: activa un usuario
+ *    tags: [Users]
+ *    description: activa un usuario permitiendole loguearse
+ *    parameters:
+ *    - in: path
+ *      name: id
+ *      required: true
+ *      schema:
+ *       type: string
+ *       format: uuid
+ *       example: "QbcLwTdVEoRuGejmVKIu"
+ *    - in: header
+ *      name: x-user-id
+ *      required: true
+ *      schema:
+ *        type: string
+ *        format: uuid
+ *        example: "QbcLwTdVEoRuGejmVKIu"
+ *    security:
+ *     - ApiKeySecurity: []
+ *    responses:
+ *       200:
+ *         description: user actived
  *         content:
  *            application/json:
  *              schema:
@@ -122,6 +238,29 @@ module.exports = swaggerEdit;
  *  @swagger
  * components:
  *  schemas:
+ *    Users:
+ *      type: object
+ *      properties:
+ *        email:
+ *          type: string
+ *          format: email
+ *        billing:
+ *          type: object
+ *          properties:
+ *            $ref: '#/components/schemas/UpdateSellerBilling'
+ *        cookie:
+ *          type: string
+ *        id:
+ *          type: string
+ *          format: uuid
+ *        identification:
+ *          type: object
+ *          properties:
+ *            number:
+ *              type: integer
+ *              format: int64
+ *            type:
+ *              type: string
  *    UpdateSellerBilling:
  *      type: object
  *      properties:
