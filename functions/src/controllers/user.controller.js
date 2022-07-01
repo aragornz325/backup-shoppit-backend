@@ -55,23 +55,47 @@ class UserController {
     }
   }
 
-  async deactivateUser(req, res, next){
-    try{
+  async deactivateUser(req, res, next) {
+    try {
       const { id } = req.params;
       await service.deactivateUser(id);
-      res.status(200).send({ msg: 'Ok'})
-    } catch ( error ) {
-      next(error)
+      res.status(200).send({ msg: 'Ok' });
+    } catch (error) {
+      next(error);
     }
   }
 
-  async activateUser(req, res, next){
-    try{
+  async activateUser(req, res, next) {
+    try {
       const { id } = req.params;
       await service.activateUser(id);
-      res.status(200).send({ msg: 'Ok'})
-    } catch ( error ) {
-      next(error)
+      res.status(200).send({ msg: 'Ok' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getOne(req, res, next) {
+    try {
+      let email = null;
+      let firstName = null;
+      let lastName = null;
+      if (req.query.email) {
+        email = req.query.email;
+      }
+      if (req.query.firstName) {
+        firstName = req.query.firstName;
+      }
+      if (req.query.lastName) {
+        lastName = req.query.lastName;
+      }
+      functions.logger.info(
+        `email:${email} firstName:${firstName} lastName:${lastName}`
+      );
+      const user = await service.getOne(email, lastName, firstName);
+      res.status(200).send(user);
+    } catch (error) {
+      next(error);
     }
   }
 }

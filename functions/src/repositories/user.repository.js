@@ -102,6 +102,25 @@ class UserRepository {
       });
     return userN;
   }
+
+  async getOne(email, firstName, lastName) {
+    let userN = '';
+    await db
+      .collection('users')
+      .where('email', '==', email)
+      .where('firstName', '==', firstName)
+      .where('lastName', '==', lastName)
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          userN = doc.data();
+        });
+      })
+      .catch((err) => {
+        functions.logger.error(err);
+      });
+    return userN;
+  }
 }
 
 module.exports = UserRepository;

@@ -12,6 +12,7 @@ const validatorHandler = require('../middlewares/validatorHandler');
 const { masivecustomClaim } = require('../utils/masiveCostumerClaim');
 const router = express.Router();
 
+router.get('/search ', usercontroller.getOne);
 router.get('/masiveclaims', masivecustomClaim);
 
 router.get(
