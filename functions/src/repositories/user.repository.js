@@ -103,24 +103,23 @@ class UserRepository {
     return userN;
   }
 
-  async getOne(email, firstName, lastName) {
-    let userN = '';
-    await db
+  async getOne(query) {
+    let userN = [];
+    const parameter = Object.keys(query).toString();
+    const objetive = query[parameter];
+    const collectionRef = db
       .collection('users')
-      .where('email', '==', email)
-      .where('firstName', '==', firstName)
-      .where('lastName', '==', lastName)
-      .get()
-      .then((snapshot) => {
-        snapshot.forEach((doc) => {
-          userN = doc.data();
-        });
-      })
-      .catch((err) => {
-        functions.logger.error(err);
+      .where(parameter, '==', objetive);
+
+    await collectionRef.get().then((snapshot) => {
+      snapshot.forEach((doc) => {
+        userN.push(doc.data());
       });
-    return userN;
+    });
+    return {
+      userN,
+      total: userN.length,
+    };
   }
 }
-
 module.exports = UserRepository;

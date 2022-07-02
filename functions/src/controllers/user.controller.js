@@ -75,24 +75,39 @@ class UserController {
     }
   }
 
+  async getUserByEmail(req, res, next) {
+    try {
+      const { email } = req.query;
+      if (!email) {
+        throw new Error('email is required');
+      }
+      const user = await service.getUserByEmail(email);
+      res.status(200).send(user);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getOne(req, res, next) {
     try {
-      let email = null;
-      let firstName = null;
-      let lastName = null;
-      if (req.query.email) {
-        email = req.query.email;
-      }
-      if (req.query.firstName) {
-        firstName = req.query.firstName;
-      }
-      if (req.query.lastName) {
-        lastName = req.query.lastName;
-      }
-      functions.logger.info(
-        `email:${email} firstName:${firstName} lastName:${lastName}`
-      );
-      const user = await service.getOne(email, lastName, firstName);
+      // let email = undefined;
+      // let firstName = undefined;
+      // let lastName = undefined;
+      // if (req.query.email) {
+      //   email = req.query.email;
+      // }
+      // if (req.query.firstName) {
+      //   firstName = req.query.firstName;
+      // }
+      // if (req.query.lastName) {
+      //   lastName = req.query.lastName;
+      // }
+      // functions.logger.info(
+      //   `email:${email} firstName:${firstName} lastName:${lastName}`
+      // );
+      const query = req.query;
+      const user = await service.getOne(query);
+
       res.status(200).send(user);
     } catch (error) {
       next(error);

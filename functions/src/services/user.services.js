@@ -128,8 +128,8 @@ class UserServices {
     functions.logger.info(`user with id:${id} has been activated`);
   }
 
-  async getOne(email, firstName, lastName) {
-    const user = await userRepository.getOne(email, firstName, lastName);
+  async getOne(query) {
+    const user = await userRepository.getOne(query);
     return user;
   }
 }
