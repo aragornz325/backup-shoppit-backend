@@ -64,7 +64,6 @@ class UserRepository {
   async getUserById(id) {
     const userRef = db.collection('users').doc(id);
     const user = await userRef.get();
-    functions.logger.info(user.data());
 
     if (!user.exists) {
       functions.logger.error(`user with ID ${id} not found`);
