@@ -38,9 +38,13 @@ module.exports = swaggerEdit;
  *     in: header
  *     name: api
  *   Token:
+ *     name: Authorization
  *     type: http
  *     scheme: bearer
  *     bearerFormat: JWT
+ *
+ *
+ *
  */
 
 // update seller
@@ -76,6 +80,7 @@ module.exports = swaggerEdit;
  *          $ref: '#/components/schemas/Users'
  *
  *    security:
+ *     - Token: []
  *     - ApiKeySecurity: []
  *    responses:
  *       200:
@@ -127,6 +132,7 @@ module.exports = swaggerEdit;
  *          $ref: '#/components/schemas/UpdateSellerBilling'
  *
  *    security:
+ *     - Token: []
  *     - ApiKeySecurity: []
  *    responses:
  *       200:
@@ -180,6 +186,7 @@ module.exports = swaggerEdit;
  *                type: string
  *                example: "2c35awra43a843wa3w3f4w38"
  *    security:
+ *     - Token: []
  *     - ApiKeySecurity: []
  *    responses:
  *       200:
@@ -223,6 +230,7 @@ module.exports = swaggerEdit;
  *        format: uuid
  *        example: "QbcLwTdVEoRuGejmVKIu"
  *    security:
+ *     - Token: []
  *     - ApiKeySecurity: []
  *    responses:
  *       200:
@@ -266,6 +274,7 @@ module.exports = swaggerEdit;
  *        format: uuid
  *        example: "QbcLwTdVEoRuGejmVKIu"
  *    security:
+ *     - Token: []
  *     - ApiKeySecurity: []
  *    responses:
  *       200:

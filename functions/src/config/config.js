@@ -14,6 +14,9 @@ const config = {
   urlConsultaPagos: process.env.URL_CONSULTA_PAGO_MP,
   backUrlMp: process.env.BACK_URL,
   apiWeb: process.env.API_WEB_FIREBASE,
+  algoliaApiSearch: process.env.ALGOLIA_API_SEARCH,
+  algoliaAppId: process.env.ALGOLIA_APP_ID,
+  algoliaIndexName: process.env.ALGOLIA_INDEX_NAME,
 };
 
 module.exports = { config };

@@ -90,21 +90,6 @@ class UserController {
 
   async getOne(req, res, next) {
     try {
-      // let email = undefined;
-      // let firstName = undefined;
-      // let lastName = undefined;
-      // if (req.query.email) {
-      //   email = req.query.email;
-      // }
-      // if (req.query.firstName) {
-      //   firstName = req.query.firstName;
-      // }
-      // if (req.query.lastName) {
-      //   lastName = req.query.lastName;
-      // }
-      // functions.logger.info(
-      //   `email:${email} firstName:${firstName} lastName:${lastName}`
-      // );
       const query = req.query;
       const user = await service.getOne(query);
 

@@ -9,6 +9,8 @@ const { auth } = require('firebase-admin');
 const userRepository = new UserRepository();
 const mercadopago = new Mercadopago();
 
+const { freeSearch } = require('../utils/free.search.algolia');
+
 class UserServices {
   async setCustomerClaimToUser(user) {
     const auth = getAuth();
@@ -129,7 +131,7 @@ class UserServices {
   }
 
   async getOne(query) {
-    const user = await userRepository.getOne(query);
+    const user = await freeSearch(query);
     return user;
   }
 }

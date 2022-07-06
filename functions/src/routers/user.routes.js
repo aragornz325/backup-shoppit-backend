@@ -12,6 +12,7 @@ const validatorHandler = require('../middlewares/validatorHandler');
 const { masivecustomClaim } = require('../utils/masiveCostumerClaim');
 const router = express.Router();
 const functions = require('firebase-functions');
+const { db } = require('../../config/firebase');
 
 router.get(
   '',
