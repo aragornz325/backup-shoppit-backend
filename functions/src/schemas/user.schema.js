@@ -28,6 +28,19 @@ const username = joi.string();
 const wishList = joi.array();
 const password = joi.string().alphanum().min(4).max(12);
 const email = joi.string().email();
+const role = joi.string().valid('admin', 'vender', 'customer');
+const status = joi.string().valid('active', 'inactive', 'pending');
+const search = joi.string();
+const limit = joi.string().min(1).max(2);
+const offset = joi.string().min(1).max(2);
+
+const querySchema = joi.object({
+  role,
+  status,
+  search,
+  limit,
+  offset,
+});
 
 const createUser = joi.object({
   firstName: firstName.required(),
@@ -79,6 +92,7 @@ const updateUser = joi.object({
   url: url,
   username: username,
   wishList: wishList,
+  role: role,
 });
 
 const createUssAndPass = joi.object({
@@ -94,4 +108,5 @@ module.exports = {
   updateUser,
   createUssAndPass,
   verifyIdToken,
+  querySchema,
 };

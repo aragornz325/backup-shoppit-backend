@@ -1,6 +1,14 @@
 const { db } = require('../../config/firebase');
 const functions = require('firebase-functions');
 const boom = require('@hapi/boom');
+const { config } = require('../config/config');
+const algoliasearch = require('algoliasearch');
+
+const client = algoliasearch(
+  `${config.algoliaAppId}`,
+  `${config.algoliaApiSearch}`
+);
+const index = client.initIndex(`${config.algoliaUsersIndexName}`);
 
 class UserRepository {
   async createUser(user) {
@@ -32,6 +40,7 @@ class UserRepository {
               identification: {},
               isConsultor: false,
               isSocial: false,
+              isAdmin: false,
               isVender: false,
               loggedIn: true,
               minimum_purchase: 0,
@@ -46,6 +55,7 @@ class UserRepository {
               url: '',
               username: user.displayName,
               wishList: [],
+              role: 'customer',
             },
             { merge: true }
           )
@@ -64,7 +74,6 @@ class UserRepository {
   async getUserById(id) {
     const userRef = db.collection('users').doc(id);
     const user = await userRef.get();
-    functions.logger.info(user.data());
 
     if (!user.exists) {
       functions.logger.error(`user with ID ${id} not found`);
@@ -86,22 +95,125 @@ class UserRepository {
     return;
   }
 
-  async getUserByEmail(email) {
-    let userN = '';
-    await db
+  async getUsersByFilter(search) {
+    let userN = [];
+    const parameter = Object.keys(search).toString();
+    const objetive = search[parameter];
+    const collectionRef = db
       .collection('users')
-      .where('email', '==', email)
+      .where(parameter, '==', objetive);
+
+    await collectionRef.get().then((snapshot) => {
+      snapshot.forEach((doc) => {
+        userN.push(doc.data());
+      });
+    });
+    return {
+      userN,
+      total: userN.length,
+    };
+  }
+
+  async getUsers(search, role, status, limit, offset) {
+    if (!search) {
+      const users = await this.getUsersWithoutAlgolia(
+        role,
+        status,
+        limit,
+        offset
+      );
+      return users;
+    } else {
+      const users = await this.getUsersWithAlgolia(
+        search,
+        role,
+        status,
+        limit,
+        offset
+      );
+      return users;
+    }
+  }
+
+  async getIndexAlgolia(search, limit) {
+    let usersAlgolia = [];
+    let result = [];
+    await index
+      .search(`${search}`, {
+        hitsPerPage: parseInt(limit, 10),
+      })
+      .then(({ hits }) => (usersAlgolia = hits))
+      .catch((err) => {
+        throw boom.badData(err);
+      });
+    usersAlgolia.forEach((user) => {
+      result.push(user.objectID);
+    });
+    return result;
+  }
+
+  //TODO: manejar offset
+  async getUsersWithoutAlgolia(role, status, limit, offset) {
+    functions.logger.info('execute search users without algolia');
+    let collectionRef = db.collection('users');
+    if (role) {
+      collectionRef = collectionRef.where('rol', '==', role);
+    }
+    if (status) {
+      collectionRef = collectionRef.where('status', '==', status);
+    }
+
+    const users = [];
+    await collectionRef
+      .limit(parseInt(limit, 10))
       .get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
-          userN = doc.data();
+          users.push(doc.data());
         });
       })
       .catch((err) => {
-        functions.logger.error(err);
+        throw boom.badData(err);
       });
-    return userN;
+
+    if (users.length <= 0) {
+      return { users: [], total: 0 };
+    } else {
+      return { users, total: users.length };
+    }
+  }
+  //TODO: manejar offset
+  async getUsersWithAlgolia(search, role, status, limit, offset) {
+    functions.logger.info('execute search users with algolia');
+    const indexAlgolia = await this.getIndexAlgolia(search, limit);
+
+    if (indexAlgolia.length <= 0) {
+      return { users: [], total: 0 };
+    }
+    let collectionRef = db.collection('users').where('id', 'in', indexAlgolia);
+
+    if (role) {
+      collectionRef = collectionRef.where('role', '==', role);
+    }
+    if (status) {
+      collectionRef = collectionRef.where('status', '==', status);
+    }
+    const users = [];
+    await collectionRef
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          users.push(doc.data());
+        });
+      })
+      .catch((err) => {
+        throw boom.badData(err);
+      });
+    if (users.length <= 0) {
+      return { users: [], total: 0 };
+    } else {
+      return { users, total: users.length };
+    }
   }
 }
-
 module.exports = UserRepository;

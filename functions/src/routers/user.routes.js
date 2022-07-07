@@ -8,13 +8,25 @@ const {
   checkApiKey,
 } = require('../middlewares/auth.handler');
 
+const { querySchema } = require('../schemas/user.schema');
 const validatorHandler = require('../middlewares/validatorHandler');
 const { masivecustomClaim } = require('../utils/masiveCostumerClaim');
 const router = express.Router();
 
+router.get('', validatorHandler(querySchema, 'query'), usercontroller.getUsers);
 router.get('/masiveclaims', masivecustomClaim);
 
-router.get('/:id', checkApiKey, usercontroller.getUserById);
+router.get(
+  '/:id',
+  checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin'],
+    allowSameUser: true,
+  }),
+  usercontroller.getUserById
+);
+
 router.patch(
   '/:id',
   checkApiKey,
@@ -47,7 +59,6 @@ router.post(
   usercontroller.verifySellerPayment
 );
 
-
 router.patch(
   '/:id/deactivate',
   checkApiKey,
@@ -57,7 +68,7 @@ router.patch(
     allowSameUser: false,
   }),
   usercontroller.deactivateUser
-)
+);
 
 router.patch(
   '/:id/activate',
@@ -68,7 +79,6 @@ router.patch(
     allowSameUser: false,
   }),
   usercontroller.activateUser
-)
-
+);
 
 module.exports = router;

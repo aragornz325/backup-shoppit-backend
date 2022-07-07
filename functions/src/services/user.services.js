@@ -99,39 +99,44 @@ class UserServices {
   }
 
   async deactivateUser(id) {
-    await getAuth().updateUser(
-      id,
-      {
-        disabled: true,
-      }
-    )
+    await getAuth().updateUser(id, {
+      disabled: true,
+    });
 
     await userRepository.updateUser(
-      id, 
+      id,
       {
         status: 'deactivated',
-      }, 
+      },
       true
-    )
+    );
     functions.logger.info(`user with id:${id} has been deactivated`);
   }
 
   async activateUser(id) {
-    await getAuth().updateUser(
-      id,
-      {
-        disabled: false,
-      }
-    )
+    await getAuth().updateUser(id, {
+      disabled: false,
+    });
 
     await userRepository.updateUser(
-      id, 
+      id,
       {
         status: 'activated',
-      }, 
+      },
       true
-    )
+    );
     functions.logger.info(`user with id:${id} has been activated`);
+  }
+
+  async getUsers(search, role, status, limit, offset) {
+    const user = await userRepository.getUsers(
+      search,
+      role,
+      status,
+      limit,
+      offset
+    );
+    return user;
   }
 }
 

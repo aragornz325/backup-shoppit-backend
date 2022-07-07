@@ -55,23 +55,38 @@ class UserController {
     }
   }
 
-  async deactivateUser(req, res, next){
-    try{
+  async deactivateUser(req, res, next) {
+    try {
       const { id } = req.params;
       await service.deactivateUser(id);
-      res.status(200).send({ msg: 'Ok'})
-    } catch ( error ) {
-      next(error)
+      res.status(200).send({ msg: 'Ok' });
+    } catch (error) {
+      next(error);
     }
   }
 
-  async activateUser(req, res, next){
-    try{
+  async activateUser(req, res, next) {
+    try {
       const { id } = req.params;
       await service.activateUser(id);
-      res.status(200).send({ msg: 'Ok'})
-    } catch ( error ) {
-      next(error)
+      res.status(200).send({ msg: 'Ok' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getUsers(req, res, next) {
+    const search = req.query.search;
+    const role = req.query.role;
+    const status = req.query.status;
+    const limit = req.query.limit || 10;
+    const offset = req.query.offset || 0;
+    try {
+      const users = await service.getUsers(search, role, status, limit, offset);
+
+      res.status(200).send(users);
+    } catch (error) {
+      next(error);
     }
   }
 }
