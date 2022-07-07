@@ -9,8 +9,6 @@ const { auth } = require('firebase-admin');
 const userRepository = new UserRepository();
 const mercadopago = new Mercadopago();
 
-const { freeSearch } = require('../utils/free.search.algolia');
-
 class UserServices {
   async setCustomerClaimToUser(user) {
     const auth = getAuth();
@@ -130,9 +128,26 @@ class UserServices {
     functions.logger.info(`user with id:${id} has been activated`);
   }
 
-  async getOne(query) {
-    const user = await freeSearch(query);
-    return user;
+  async getUsers(query, rol, status, limit, offset) {
+    if (query) {
+      const user = await userRepository.getUsersWithAlgolia(
+        query,
+        rol,
+        status,
+        limit,
+        offset
+      );
+      return user;
+    }
+    if (!query) {
+      const user = await userRepository.getUsersWithoutAlgolia(
+        rol,
+        status,
+        limit,
+        offset
+      );
+      return user;
+    }
   }
 }
 

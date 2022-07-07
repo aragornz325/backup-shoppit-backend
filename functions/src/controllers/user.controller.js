@@ -75,25 +75,16 @@ class UserController {
     }
   }
 
-  async getUserByEmail(req, res, next) {
+  async getUsers(req, res, next) {
+    const query = req.query.query;
+    const rol = req.query.rol;
+    const status = req.query.status;
+    const limit = req.query.limit || 10;
+    const offset = req.query.offset || 0;
     try {
-      const { email } = req.query;
-      if (!email) {
-        throw new Error('email is required');
-      }
-      const user = await service.getUserByEmail(email);
-      res.status(200).send(user);
-    } catch (error) {
-      next(error);
-    }
-  }
+      const users = await service.getUsers(query, rol, status, limit, offset);
 
-  async getOne(req, res, next) {
-    try {
-      const query = req.query;
-      const user = await service.getOne(query);
-
-      res.status(200).send(user);
+      res.status(200).send(users);
     } catch (error) {
       next(error);
     }

@@ -1,6 +1,15 @@
 const { db } = require('../../config/firebase');
 const functions = require('firebase-functions');
 const boom = require('@hapi/boom');
+const { config } = require('../config/config');
+const algoliasearch = require('algoliasearch');
+const { user } = require('firebase-functions/v1/auth');
+
+const client = algoliasearch(
+  `${config.algoliaAppId}`,
+  `${config.algoliaApiSearch}`
+);
+const index = client.initIndex(`${config.algoliaIndexName}`);
 
 class UserRepository {
   async createUser(user) {
@@ -32,6 +41,7 @@ class UserRepository {
               identification: {},
               isConsultor: false,
               isSocial: false,
+              isAdmin: false,
               isVender: false,
               loggedIn: true,
               minimum_purchase: 0,
@@ -119,6 +129,210 @@ class UserRepository {
       userN,
       total: userN.length,
     };
+  }
+
+  async getAllUsersFromDb(limit, offset) {
+    let users = [];
+    const collectionRef = db.collection('users').limit(parseInt(limit, 10));
+    await collectionRef.get().then((snapshot) => {
+      snapshot.forEach((doc) => {
+        users.push(doc.data());
+      });
+    });
+    return users;
+  }
+
+  async getIndexAlgolia(query, limit) {
+    console.log('ejecutando index algolia', query);
+    let usersAlgolia = [];
+    let result = [];
+    await index
+      .search(`${query}`)
+      .then(({ hits }) => (usersAlgolia = hits))
+      .catch((err) => {
+        throw boom.badData(err);
+      });
+    usersAlgolia.forEach((user) => {
+      result.push(user.objectID);
+    });
+    return result;
+  }
+
+  async getUsersWithoutAlgolia(query, rol, status, limit, offset) {
+    functions.logger.info('execute search users without algolia');
+    const collectionRef = db.collection('users');
+    let rolSearch = '';
+    if (rol === 'vender') {
+      rolSearch = 'isVender';
+    }
+    if (rol === 'admin') {
+      rolSearch = 'isAdmin';
+    }
+
+    let users = [];
+
+    if (rol === undefined && status === undefined) {
+      const usersdb = await this.getAllUsersFromDb(limit);
+      return usersdb;
+    }
+    if (rol !== undefined && rol != 'customer' && status === undefined) {
+      await collectionRef
+        .where(rolSearch, '==', true)
+        .get()
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            users.push(doc.data());
+          });
+        })
+        .catch((err) => {
+          throw boom.badData(err);
+        });
+    }
+    if (rol !== undefined && rol != 'customer' && status != undefined) {
+      await collectionRef
+        .where(rolSearch, '==', true)
+        .where('status', '==', status)
+        .get()
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            users.push(doc.data());
+          });
+        })
+        .catch((err) => {
+          throw boom.badData(err);
+        });
+    }
+    if (rol !== undefined && rol === 'customer' && status === undefined) {
+      await collectionRef
+        .where('isVender', '==', false)
+        .where('isAdmin', '==', false)
+        .get()
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            users.push(doc.data());
+          });
+        })
+        .catch((err) => {
+          throw boom.badData(err);
+        });
+    }
+    if (rol !== undefined && rol === 'customer' && status != undefined) {
+      await collectionRef
+        .where('isVender', '==', false)
+        .where('isAdmin', '==', false)
+        .where('status', '==', status)
+        .get()
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            users.push(doc.data());
+          });
+        })
+        .catch((err) => {
+          throw boom.badData(err);
+        });
+    }
+    return { users, total: users.length };
+  }
+
+  async getUsersWithAlgolia(query, rol, status, limit, offset) {
+    functions.logger.info('execute search users with algolia');
+    const collectionRef = db.collection('users');
+    const indexAlgolia = await this.getIndexAlgolia(query, limit);
+
+    let rolSearch = '';
+    if (rol === 'vender') {
+      rolSearch = 'isVender';
+    }
+    if (rol === 'admin') {
+      rolSearch = 'isAdmin';
+    }
+
+    let users = [];
+    if (indexAlgolia.length > 0 && rol === undefined && status === undefined) {
+      await collectionRef
+        .where('id', 'in', indexAlgolia)
+        .get()
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            users.push(doc.data());
+          });
+        })
+        .catch((err) => {
+          throw boom.badData(err);
+        });
+    }
+    if (indexAlgolia.length > 0 && rol !== undefined && status === undefined) {
+      await collectionRef
+        .where('id', 'in', indexAlgolia)
+        .where(rolSearch, '==', true)
+        .get()
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            users.push(doc.data());
+          });
+        })
+        .catch((err) => {
+          throw boom.badData(err);
+        });
+    }
+    if (indexAlgolia.length > 0 && rol !== undefined && status != undefined) {
+      await collectionRef
+        .where('id', 'in', indexAlgolia)
+        .where(rolSearch, '==', true)
+        .where('status', '==', status)
+        .get()
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            users.push(doc.data());
+          });
+        })
+        .catch((err) => {
+          throw boom.badData(err);
+        });
+    }
+    if (
+      indexAlgolia.length > 0 &&
+      rol !== undefined &&
+      rol === 'customer' &&
+      status === undefined
+    ) {
+      await collectionRef
+        .where('id', 'in', indexAlgolia)
+        .where('isVender', '==', false)
+        .where('isAdmin', '==', false)
+        .get()
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            users.push(doc.data());
+          });
+        })
+        .catch((err) => {
+          throw boom.badData(err);
+        });
+    }
+    if (
+      indexAlgolia.length > 0 &&
+      rol !== undefined &&
+      rol === 'customer' &&
+      status != undefined
+    ) {
+      await collectionRef
+        .where('id', 'in', indexAlgolia)
+        .where('isVender', '==', false)
+        .where('isAdmin', '==', false)
+        .where('status', '==', status)
+        .get()
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            users.push(doc.data());
+          });
+        })
+        .catch((err) => {
+          throw boom.badData(err);
+        });
+    }
+
+    return { users, total: users.length };
   }
 }
 module.exports = UserRepository;

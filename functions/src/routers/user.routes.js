@@ -11,17 +11,8 @@ const {
 const validatorHandler = require('../middlewares/validatorHandler');
 const { masivecustomClaim } = require('../utils/masiveCostumerClaim');
 const router = express.Router();
-const functions = require('firebase-functions');
-const { db } = require('../../config/firebase');
 
-router.get(
-  '',
-  isAuthenticated,
-  isAuthorized,
-  checkApiKey,
-  usercontroller.getUserByEmail
-);
-router.get('/search', usercontroller.getOne);
+router.get('', usercontroller.getUsers);
 router.get('/masiveclaims', masivecustomClaim);
 
 router.get(
