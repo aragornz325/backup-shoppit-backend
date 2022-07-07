@@ -92,6 +92,7 @@ const updateUser = joi.object({
   url: url,
   username: username,
   wishList: wishList,
+  role: role,
 });
 
 const createUssAndPass = joi.object({

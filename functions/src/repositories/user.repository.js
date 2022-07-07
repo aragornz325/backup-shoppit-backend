@@ -146,7 +146,9 @@ class UserRepository {
     let usersAlgolia = [];
     let result = [];
     await index
-      .search(`${search}`)
+      .search(`${search}`, {
+        hitsPerPage: parseInt(limit, 10),
+      })
       .then(({ hits }) => (usersAlgolia = hits))
       .catch((err) => {
         throw boom.badData(err);
@@ -154,6 +156,7 @@ class UserRepository {
     usersAlgolia.forEach((user) => {
       result.push(user.objectID);
     });
+    console.log(result);
     return result;
   }
 
@@ -202,6 +205,12 @@ class UserRepository {
     const collectionRef = db.collection('users');
     const indexAlgolia = await this.getIndexAlgolia(search, limit);
 
+    if (indexAlgolia.length <= 0) {
+      return { users: 'no match', total: 0 };
+    }
+    if (role === undefined && status === undefined) {
+      querySearch = collectionRef.where('id', 'in', indexAlgolia);
+    }
     if (role && status === undefined) {
       querySearch = collectionRef
         .where('id', 'in', indexAlgolia)
@@ -218,12 +227,8 @@ class UserRepository {
         .where('rol', '==', role)
         .where('status', '==', status);
     }
-    if (role === undefined && status === undefined) {
-      querySearch = collectionRef.where('id', 'in', indexAlgolia);
-    }
     const users = [];
     await querySearch
-      .limit(parseInt(limit, 10))
       .get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
