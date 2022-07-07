@@ -95,24 +95,7 @@ class UserRepository {
     return;
   }
 
-  async getUserByEmail(email) {
-    let userN = '';
-    await db
-      .collection('users')
-      .where('email', '==', email)
-      .get()
-      .then((snapshot) => {
-        snapshot.forEach((doc) => {
-          userN = doc.data();
-        });
-      })
-      .catch((err) => {
-        functions.logger.error(err);
-      });
-    return userN;
-  }
-
-  async getOne(search) {
+  async getUsersByFilter(search) {
     let userN = [];
     const parameter = Object.keys(search).toString();
     const objetive = search[parameter];
@@ -131,15 +114,25 @@ class UserRepository {
     };
   }
 
-  async getAllUsersFromDb(limit, offset) {
-    let users = [];
-    const collectionRef = db.collection('users').limit(parseInt(limit, 10));
-    await collectionRef.get().then((snapshot) => {
-      snapshot.forEach((doc) => {
-        users.push(doc.data());
-      });
-    });
-    return users;
+  async getUsers(search, role, status, limit, offset) {
+    if (!search) {
+      const users = await this.getUsersWithoutAlgolia(
+        role,
+        status,
+        limit,
+        offset
+      );
+      return users;
+    } else {
+      const users = await this.getUsersWithAlgolia(
+        search,
+        role,
+        status,
+        limit,
+        offset
+      );
+      return users;
+    }
   }
 
   async getIndexAlgolia(search, limit) {
@@ -156,31 +149,22 @@ class UserRepository {
     usersAlgolia.forEach((user) => {
       result.push(user.objectID);
     });
-    console.log(result);
     return result;
   }
 
   //TODO: manejar offset
   async getUsersWithoutAlgolia(role, status, limit, offset) {
     functions.logger.info('execute search users without algolia');
-    let querySearch = '';
-    const collectionRef = db.collection('users');
-    if (role && status === undefined) {
-      querySearch = collectionRef.where('rol', '==', role);
+    let collectionRef = db.collection('users');
+    if (role) {
+      collectionRef = collectionRef.where('rol', '==', role);
     }
-    if (role === undefined && status) {
-      querySearch = collectionRef.where('status', '==', status);
+    if (status) {
+      collectionRef = collectionRef.where('status', '==', status);
     }
-    if (role && status) {
-      querySearch = collectionRef
-        .where('rol', '==', role)
-        .where('status', '==', status);
-    }
-    if (role === undefined && status === undefined) {
-      querySearch = collectionRef;
-    }
+
     const users = [];
-    await querySearch
+    await collectionRef
       .limit(parseInt(limit, 10))
       .get()
       .then((snapshot) => {
@@ -193,7 +177,7 @@ class UserRepository {
       });
 
     if (users.length <= 0) {
-      return { users: 'no match', total: 0 };
+      return { users: [], total: 0 };
     } else {
       return { users, total: users.length };
     }
@@ -201,34 +185,21 @@ class UserRepository {
   //TODO: manejar offset
   async getUsersWithAlgolia(search, role, status, limit, offset) {
     functions.logger.info('execute search users with algolia');
-    let querySearch = '';
-    const collectionRef = db.collection('users');
     const indexAlgolia = await this.getIndexAlgolia(search, limit);
 
     if (indexAlgolia.length <= 0) {
-      return { users: 'no match', total: 0 };
+      return { users: [], total: 0 };
     }
-    if (role === undefined && status === undefined) {
-      querySearch = collectionRef.where('id', 'in', indexAlgolia);
+    let collectionRef = db.collection('users').where('id', 'in', indexAlgolia);
+
+    if (role) {
+      collectionRef = collectionRef.where('role', '==', role);
     }
-    if (role && status === undefined) {
-      querySearch = collectionRef
-        .where('id', 'in', indexAlgolia)
-        .where('rol', '==', role);
-    }
-    if (role === undefined && status) {
-      querySearch = collectionRef
-        .where('id', 'in', indexAlgolia)
-        .where('status', '==', status);
-    }
-    if (role && status) {
-      querySearch = collectionRef
-        .where('id', 'in', indexAlgolia)
-        .where('rol', '==', role)
-        .where('status', '==', status);
+    if (status) {
+      collectionRef = collectionRef.where('status', '==', status);
     }
     const users = [];
-    await querySearch
+    await collectionRef
       .get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
@@ -239,7 +210,7 @@ class UserRepository {
         throw boom.badData(err);
       });
     if (users.length <= 0) {
-      return { users: 'no match', total: 0 };
+      return { users: [], total: 0 };
     } else {
       return { users, total: users.length };
     }

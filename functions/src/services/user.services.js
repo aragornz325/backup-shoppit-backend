@@ -129,25 +129,14 @@ class UserServices {
   }
 
   async getUsers(search, role, status, limit, offset) {
-    if (search) {
-      const user = await userRepository.getUsersWithAlgolia(
-        search,
-        role,
-        status,
-        limit,
-        offset
-      );
-      return user;
-    }
-    if (!search) {
-      const user = await userRepository.getUsersWithoutAlgolia(
-        role,
-        status,
-        limit,
-        offset
-      );
-      return user;
-    }
+    const user = await userRepository.getUsers(
+      search,
+      role,
+      status,
+      limit,
+      offset
+    );
+    return user;
   }
 }
 
