@@ -16,7 +16,7 @@ const config = {
   apiWeb: process.env.API_WEB_FIREBASE,
   algoliaApiSearch: process.env.ALGOLIA_API_SEARCH,
   algoliaAppId: process.env.ALGOLIA_APP_ID,
-  algoliaIndexName: process.env.ALGOLIA_INDEX_NAME,
+  algoliaUsersIndexName: process.env.ALGOLIA_USER_INDEX_NAME,
 };
 
 module.exports = { config };

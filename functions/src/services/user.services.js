@@ -128,20 +128,20 @@ class UserServices {
     functions.logger.info(`user with id:${id} has been activated`);
   }
 
-  async getUsers(query, rol, status, limit, offset) {
-    if (query) {
+  async getUsers(search, role, status, limit, offset) {
+    if (search) {
       const user = await userRepository.getUsersWithAlgolia(
-        query,
-        rol,
+        search,
+        role,
         status,
         limit,
         offset
       );
       return user;
     }
-    if (!query) {
+    if (!search) {
       const user = await userRepository.getUsersWithoutAlgolia(
-        rol,
+        role,
         status,
         limit,
         offset

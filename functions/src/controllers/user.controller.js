@@ -76,13 +76,13 @@ class UserController {
   }
 
   async getUsers(req, res, next) {
-    const query = req.query.query;
-    const rol = req.query.rol;
+    const search = req.query.search;
+    const role = req.query.role;
     const status = req.query.status;
     const limit = req.query.limit || 10;
     const offset = req.query.offset || 0;
     try {
-      const users = await service.getUsers(query, rol, status, limit, offset);
+      const users = await service.getUsers(search, role, status, limit, offset);
 
       res.status(200).send(users);
     } catch (error) {

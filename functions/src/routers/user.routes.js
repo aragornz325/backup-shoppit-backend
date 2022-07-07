@@ -8,11 +8,12 @@ const {
   checkApiKey,
 } = require('../middlewares/auth.handler');
 
+const { querySchema } = require('../schemas/user.schema');
 const validatorHandler = require('../middlewares/validatorHandler');
 const { masivecustomClaim } = require('../utils/masiveCostumerClaim');
 const router = express.Router();
 
-router.get('', usercontroller.getUsers);
+router.get('', validatorHandler(querySchema, 'query'), usercontroller.getUsers);
 router.get('/masiveclaims', masivecustomClaim);
 
 router.get(

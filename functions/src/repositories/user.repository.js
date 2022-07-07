@@ -3,13 +3,12 @@ const functions = require('firebase-functions');
 const boom = require('@hapi/boom');
 const { config } = require('../config/config');
 const algoliasearch = require('algoliasearch');
-const { user } = require('firebase-functions/v1/auth');
 
 const client = algoliasearch(
   `${config.algoliaAppId}`,
   `${config.algoliaApiSearch}`
 );
-const index = client.initIndex(`${config.algoliaIndexName}`);
+const index = client.initIndex(`${config.algoliaUsersIndexName}`);
 
 class UserRepository {
   async createUser(user) {
@@ -56,6 +55,7 @@ class UserRepository {
               url: '',
               username: user.displayName,
               wishList: [],
+              role: 'customer',
             },
             { merge: true }
           )
@@ -112,10 +112,10 @@ class UserRepository {
     return userN;
   }
 
-  async getOne(query) {
+  async getOne(search) {
     let userN = [];
-    const parameter = Object.keys(query).toString();
-    const objetive = query[parameter];
+    const parameter = Object.keys(search).toString();
+    const objetive = search[parameter];
     const collectionRef = db
       .collection('users')
       .where(parameter, '==', objetive);
@@ -142,12 +142,11 @@ class UserRepository {
     return users;
   }
 
-  async getIndexAlgolia(query, limit) {
-    console.log('ejecutando index algolia', query);
+  async getIndexAlgolia(search, limit) {
     let usersAlgolia = [];
     let result = [];
     await index
-      .search(`${query}`)
+      .search(`${search}`)
       .then(({ hits }) => (usersAlgolia = hits))
       .catch((err) => {
         throw boom.badData(err);
@@ -158,181 +157,87 @@ class UserRepository {
     return result;
   }
 
-  async getUsersWithoutAlgolia(query, rol, status, limit, offset) {
+  //TODO: manejar offset
+  async getUsersWithoutAlgolia(role, status, limit, offset) {
     functions.logger.info('execute search users without algolia');
+    let querySearch = '';
     const collectionRef = db.collection('users');
-    let rolSearch = '';
-    if (rol === 'vender') {
-      rolSearch = 'isVender';
+    if (role && status === undefined) {
+      querySearch = collectionRef.where('rol', '==', role);
     }
-    if (rol === 'admin') {
-      rolSearch = 'isAdmin';
+    if (role === undefined && status) {
+      querySearch = collectionRef.where('status', '==', status);
     }
+    if (role && status) {
+      querySearch = collectionRef
+        .where('rol', '==', role)
+        .where('status', '==', status);
+    }
+    if (role === undefined && status === undefined) {
+      querySearch = collectionRef;
+    }
+    const users = [];
+    await querySearch
+      .limit(parseInt(limit, 10))
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          users.push(doc.data());
+        });
+      })
+      .catch((err) => {
+        throw boom.badData(err);
+      });
 
-    let users = [];
-
-    if (rol === undefined && status === undefined) {
-      const usersdb = await this.getAllUsersFromDb(limit);
-      return usersdb;
+    if (users.length <= 0) {
+      return { users: 'no match', total: 0 };
+    } else {
+      return { users, total: users.length };
     }
-    if (rol !== undefined && rol != 'customer' && status === undefined) {
-      await collectionRef
-        .where(rolSearch, '==', true)
-        .get()
-        .then((snapshot) => {
-          snapshot.forEach((doc) => {
-            users.push(doc.data());
-          });
-        })
-        .catch((err) => {
-          throw boom.badData(err);
-        });
-    }
-    if (rol !== undefined && rol != 'customer' && status != undefined) {
-      await collectionRef
-        .where(rolSearch, '==', true)
-        .where('status', '==', status)
-        .get()
-        .then((snapshot) => {
-          snapshot.forEach((doc) => {
-            users.push(doc.data());
-          });
-        })
-        .catch((err) => {
-          throw boom.badData(err);
-        });
-    }
-    if (rol !== undefined && rol === 'customer' && status === undefined) {
-      await collectionRef
-        .where('isVender', '==', false)
-        .where('isAdmin', '==', false)
-        .get()
-        .then((snapshot) => {
-          snapshot.forEach((doc) => {
-            users.push(doc.data());
-          });
-        })
-        .catch((err) => {
-          throw boom.badData(err);
-        });
-    }
-    if (rol !== undefined && rol === 'customer' && status != undefined) {
-      await collectionRef
-        .where('isVender', '==', false)
-        .where('isAdmin', '==', false)
-        .where('status', '==', status)
-        .get()
-        .then((snapshot) => {
-          snapshot.forEach((doc) => {
-            users.push(doc.data());
-          });
-        })
-        .catch((err) => {
-          throw boom.badData(err);
-        });
-    }
-    return { users, total: users.length };
   }
-
-  async getUsersWithAlgolia(query, rol, status, limit, offset) {
+  //TODO: manejar offset
+  async getUsersWithAlgolia(search, role, status, limit, offset) {
     functions.logger.info('execute search users with algolia');
+    let querySearch = '';
     const collectionRef = db.collection('users');
-    const indexAlgolia = await this.getIndexAlgolia(query, limit);
+    const indexAlgolia = await this.getIndexAlgolia(search, limit);
 
-    let rolSearch = '';
-    if (rol === 'vender') {
-      rolSearch = 'isVender';
-    }
-    if (rol === 'admin') {
-      rolSearch = 'isAdmin';
-    }
-
-    let users = [];
-    if (indexAlgolia.length > 0 && rol === undefined && status === undefined) {
-      await collectionRef
+    if (role && status === undefined) {
+      querySearch = collectionRef
         .where('id', 'in', indexAlgolia)
-        .get()
-        .then((snapshot) => {
-          snapshot.forEach((doc) => {
-            users.push(doc.data());
-          });
-        })
-        .catch((err) => {
-          throw boom.badData(err);
-        });
+        .where('rol', '==', role);
     }
-    if (indexAlgolia.length > 0 && rol !== undefined && status === undefined) {
-      await collectionRef
+    if (role === undefined && status) {
+      querySearch = collectionRef
         .where('id', 'in', indexAlgolia)
-        .where(rolSearch, '==', true)
-        .get()
-        .then((snapshot) => {
-          snapshot.forEach((doc) => {
-            users.push(doc.data());
-          });
-        })
-        .catch((err) => {
-          throw boom.badData(err);
-        });
+        .where('status', '==', status);
     }
-    if (indexAlgolia.length > 0 && rol !== undefined && status != undefined) {
-      await collectionRef
+    if (role && status) {
+      querySearch = collectionRef
         .where('id', 'in', indexAlgolia)
-        .where(rolSearch, '==', true)
-        .where('status', '==', status)
-        .get()
-        .then((snapshot) => {
-          snapshot.forEach((doc) => {
-            users.push(doc.data());
-          });
-        })
-        .catch((err) => {
-          throw boom.badData(err);
-        });
+        .where('rol', '==', role)
+        .where('status', '==', status);
     }
-    if (
-      indexAlgolia.length > 0 &&
-      rol !== undefined &&
-      rol === 'customer' &&
-      status === undefined
-    ) {
-      await collectionRef
-        .where('id', 'in', indexAlgolia)
-        .where('isVender', '==', false)
-        .where('isAdmin', '==', false)
-        .get()
-        .then((snapshot) => {
-          snapshot.forEach((doc) => {
-            users.push(doc.data());
-          });
-        })
-        .catch((err) => {
-          throw boom.badData(err);
-        });
+    if (role === undefined && status === undefined) {
+      querySearch = collectionRef.where('id', 'in', indexAlgolia);
     }
-    if (
-      indexAlgolia.length > 0 &&
-      rol !== undefined &&
-      rol === 'customer' &&
-      status != undefined
-    ) {
-      await collectionRef
-        .where('id', 'in', indexAlgolia)
-        .where('isVender', '==', false)
-        .where('isAdmin', '==', false)
-        .where('status', '==', status)
-        .get()
-        .then((snapshot) => {
-          snapshot.forEach((doc) => {
-            users.push(doc.data());
-          });
-        })
-        .catch((err) => {
-          throw boom.badData(err);
+    const users = [];
+    await querySearch
+      .limit(parseInt(limit, 10))
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          users.push(doc.data());
         });
+      })
+      .catch((err) => {
+        throw boom.badData(err);
+      });
+    if (users.length <= 0) {
+      return { users: 'no match', total: 0 };
+    } else {
+      return { users, total: users.length };
     }
-
-    return { users, total: users.length };
   }
 }
 module.exports = UserRepository;
