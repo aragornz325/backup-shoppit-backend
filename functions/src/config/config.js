@@ -17,6 +17,8 @@ const config = {
   algoliaApiSearch: process.env.ALGOLIA_API_SEARCH,
   algoliaAppId: process.env.ALGOLIA_APP_ID,
   algoliaUsersIndexName: process.env.ALGOLIA_USER_INDEX_NAME,
+  client_email: process.env.CLIENT_EMAIL,
+  private_key: process.env.PRIVATE_KEY,
 };
 
 module.exports = { config };
