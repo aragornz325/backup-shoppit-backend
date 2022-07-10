@@ -48,11 +48,11 @@ class GoogleSheetsRepository {
       endIndex: 1000,
     });
     await userSheet.loadCells('A1:ALL1');
-    const celdaId = userSheet.getCellByA1('ALL1'); //para evitar que el usuario  lo vea y lo modifique
+    const celdaId = userSheet.getCellByA1('ALL1');
     celdaId.value = 'id';
-    await userSheet.saveUpdatedCells(); //guardar todo en una sola llamada
+    await userSheet.saveUpdatedCells();
 
-    functions.logger.log('GoogleSheetsRepository: initSheet: OK');
+    functions.logger.log('initSheet: OK');
 
     return 'ok';
   }
@@ -63,12 +63,10 @@ class GoogleSheetsRepository {
     const sheet = doc.sheetsByIndex[1];
     const rows = await sheet.getRows();
 
-    let index = 0;
     functions.logger.info(`the row already exists in the db`);
     for (let i = 0; i < rows.length; i++) {
       const item = rows[i];
       if (item.id) {
-        index++;
         functions.logger.info(`ro`);
         continue;
       }
@@ -100,7 +98,6 @@ class GoogleSheetsRepository {
       functions.logger.log(` setting id in sheet`);
       item.id = productID;
       await item.save();
-      index += index;
     }
   }
   // const insertRows = async (req, res) => {
@@ -168,18 +165,18 @@ class GoogleSheetsRepository {
   //   }
   // }
 
-  async insertId(productID, spreadId, rowRef) {
-    const doc = await this.docConstructor(spreadId);
+  // async insertId(productID, spreadId, rowRef) {
+  //   const doc = await this.docConstructor(spreadId);
 
-    await doc.loadInfo();
-    const sheet = doc.sheetsByIndex[1];
-    const rows = await sheet.getRows();
+  //   await doc.loadInfo();
+  //   const sheet = doc.sheetsByIndex[1];
+  //   const rows = await sheet.getRows();
 
-    if (rows.length > 0) {
-      console.log('tiene mas de uno');
-    }
-    return { msg: ' id in sheet Updated' };
-  }
+  //   if (rows.length > 0) {
+  //     console.log('tiene mas de uno');
+  //   }
+  //   return { msg: ' id in sheet Updated' };
+  // }
 
   // const editProducts = async (req, res) => {
   //   const { id, spreadId, editedProduct } = req.body;
