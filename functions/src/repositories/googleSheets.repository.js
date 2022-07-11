@@ -1,7 +1,10 @@
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { config } = require('../config/config');
 const functions = require('firebase-functions');
-const { validateSheetsProduct } = require('../schemas/prod.schema');
+const {
+  validateSheetsProduct,
+  validateItem,
+} = require('../schemas/prod.schema');
 const ProductsRepository = require('../repositories/products.repository');
 const productsRepository = new ProductsRepository();
 
@@ -27,6 +30,27 @@ const headers = [
 let userSheet = null;
 
 class GoogleSheetsRepository {
+  async createProductObject(item) {
+    const product = {
+      name: item.name,
+      offer_price: parseInt(item.offer_price, 10),
+      regular_price: parseInt(item.offer_price, 10),
+      description: item.description,
+      image_url: item.image_url,
+      stock_XS: parseInt(item.Stock_XS, 10),
+      stock_S: parseInt(item.Stock_S, 10),
+      stock_M: parseInt(item.Stock_M, 10),
+      stock_L: parseInt(item.Stock_L, 10),
+      stock_XL: parseInt(item.Stock_XL, 10),
+      sku: item.SKU,
+      height: parseInt(item.height, 10),
+      width: parseInt(item.width, 10),
+      longitude: parseInt(item.longitude, 10),
+      weight: parseInt(item.weight, 10),
+    };
+    return product;
+  }
+
   async docConstructor(spreadId) {
     const doc = new GoogleSpreadsheet(spreadId);
     await doc.useServiceAccountAuth({
@@ -38,7 +62,6 @@ class GoogleSheetsRepository {
 
   async initSheet(spreadId) {
     const doc = await this.docConstructor(spreadId);
-    //agregar la primera fila de cabecera para iniciar el documento
     userSheet = await doc.addSheet({
       title: 'Shoppit',
       headerValues: headers,
@@ -62,36 +85,23 @@ class GoogleSheetsRepository {
     await doc.loadInfo();
     const sheet = doc.sheetsByIndex[1];
     const rows = await sheet.getRows();
-
-    functions.logger.info(`the row already exists in the db`);
+    console.log('esto ese row', rows.length);
+    if (rows.length <= 0) {
+      throw boom.badData('The sheet is empty');
+    }
+    functions.logger.info(`starting process of destructuring sheet`);
     for (let i = 0; i < rows.length; i++) {
       const item = rows[i];
       if (item.id) {
-        functions.logger.info(`ro`);
+        functions.logger.info(`the row is already indexed in the db`);
         continue;
       }
       const rowRef = parseInt(item._rowNumber, 10);
-      let payload = {
-        name: item.name,
-        offer_price: parseInt(item.offer_price, 10),
-        regular_price: parseInt(item.offer_price, 10),
-        description: item.description,
-        image_url: item.image_url,
-        stock_XS: parseInt(item.Stock_XS, 10),
-        stock_S: parseInt(item.Stock_S, 10),
-        stock_M: parseInt(item.Stock_M, 10),
-        stock_L: parseInt(item.Stock_L, 10),
-        stock_XL: parseInt(item.Stock_XL, 10),
-        sku: item.SKU,
-        height: parseInt(item.height, 10),
-        width: parseInt(item.width, 10),
-        longitude: parseInt(item.longitude, 10),
-        weight: parseInt(item.weight, 10),
-      };
+      let payload = this.createProductObject(item);
       const { error } = validateSheetsProduct.validate(payload);
       if (error) {
-        functions.logger.log(`error in item ${item.name}, ${error}`);
-        throw boom.badData(`error in item ${item.name}, ${error}`);
+        functions.logger.log(`error in item ${rows[i].name}, ${error}`);
+        throw boom.badData(`error in item ${rows[i].name}, ${error}`);
       }
       functions.logger.log(`inserting product of row ${rowRef} in collection`);
       const productID = await productsRepository.createProduct(payload);
@@ -100,11 +110,58 @@ class GoogleSheetsRepository {
       await item.save();
     }
   }
+
+  async updateProduct(spreadId) {
+    const doc = await this.docConstructor(spreadId);
+    await doc.loadInfo();
+    const sheet = doc.sheetsByIndex[1];
+    const rows = await sheet.getRows();
+    if (rows.length <= 0) {
+      throw boom.badData('The sheet is empty');
+    }
+    for (let i = 0; i < rows.length; i++) {
+      const item = rows[i];
+      const rowRef = parseInt(item._rowNumber, 10);
+      functions.logger.info(`starting process of updating product`);
+      const productInDb = await productsRepository.getProductById(item.id);
+      if (
+        productInDb.name === item.name &&
+        productInDb.offer_price === item.offer_price &&
+        productInDb.regular_price === item.regular_price &&
+        productInDb.description === item.description &&
+        productInDb.image_url === item.image_url &&
+        productInDb.stock_XS === item.stock_XS &&
+        productInDb.stock_S === item.stock_S &&
+        productInDb.stock_M === item.stock_M &&
+        productInDb.stock_L === item.stock_L &&
+        productInDb.stock_XL === item.stock_XL &&
+        productInDb.sku === item.sku &&
+        productInDb.height === item.height &&
+        productInDb.width === item.width &&
+        productInDb.longitude === item.longitude &&
+        productInDb.weight === item.weight
+      ) {
+        functions.logger.info(
+          `the product in row ${rowRef} does not need to be updated`
+        );
+        continue;
+      }
+      let payload = this.createProductObject(item);
+      const { error } = validateSheetsProduct.validate(payload);
+      if (error) {
+        functions.logger.log(`error in item ${rows[i].name}, ${error}`);
+        throw boom.badData(`error in item ${rows[i].name}, ${error}`);
+      }
+      functions.logger.log(`updating product of row ${rowRef} in collection`);
+      await productsRepository.updateProduct(item.id, payload);
+    }
+  }
+
   // const insertRows = async (req, res) => {
   //   //Recibe una lista de objectos [{..}, {..}]
   //   const { rowsArray, spreadId } = req.body;
   //   if (!rowsArray || !spreadId)
-  //     return res.status(400).json({ error: 'Bad request' });
+  //    throw boom.badRequest('missing rowsArray or spreadId');
 
   //   const doc = new GoogleSpreadsheet(spreadId);
   //   doc.useServiceAccountAuth({
