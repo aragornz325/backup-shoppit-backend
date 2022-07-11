@@ -32,9 +32,6 @@ class ProductsController {
 
   async updateProductSheet(req, res, next) {
     const spreadId = req.params.id;
-    functions.logger.info(
-      `updating information in the sheet with ID-->: ${spreadId}`
-    );
     try {
       await productsService.updateProductSheet(spreadId);
       functions.logger.info('information updated correctly');

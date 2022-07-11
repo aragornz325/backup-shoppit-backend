@@ -30,6 +30,36 @@ const headers = [
 let userSheet = null;
 
 class GoogleSheetsRepository {
+  async compareObj(productInDb, item) {
+    const aKeys = Object.keys(productInDb).sort();
+    const bKeys = Object.keys(item).sort();
+    const aValues = Object.values(productInDb).sort();
+    const bValues = Object.values(item).sort();
+    if (aValues.length !== bValues.length) {
+      return false;
+    }
+    if (aKeys.length !== bKeys.length) {
+      return false;
+    }
+    if (aKeys.join('') !== bKeys.join('')) {
+      return false;
+    }
+    if (aValues.join('') !== bValues.join('')) {
+      return false;
+    }
+    for (let i = 0; i < aValues.length; i++) {
+      if (aValues[i] !== bValues[i]) {
+        return false;
+      }
+    }
+    for (let i = 0; i < aKeys.length; i++) {
+      if (productInDb[aKeys[i]] !== item[bKeys[i]]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   async createProductObject(item) {
     const product = {
       name: item.name,
@@ -43,11 +73,12 @@ class GoogleSheetsRepository {
       stock_L: parseInt(item.Stock_L, 10),
       stock_XL: parseInt(item.Stock_XL, 10),
       sku: item.SKU,
-      height: parseInt(item.height, 10),
-      width: parseInt(item.width, 10),
-      longitude: parseInt(item.longitude, 10),
-      weight: parseInt(item.weight, 10),
+      height: parseFloat(item.height),
+      width: parseFloat(item.width),
+      longitude: parseFloat(item.longitude),
+      weight: parseFloat(item.weight),
     };
+
     return product;
   }
 
@@ -85,7 +116,7 @@ class GoogleSheetsRepository {
     await doc.loadInfo();
     const sheet = doc.sheetsByIndex[1];
     const rows = await sheet.getRows();
-    console.log('esto ese row', rows.length);
+
     if (rows.length <= 0) {
       throw boom.badData('The sheet is empty');
     }
@@ -97,7 +128,7 @@ class GoogleSheetsRepository {
         continue;
       }
       const rowRef = parseInt(item._rowNumber, 10);
-      let payload = this.createProductObject(item);
+      let payload = await this.createProductObject(item);
       const { error } = validateSheetsProduct.validate(payload);
       if (error) {
         functions.logger.log(`error in item ${rows[i].name}, ${error}`);
@@ -116,37 +147,33 @@ class GoogleSheetsRepository {
     await doc.loadInfo();
     const sheet = doc.sheetsByIndex[1];
     const rows = await sheet.getRows();
-    if (rows.length <= 0) {
-      throw boom.badData('The sheet is empty');
-    }
+
     for (let i = 0; i < rows.length; i++) {
       const item = rows[i];
+      let payload = await this.createProductObject(item);
       const rowRef = parseInt(item._rowNumber, 10);
-      functions.logger.info(`starting process of updating product`);
       const productInDb = await productsRepository.getProductById(item.id);
       if (
-        productInDb.name === item.name &&
-        productInDb.offer_price === item.offer_price &&
-        productInDb.regular_price === item.regular_price &&
-        productInDb.description === item.description &&
-        productInDb.image_url === item.image_url &&
-        productInDb.stock_XS === item.stock_XS &&
-        productInDb.stock_S === item.stock_S &&
-        productInDb.stock_M === item.stock_M &&
-        productInDb.stock_L === item.stock_L &&
-        productInDb.stock_XL === item.stock_XL &&
-        productInDb.sku === item.sku &&
-        productInDb.height === item.height &&
-        productInDb.width === item.width &&
-        productInDb.longitude === item.longitude &&
-        productInDb.weight === item.weight
+        productInDb.name === payload.name &&
+        productInDb.offer_price === payload.offer_price &&
+        productInDb.regular_price === payload.regular_price &&
+        productInDb.description === payload.description &&
+        productInDb.image_url === payload.image_url &&
+        productInDb.stock_XS === payload.stock_XS &&
+        productInDb.stock_S === payload.stock_S &&
+        productInDb.stock_M === payload.stock_M &&
+        productInDb.stock_L === payload.stock_L &&
+        productInDb.stock_XL === payload.stock_XL &&
+        productInDb.sku === payload.sku &&
+        productInDb.height === payload.height &&
+        productInDb.width === payload.width &&
+        productInDb.longitude === payload.longitude &&
+        productInDb.weight === payload.weight
       ) {
-        functions.logger.info(
-          `the product in row ${rowRef} does not need to be updated`
-        );
+        functions.logger.log(`the row ${rowRef} not need to be updated`);
         continue;
       }
-      let payload = this.createProductObject(item);
+
       const { error } = validateSheetsProduct.validate(payload);
       if (error) {
         functions.logger.log(`error in item ${rows[i].name}, ${error}`);
@@ -178,49 +205,6 @@ class GoogleSheetsRepository {
   //     return res.status(500).json({ error: err.message });
   //   }
   // };
-
-  // async getProducts(spreadId) {
-  //   const doc = this.docConstructor(spreadId);
-
-  //   await doc.loadInfo();
-  //   try {
-  //     const sheet = doc.sheetsByIndex[1];
-  //     const rows = await sheet.getRows();
-  //     // return res.send(rows[1]['precio_oferta'])
-  //     let prodList = [];
-  //     let index = 0;
-  //     for (let i = 0; i < rows.length; i++) {
-
-  //       if (rows.nombre && rows.id) {
-  //         let itemL = {
-  //           ['nombre']: rows[i]['nombre'],
-  //           ['id']: rows[i]['id'],
-  //           ['precio_oferta']: rows[i]['precio_oferta'],
-  //           ['precio_regular']: rows[i]['precio_regular'],
-  //           ['Stock XS']: rows[i]['Stock XS'],
-  //           ['Stock S']: rows[i]['Stock S'],
-  //           ['Stock M (por default)']: rows[i]['Stock M (por default)'],
-  //           ['Stock L']: rows[i]['Stock L'],
-  //           ['Stock XL']: rows[i]['Stock XL'],
-  //           ['descripcion']: rows[i]['descripcion'],
-  //           ['SKU']: rows[i]['SKU'],
-  //           ['Alto (cm)']: rows[i]['Alto (cm)'],
-  //           ['Ancho (cm)']: rows[i]['Ancho (cm)'],
-  //           ['Longitud (cm)']: rows[i]['Longitud (cm)'],
-  //           ['Peso (kg)']: rows[i]['Peso (kg)'],
-  //           ['numFila']: i,
-  //         };
-  //         prodList.push(itemL);
-  //         index++;
-  //       } else {
-  //         throw boom.badData('Empty params');
-  //       }
-  //     }
-  //     return prodList;
-  //   } catch (error) {
-  //     throw boom.badData(error);
-  //   }
-  // }
 
   // async insertId(productID, spreadId, rowRef) {
   //   const doc = await this.docConstructor(spreadId);

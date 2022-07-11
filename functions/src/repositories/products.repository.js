@@ -7,7 +7,7 @@ class ProductsRepository {
     let productID = '';
     await db
       .collection('productodPrueba')
-      .add(payload)
+      .add(...payload)
       .then((docRef) => {
         productID = docRef.id;
       })

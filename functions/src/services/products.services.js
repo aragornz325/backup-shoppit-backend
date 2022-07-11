@@ -20,10 +20,6 @@ class ProductsService {
   }
 
   async updateProductSheet(spreadId) {
-    functions.logger.info(
-      `updating information in the sheet with ID: ${spreadId}`
-    );
-
     await googleSheetsRepository.updateProduct(spreadId);
 
     return { msg: 'ok' };
