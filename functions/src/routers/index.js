@@ -1,9 +1,9 @@
 const useRouter = require('./user.routes');
-const googleSheetsRouter = require('./products.router');
+const productsRouter = require('./products.router');
 
 function routerApi(app) {
   app.use('/users', useRouter);
-  app.use('/products', googleSheetsRouter);
+  app.use('/products', productsRouter);
 }
 
 module.exports = routerApi;
