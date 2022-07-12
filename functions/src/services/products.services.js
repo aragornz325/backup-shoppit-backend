@@ -1,11 +1,29 @@
-const GoogleSheetsrepository = require('../repositories/googleSheet.repository');
-const googleSheetsrepository = new GoogleSheetsrepository();
+const GoogleSheetsRepository = require('../repositories/googlesheet.repository');
+const googleSheetsRepository = new GoogleSheetsRepository();
 
-class ProductsServices {
-  async initSheet(sheetID) {
-    const init = await googleSheetsrepository.docConstructor(sheetID);
+const functions = require('firebase-functions');
+
+class ProductsService {
+  async initSheet(spreadId) {
+    const init = await googleSheetsRepository.initSheet(spreadId);
     return init;
+  }
+
+  async getProductSheet(spreadId) {
+    functions.logger.info(
+      `capturing information from the sheet with ID: ${spreadId}`
+    );
+
+    await googleSheetsRepository.getProduct(spreadId);
+
+    return { msg: 'ok' };
+  }
+
+  async updateProductSheet(spreadId) {
+    await googleSheetsRepository.updateProduct(spreadId);
+
+    return { msg: 'ok' };
   }
 }
 
-module.exports = ProductsServices;
+module.exports = ProductsService;
