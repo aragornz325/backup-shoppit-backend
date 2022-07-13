@@ -67,6 +67,18 @@ class UserServices {
         status: 'active',
         isVender: true,
         activeVender: true,
+        user_membership: {
+          membarship_id: body.membershipId,
+          due_date: '', //TODO: revisar fecha de caducidad de la membresia
+          membership_payments: [
+            {
+              platform_name: 'mercadopago', //TODO: revisar nombre de la plataforma
+              payment_platform_id: body.pagoId,
+              payment_date: new Date(), //TODO: revisar pasar a UNIX
+              payment_status: response.data.status,
+            },
+          ],
+        },
       },
       true
     );
