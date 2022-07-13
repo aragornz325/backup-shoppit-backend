@@ -195,7 +195,7 @@ class UserRepository {
   async getUsersWithAlgolia(search, role, status, limit, offset) {
     functions.logger.info('execute search users with algolia');
     const indexAlgolia = await this.getIndexAlgolia(search);
-    console.log(indexAlgolia.length);
+
     if (indexAlgolia.length <= 0) {
       return { users: [], total: 0 };
     }
