@@ -62,14 +62,24 @@ class MembershipsRepository {
   }
 
   async getMemberships() {
-    const membershipsRef = db.collection('memberships');
+    const membershipsRef = db.collection('memberships').orderBy('name', 'asc');
     const memberships = await membershipsRef.get();
     const membershipsList = [];
     memberships.forEach((doc) => {
-      membershipsList.push(doc.data());
+      membershipsList.push({ ...doc.data(), id: doc.id });
     });
     functions.logger.info(`getMemberships ok`);
     return membershipsList;
+  }
+
+  async getMembershipById(id) {
+    const membershipsRef = db.collection('memberships').doc(id);
+    const memberships = await membershipsRef.get();
+    if (!memberships.exists) {
+      functions.logger.error(`membership with ID ${id} not found`);
+      throw boom.badData(`membership with ID ${id} not found`);
+    }
+    return memberships.data();
   }
 }
 

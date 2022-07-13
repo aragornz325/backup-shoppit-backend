@@ -15,11 +15,13 @@ const {
 
 const validatorHandler = require('../middlewares/validatorHandler');
 
+router.get('/', membershipscontroller.getMemberships);
 router.post(
   '/',
   validatorHandler(createMembershipDTO, 'body'),
   membershipscontroller.createMembership
 );
+router.get('/:id', membershipscontroller.getMembership);
 router.patch(
   '/:id',
   validatorHandler(updateMembershipDTO, 'body'),

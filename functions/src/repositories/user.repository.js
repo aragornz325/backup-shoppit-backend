@@ -146,11 +146,17 @@ class UserRepository {
     }
   }
 
-  async getIndexAlgolia(search) {
+  async getIndexAlgolia(search, limit, offset) {
     let usersAlgolia = [];
     let result = [];
     await index
-      .search(`${search}`)
+      .search(
+        `${search}`,
+        {
+          hitsPerPage: limit,
+        },
+        { offset: offset }
+      )
       .then(({ hits }) => (usersAlgolia = hits))
       .catch((err) => {
         throw boom.badData(err);
@@ -175,6 +181,8 @@ class UserRepository {
     const users = [];
     await collectionRef
       .limit(parseInt(limit, 10))
+      .orderBy('id', 'desc')
+      .startAfter(offset)
       .get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
@@ -194,7 +202,7 @@ class UserRepository {
   //TODO: manejar offset
   async getUsersWithAlgolia(search, role, status, limit, offset) {
     functions.logger.info('execute search users with algolia');
-    const indexAlgolia = await this.getIndexAlgolia(search);
+    const indexAlgolia = await this.getIndexAlgolia(search, limit, offset);
 
     if (indexAlgolia.length <= 0) {
       return { users: [], total: 0 };
@@ -213,6 +221,7 @@ class UserRepository {
       }
       const users = [];
       await collectionRef
+        .orderBy('id', 'desc')
         .get()
         .then((snapshot) => {
           snapshot.forEach((doc) => {
