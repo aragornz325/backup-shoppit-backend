@@ -3,6 +3,7 @@ const functions = require('firebase-functions');
 const boom = require('@hapi/boom');
 const { config } = require('../config/config');
 const algoliasearch = require('algoliasearch');
+const { chunckarray } = require('../utils/auxiliar');
 
 const client = algoliasearch(
   `${config.algoliaAppId}`,
@@ -114,6 +115,16 @@ class UserRepository {
     };
   }
 
+  // async getUserByEmail(email) {
+  //   const userRef = db.collection('users').where('email', '==', email);
+  //   const user = await userRef.get();
+  //   if (!user.exists) {
+  //     functions.logger.error(`user with email ${email} not found`);
+  //     throw boom.badData(`user with email ${email} not found`);
+  //   }
+  //   return user.data();
+  // }
+
   async getUsers(search, role, status, limit, offset) {
     if (!search) {
       const users = await this.getUsersWithoutAlgolia(
@@ -135,13 +146,17 @@ class UserRepository {
     }
   }
 
-  async getIndexAlgolia(search, limit) {
+  async getIndexAlgolia(search, limit, offset) {
     let usersAlgolia = [];
     let result = [];
     await index
-      .search(`${search}`, {
-        hitsPerPage: parseInt(limit, 10),
-      })
+      .search(
+        `${search}`,
+        {
+          hitsPerPage: limit,
+        },
+        { offset: offset }
+      )
       .then(({ hits }) => (usersAlgolia = hits))
       .catch((err) => {
         throw boom.badData(err);
@@ -166,6 +181,8 @@ class UserRepository {
     const users = [];
     await collectionRef
       .limit(parseInt(limit, 10))
+      .orderBy('id', 'desc')
+      .startAfter(offset)
       .get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
@@ -185,33 +202,67 @@ class UserRepository {
   //TODO: manejar offset
   async getUsersWithAlgolia(search, role, status, limit, offset) {
     functions.logger.info('execute search users with algolia');
-    const indexAlgolia = await this.getIndexAlgolia(search, limit);
+    const indexAlgolia = await this.getIndexAlgolia(search, limit, offset);
 
     if (indexAlgolia.length <= 0) {
       return { users: [], total: 0 };
     }
-    let collectionRef = db.collection('users').where('id', 'in', indexAlgolia);
 
-    if (role) {
-      collectionRef = collectionRef.where('role', '==', role);
-    }
-    if (status) {
-      collectionRef = collectionRef.where('status', '==', status);
-    }
-    const users = [];
-    await collectionRef
-      .get()
-      .then((snapshot) => {
-        snapshot.forEach((doc) => {
-          users.push(doc.data());
+    if (indexAlgolia.length <= 10) {
+      let collectionRef = db
+        .collection('users')
+        .where('id', 'in', indexAlgolia);
+
+      if (role) {
+        collectionRef = collectionRef.where('role', '==', role);
+      }
+      if (status) {
+        collectionRef = collectionRef.where('status', '==', status);
+      }
+      const users = [];
+      await collectionRef
+        .orderBy('id', 'desc')
+        .get()
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            users.push(doc.data());
+          });
+        })
+        .catch((err) => {
+          throw boom.badData(err);
         });
-      })
-      .catch((err) => {
-        throw boom.badData(err);
-      });
-    if (users.length <= 0) {
-      return { users: [], total: 0 };
+      if (users.length <= 0) {
+        return { users: [], total: 0 };
+      } else {
+        return { users, total: users.length };
+      }
     } else {
+      const arrayChuncked = await chunckarray(indexAlgolia, 10);
+      let users = [];
+      for (let i = 0; i < arrayChuncked.length; i++) {
+        let collectionRef = db
+          .collection('users')
+          .where('id', 'in', arrayChuncked[i]);
+
+        if (role) {
+          collectionRef = collectionRef.where('role', '==', role);
+        }
+        if (status) {
+          collectionRef = collectionRef.where('status', '==', status);
+        }
+        const result = [];
+        await collectionRef
+          .get()
+          .then((snapshot) => {
+            snapshot.forEach((doc) => {
+              result.push(doc.data());
+            });
+          })
+          .catch((err) => {
+            throw boom.badData(err);
+          });
+        users = users.concat(result);
+      }
       return { users, total: users.length };
     }
   }
