@@ -229,7 +229,7 @@ class UserRepository {
       }
     } else {
       const arrayChuncked = await chunckarray(indexAlgolia, 10);
-      let result = [];
+      let users = [];
       for (let i = 0; i < arrayChuncked.length; i++) {
         let collectionRef = db
           .collection('users')
@@ -241,20 +241,20 @@ class UserRepository {
         if (status) {
           collectionRef = collectionRef.where('status', '==', status);
         }
-        const users = [];
+        const result = [];
         await collectionRef
           .get()
           .then((snapshot) => {
             snapshot.forEach((doc) => {
-              users.push(doc.data());
+              result.push(doc.data());
             });
           })
           .catch((err) => {
             throw boom.badData(err);
           });
-        result = result.concat(users);
+        users = users.concat(result);
       }
-      return { users: result, total: result.length };
+      return { users, total: users.length };
     }
   }
 }
