@@ -1,6 +1,5 @@
 const UserServices = require('../services/user.services');
 const service = new UserServices();
-const functions = require('firebase-functions');
 
 class UserController {
   async setCustomerClaimToNewUser(user) {

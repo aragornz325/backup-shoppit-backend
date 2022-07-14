@@ -1,4 +1,5 @@
 const express = require('express');
+const router = express.Router();
 const UserController = require('../controllers/user.controller');
 const usercontroller = new UserController();
 
@@ -11,7 +12,6 @@ const {
 const { querySchema } = require('../schemas/user.schema');
 const validatorHandler = require('../middlewares/validatorHandler');
 const { masivecustomClaim } = require('../utils/masiveCostumerClaim');
-const router = express.Router();
 
 router.get('', validatorHandler(querySchema, 'query'), usercontroller.getUsers);
 router.get('/masiveclaims', masivecustomClaim);
