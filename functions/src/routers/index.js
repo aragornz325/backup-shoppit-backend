@@ -1,6 +1,6 @@
 const useRouter = require('./user.routes');
 const productsRouter = require('./products.router');
-const membershipsRouter = require('./memberships.router');
+const membershipsRouter = require('./memberships.routes');
 
 function routerApi(app) {
   app.use('/users', useRouter);
