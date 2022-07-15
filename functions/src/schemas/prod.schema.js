@@ -56,6 +56,7 @@ const variations = joi.array().items({
   size,
   color,
   quantity,
+  sku,
 });
 const vendor = joi.object({
   minimum_purchase: joi.number(),
@@ -82,8 +83,6 @@ const createProduct = joi.object({
   state: state.required(),
   variations: variations.required(),
   images_url: images_url.required(),
-  total_stock: total_stock.required(),
-  sku: sku.required(),
   category: category.required(),
   publish: publish.required(),
   offer_price: offer_price.required(),

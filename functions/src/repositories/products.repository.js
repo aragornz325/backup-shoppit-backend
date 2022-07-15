@@ -14,7 +14,7 @@ class ProductsRepository {
     let checkProduct;
     await db
       .collection('productspruebacrud')
-      .where('sku', '==', payload.sku)
+      .where('name', '==', payload.name)
       .get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
@@ -26,21 +26,23 @@ class ProductsRepository {
       throw boom.badRequest('Product already exists');
     }
 
-    let total_stock = payload.total_stock;
-    if (payload.variations.length > 0) {
-      payload.variations.forEach((variation) => {
-        total_stock += variation.quantity;
-      });
-    }
+    let total_stock = 0;
+    payload.variations.forEach((variation) => {
+      total_stock += variation.quantity;
+    });
 
     await db.collection('productspruebacrud').add({
       name: payload.name,
       description: payload.description,
       regular_price: payload.regular_price,
       state: payload.state,
-      variations: payload.variations,
+      variations: payload.variations.map((element, index) => {
+        return {
+          ...element,
+          sku: element.sku || `${id}_variation_${index}`,
+        };
+      }),
       images_url: payload.images_url,
-      sku: payload.sku,
       category: payload.category,
       publish: payload.publish,
       offer_price: payload.offer_price,
