@@ -1,8 +1,6 @@
 const { db } = require('../../config/firebase');
 const functions = require('firebase-functions');
 const boom = require('@hapi/boom');
-const { config } = require('../config/config');
-const algoliasearch = require('algoliasearch');
 
 class ProductsRepository {
   async createProduct(payload, id) {
@@ -50,7 +48,7 @@ class ProductsRepository {
       total_stock,
       owner_id: id,
     });
-    return { msg: ' created' };
+    return { msg: 'created' };
   }
 
   async getProductById(id) {
