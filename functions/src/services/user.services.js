@@ -12,6 +12,7 @@ const mercadopago = new Mercadopago();
 class UserServices {
   async setCustomerClaimToUser(user) {
     const auth = getAuth();
+    functions.logger.info('seting customer claim to user');
     await auth.setCustomUserClaims(user.uid, { role: ['customer'] });
     functions.logger.info(`seting claim to user ${JSON.stringify(user)}`);
     await userRepository.createUser(user);
