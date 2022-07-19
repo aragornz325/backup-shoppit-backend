@@ -65,7 +65,9 @@ class UserServices {
     await userRepository.updateUser(
       id,
       {
+        pagaId: body.pagoId,
         status: 'active',
+        role: 'seller',
         isVender: true,
         activeVender: true,
         user_membership: {

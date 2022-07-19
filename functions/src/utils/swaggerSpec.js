@@ -47,6 +47,43 @@ module.exports = swaggerEdit;
  *
  */
 
+/**
+ * @swagger
+ * path:
+ * /memberships:
+ *  get:
+ *   summary: Get all memberships
+ *   description: Get all memberships
+ *   operationId: getMemberships
+ *   tags: [Memberships]
+ *   parameters:
+ *   - in: header
+ *     name: x-user-id
+ *     required: true
+ *     example: "QbcLwTdVEoRuGejmVKIu"
+ *     schema:
+ *      type: string
+ *      format: uuid
+ *   security:
+ *     - ApiKeySecurity []
+ *     - Token []
+ *   responses:
+ *    '200':
+ *     description: A list of memberships
+ *     content:
+ *      application/json:
+ *        schema:
+ *          type: array
+ *          items:
+ *            type: object
+ *            $ref: '#/components/schemas/Membership'
+ *
+ *
+ *
+ *
+ *
+ */
+
 // update seller
 /**
  * @swagger
@@ -293,11 +330,51 @@ module.exports = swaggerEdit;
  *     description: "Error: Unauthorized"
  */
 
-// SCHEMA DE USUARIOS
+// SCHEMAS
 /**
  *  @swagger
  * components:
  *  schemas:
+ *    Memberships:
+ *      type: object
+ *      properties:
+ *        id:
+ *         type: string
+ *        name:
+ *          type: string
+ *        description:
+ *          type: string
+ *        membership_benefits:
+ *          type: array
+ *          items:
+ *           type: string
+ *        memberships_discounts:
+ *          type: array
+ *          items:
+ *           type: number
+ *        price:
+ *          type: number
+ *        payment_cycle:
+ *          type: string
+ *        active:
+ *          type: boolean
+ *        payment_url:
+ *          type: string
+ *      example:
+ *        id: QbcLwTdVEoRuGejmVKIu
+ *        name: "Basic"
+ *        description: "Basic membership"
+ *        price: 0
+ *        payment_cycle: "monthly"
+ *        active: true
+ *        membership_benefits:
+ *         - "Free shipping"
+ *         - "Free returns"
+ *         - "Free cancellation"
+ *         - "Free upgrade"
+ *        memberships_discounts:
+ *         - 20
+ *         - 30
  *    Users:
  *      type: object
  *      properties:
@@ -342,6 +419,8 @@ module.exports = swaggerEdit;
  *          type: array
  *        recentProducts:
  *          type: array
+ *        role:
+ *          type: string
  *        sheetsId:
  *          type: string
  *        storeName:
