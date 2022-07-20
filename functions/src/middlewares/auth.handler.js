@@ -25,7 +25,7 @@ async function isAuthenticated(req, res, next) {
     };
     return next();
   } catch (error) {
-    next(boom.unauthorized('unauthorized'));
+    next(boom.unauthorized('unauthorized este es el decodedToken'));
   }
 }
 

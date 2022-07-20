@@ -91,8 +91,8 @@ class GoogleSheetsRepository {
     return doc;
   }
 
-  async initSheet(spreadId) {
-    const doc = await this.docConstructor(spreadId);
+  async initSheet(id) {
+    const doc = await this.docConstructor(id);
     userSheet = await doc.addSheet({
       title: 'Shoppit',
       headerValues: headers,

@@ -1,29 +1,32 @@
-const GoogleSheetsRepository = require('../repositories/googlesheet.repository');
+const ProductsRepository = require('../repositories/products.repository');
+const productsRepository = new ProductsRepository();
+const GoogleSheetsRepository = require('../repositories/googleSheet.repository');
 const googleSheetsRepository = new GoogleSheetsRepository();
 
-const functions = require('firebase-functions');
-
-class ProductsService {
-  async initSheet(spreadId) {
-    const init = await googleSheetsRepository.initSheet(spreadId);
-    return init;
+class ProductsServices {
+  async createProduct(payload, id) {
+    return await productsRepository.createProduct(payload, id);
   }
 
-  async getProductSheet(spreadId) {
-    functions.logger.info(
-      `capturing information from the sheet with ID: ${spreadId}`
-    );
-
-    await googleSheetsRepository.getProduct(spreadId);
-
-    return { msg: 'ok' };
+  async getProductById(id) {
+    return await productsRepository.getProductById(id);
   }
 
-  async updateProductSheet(spreadId) {
-    await googleSheetsRepository.updateProduct(spreadId);
+  async getProducts(query) {
+    return await productsRepository.getProducts(query);
+  }
 
-    return { msg: 'ok' };
+  async updateProduct(id, payload, merge) {
+    return await productsRepository.updateProduct(id, payload, merge);
+  }
+
+  async deleteProduct(id) {
+    return await productsRepository.deleteProduct(id);
+  }
+
+  async initSheet(id, payload) {
+    return await googleSheetsRepository.initSheet(id, payload);
   }
 }
 
-module.exports = ProductsService;
+module.exports = ProductsServices;
