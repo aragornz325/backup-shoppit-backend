@@ -1,5 +1,5 @@
 const useRouter = require('./user.routes');
-const productsRouter = require('./products.router');
+const productsRouter = require('./products.routes');
 const membershipsRouter = require('./memberships.routes');
 const productRouter = require('./products.routes');
 

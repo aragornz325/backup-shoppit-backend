@@ -17,8 +17,8 @@ const validatorHandler = require('../middlewares/validatorHandler');
 
 router.get('', productsController.getProducts);
 router.post('/batch/:id', productsController.initSheet);
-router.get('/batch/:id', productsController.getProductSheet);
-router.patch('/batch/:id', productsController.updateProductSheet);
+// router.get('/batch/:id', productsController.getProductSheet);
+// router.patch('/batch/:id', productsController.updateProductSheet);
 router.post(
   '/:id',
   validatorHandler(createProduct, 'body'),

@@ -11,55 +11,29 @@ const productsRepository = new ProductsRepository();
 const boom = require('@hapi/boom');
 const headers = [
   'name',
-  'offer_price',
-  'regular_price',
   'description',
-  'image_url',
+  'currency',
+  'regular_price',
+  'state',
+  'images_url',
+  'category',
+  'offer_price',
+  'min_sell_amount',
+  'sku',
+  'variation_type',
+  'size',
+  'color',
+  'quantity',
+  'Stock_XL',
   'height',
   'width',
-  'weight',
   'longitude',
-  'SKU',
-  'Stock_XS',
-  'Stock_S',
-  'Stock_M',
-  'Stock_L',
-  'Stock_XL',
+  'weight',
 ];
 
 let userSheet = null;
 
 class GoogleSheetsRepository {
-  async compareObj(productInDb, item) {
-    const aKeys = Object.keys(productInDb).sort();
-    const bKeys = Object.keys(item).sort();
-    const aValues = Object.values(productInDb).sort();
-    const bValues = Object.values(item).sort();
-    if (aValues.length !== bValues.length) {
-      return false;
-    }
-    if (aKeys.length !== bKeys.length) {
-      return false;
-    }
-    if (aKeys.join('') !== bKeys.join('')) {
-      return false;
-    }
-    if (aValues.join('') !== bValues.join('')) {
-      return false;
-    }
-    for (let i = 0; i < aValues.length; i++) {
-      if (aValues[i] !== bValues[i]) {
-        return false;
-      }
-    }
-    for (let i = 0; i < aKeys.length; i++) {
-      if (productInDb[aKeys[i]] !== item[bKeys[i]]) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   async createProductObject(item) {
     const product = {
       name: item.name,

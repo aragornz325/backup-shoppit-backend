@@ -188,7 +188,6 @@ class UserRepository {
     }
 
     const users = [];
-    console.log('voy a buscar');
     await collectionRef
       .limit(parseInt(limit, 10))
       .orderBy('lastName', 'asc')
