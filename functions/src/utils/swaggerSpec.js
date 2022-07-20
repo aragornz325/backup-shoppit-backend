@@ -77,7 +77,7 @@ module.exports = swaggerEdit;
  *      application/json:
  *        schema:
  *          type: object
- *          $ref: '#/components/schemas/Users'
+ *           $ref: '#/components/schemas/Users'
  *
  *    security:
  *     - Token: []

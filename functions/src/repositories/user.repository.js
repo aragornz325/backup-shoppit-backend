@@ -164,6 +164,7 @@ class UserRepository {
     usersAlgolia.forEach((user) => {
       result.push(user.objectID);
     });
+
     return result;
   }
 
@@ -179,9 +180,10 @@ class UserRepository {
     }
 
     const users = [];
+    console.log('voy a buscar');
     await collectionRef
       .limit(parseInt(limit, 10))
-      .orderBy('id', 'desc')
+      .orderBy('lastName', 'asc')
       .startAfter(offset)
       .get()
       .then((snapshot) => {
@@ -221,7 +223,7 @@ class UserRepository {
       }
       const users = [];
       await collectionRef
-        .orderBy('id', 'desc')
+        .orderBy('lastName', 'asc')
         .get()
         .then((snapshot) => {
           snapshot.forEach((doc) => {
