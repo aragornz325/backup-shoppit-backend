@@ -5,7 +5,6 @@ const { sendEmail } = require('../utils/mailer');
 const { activeSeller } = require('../utils/baseMails.js');
 const Mercadopago = require('./mercadopago.services');
 const UserRepository = require('../repositories/user.repository');
-const { auth } = require('firebase-admin');
 const userRepository = new UserRepository();
 const mercadopago = new Mercadopago();
 
@@ -102,6 +101,7 @@ class UserServices {
   }
 
   async updateUser(id, body) {
+    console.log('ejecutando updateUser');
     const user = await userRepository.updateUser(id, body, true);
     return user;
   }

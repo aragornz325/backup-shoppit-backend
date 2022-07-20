@@ -1,8 +1,6 @@
 const { db } = require('../../config/firebase');
 const functions = require('firebase-functions');
 const boom = require('@hapi/boom');
-const { config } = require('../config/config');
-const algoliasearch = require('algoliasearch');
 
 class MembershipsRepository {
   async createMembership(payload) {
