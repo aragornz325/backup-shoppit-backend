@@ -44,7 +44,6 @@ class UserController {
   }
 
   async updateUser(req, res, next) {
-    console.log('ejecutando contreller');
     try {
       const { id } = req.params;
       const body = req.body;

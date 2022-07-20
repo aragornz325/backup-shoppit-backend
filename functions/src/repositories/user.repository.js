@@ -88,12 +88,11 @@ class UserRepository {
 
   async updateUser(id, payload, merge) {
     const userRef = db.collection('users').doc(id);
-    console.log('ejecutando update user');
-    // const user = await userRef.get();
-    // if (!user.exists) {
-    //   functions.logger.error(`user with ID ${id} not found`);
-    //   throw boom.badData(`user with ID ${id} not found`);
-    // }
+    const user = await userRef.get();
+    if (!user.exists) {
+      functions.logger.error(`user with ID ${id} not found`);
+      throw boom.badData(`user with ID ${id} not found`);
+    }
     await userRef.set(payload, { merge: merge });
     functions.logger.info(`update ok`);
     return { msg: 'ok' };
@@ -189,7 +188,6 @@ class UserRepository {
     }
 
     const users = [];
-    console.log('voy a buscar');
     await collectionRef
       .limit(parseInt(limit, 10))
       .orderBy('lastName', 'asc')

@@ -101,7 +101,6 @@ class UserServices {
   }
 
   async updateUser(id, body) {
-    console.log('ejecutando updateUser');
     const user = await userRepository.updateUser(id, body, true);
     return user;
   }
