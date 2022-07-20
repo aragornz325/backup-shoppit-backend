@@ -6,7 +6,7 @@ const available_colors = joi.string();
 const available_size = joi.string();
 const category = joi.string().valid('clothes', 'shoes', 'accessories', 'tech');
 const color = joi.string().max(20);
-const currency = joi.string().min(3).max(3).default('ARS');
+const currency = joi.string().valid('ARS', 'USD', 'BRL', 'PYG').default('ARS');
 const stock = joi.number().integer();
 const description = joi.string().max(255);
 
@@ -88,6 +88,7 @@ const createProduct = joi.object({
   offer_price: offer_price.required(),
   min_sell_amount: min_sell_amount.required(),
   dimensions: dimensions.required(),
+  currency: currency.required(),
 });
 
 const updateProduct = joi.object({
