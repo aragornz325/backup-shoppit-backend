@@ -39,7 +39,7 @@ const regular_price = joi.number().integer().positive();
 const sale_price = joi.number().integer().positive();
 const selected_variation = joi.string();
 const size = joi.string().valid('XS', 'S', 'M', 'L', 'XL', 'XXL');
-const sku = joi.number();
+const sku = joi.string();
 const state = joi.string().valid('new', 'used');
 const status = joi.string();
 const stock_quantity = joi.number().positive();
@@ -88,7 +88,7 @@ const createProduct = joi.object({
   regular_price: regular_price.required(),
   state: state.required(),
   variations: variations.required(),
-  images_url: images_url.required(),
+  images_url: images_url,
   category: category.required(),
   publish: publish.required(),
   offer_price: offer_price.required(),
@@ -158,6 +158,5 @@ module.exports = {
   createProduct,
   updateProduct,
   getOne,
-  validateSheetsProduct,
   validateItem,
 };

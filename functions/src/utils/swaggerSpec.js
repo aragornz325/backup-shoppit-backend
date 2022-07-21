@@ -202,7 +202,7 @@ module.exports = swaggerEdit;
  *            paymenc_cycle: "monthly"
  *            price: "10000"
  *            description: "Membership 1"
- *
+ */
 
 // update seller
 /**

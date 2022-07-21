@@ -66,6 +66,15 @@ class ProductsController {
       next(error);
     }
   }
+  async getProductSheet(req, res, next) {
+    try {
+      const id = req.params.id;
+      const sheet = await productsServices.getProductSheet(id);
+      res.status(200).send(sheet);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = ProductsController;

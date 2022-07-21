@@ -27,6 +27,9 @@ class ProductsServices {
   async initSheet(id, payload) {
     return await googleSheetsRepository.initSheet(id, payload);
   }
+  async getProductSheet(id) {
+    return await googleSheetsRepository.getProduct(id);
+  }
 }
 
 module.exports = ProductsServices;

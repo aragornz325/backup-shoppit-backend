@@ -6,8 +6,8 @@ class ProductsRepository {
   async createProduct(payload) {
     let productID = '';
     await db
-      .collection('productodPrueba')
-      .add(...payload)
+      .collection('productodPruebasheet')
+      .add(payload)
       .then((docRef) => {
         productID = docRef.id;
       })

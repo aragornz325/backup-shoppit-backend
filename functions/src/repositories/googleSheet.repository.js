@@ -1,10 +1,7 @@
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { config } = require('../config/config');
 const functions = require('firebase-functions');
-const {
-  validateSheetsProduct,
-  validateItem,
-} = require('../schemas/prod.schema');
+const { createProduct } = require('../schemas/prod.schema');
 const ProductsRepository = require('../repositories/products.repository');
 const productsRepository = new ProductsRepository();
 
@@ -24,7 +21,6 @@ const headers = [
   'size',
   'color',
   'quantity',
-  'Stock_XL',
   'height',
   'width',
   'longitude',
@@ -34,23 +30,36 @@ const headers = [
 let userSheet = null;
 
 class GoogleSheetsRepository {
-  async createProductObject(item) {
+  async createProductObject(spreadId, item, rowRef) {
     const product = {
       name: item.name,
-      offer_price: parseInt(item.offer_price, 10),
+      currency: item.currency,
       regular_price: parseInt(item.offer_price, 10),
       description: item.description,
-      image_url: item.image_url,
-      stock_XS: parseInt(item.Stock_XS, 10),
-      stock_S: parseInt(item.Stock_S, 10),
-      stock_M: parseInt(item.Stock_M, 10),
-      stock_L: parseInt(item.Stock_L, 10),
-      stock_XL: parseInt(item.Stock_XL, 10),
-      sku: item.SKU,
-      height: parseFloat(item.height),
-      width: parseFloat(item.width),
-      longitude: parseFloat(item.longitude),
-      weight: parseFloat(item.weight),
+      state: item.state,
+      images_url: [item.images_url] || [
+        'https://cdn.shopify.com/s/files/1/0986/0842/products/21XMEfB8BFL.gif?v=1571515951',
+      ],
+      category: item.category,
+      variations: [
+        {
+          variation_type: item.variation_type,
+          size: item.size,
+          color: item.color,
+          quantity: item.quantity,
+          sku:
+            item.sku || `row_${rowRef}/${item.name}/${item.color}/${spreadId}`,
+        },
+      ],
+      dimensions: {
+        height: parseFloat(item.height),
+        width: parseFloat(item.width),
+        longitude: parseFloat(item.longitude),
+        weight: parseFloat(item.weight),
+      },
+      offer_price: parseInt(item.offer_price, 10),
+      min_sell_amount: parseInt(item.min_sell_amount, 10),
+      publish: true,
     };
 
     return product;
@@ -102,8 +111,8 @@ class GoogleSheetsRepository {
         continue;
       }
       const rowRef = parseInt(item._rowNumber, 10);
-      let payload = await this.createProductObject(item);
-      const { error } = validateSheetsProduct.validate(payload);
+      let payload = await this.createProductObject(spreadId, item, rowRef);
+      const { error } = createProduct.validate(payload);
       if (error) {
         functions.logger.log(`error in item ${rows[i].name}, ${error}`);
         throw boom.badData(`error in item ${rows[i].name}, ${error}`);
@@ -114,6 +123,7 @@ class GoogleSheetsRepository {
       item.id = productID;
       await item.save();
     }
+    return { msg: 'ok' };
   }
 
   async updateProduct(spreadId) {
@@ -148,7 +158,7 @@ class GoogleSheetsRepository {
         continue;
       }
 
-      const { error } = validateSheetsProduct.validate(payload);
+      const { error } = createProduct.validate(payload);
       if (error) {
         functions.logger.log(`error in item ${rows[i].name}, ${error}`);
         throw boom.badData(`error in item ${rows[i].name}, ${error}`);
@@ -157,84 +167,6 @@ class GoogleSheetsRepository {
       await productsRepository.updateProduct(item.id, payload);
     }
   }
-
-  // const insertRows = async (req, res) => {
-  //   //Recibe una lista de objectos [{..}, {..}]
-  //   const { rowsArray, spreadId } = req.body;
-  //   if (!rowsArray || !spreadId)
-  //    throw boom.badRequest('missing rowsArray or spreadId');
-
-  //   const doc = new GoogleSpreadsheet(spreadId);
-  //   doc.useServiceAccountAuth({
-  //     client_email: credentials.client_email,
-  //     private_key: credentials.private_key,
-  //   });
-  //   await doc.loadInfo();
-  //   try {
-  //     const sheet = doc.sheetsByIndex[1];
-  //     console.log(typeof rowsArray);
-  //     const addedRow = await sheet.addRows(rowsArray);
-  //     return res.status(200).json({ result: addedRow });
-  //   } catch (err) {
-  //     return res.status(500).json({ error: err.message });
-  //   }
-  // };
-
-  // async insertId(productID, spreadId, rowRef) {
-  //   const doc = await this.docConstructor(spreadId);
-
-  //   await doc.loadInfo();
-  //   const sheet = doc.sheetsByIndex[1];
-  //   const rows = await sheet.getRows();
-
-  //   if (rows.length > 0) {
-  //     console.log('tiene mas de uno');
-  //   }
-  //   return { msg: ' id in sheet Updated' };
-  // }
-
-  // const editProducts = async (req, res) => {
-  //   const { id, spreadId, editedProduct } = req.body;
-  //   if (!id || !editedProduct || !spreadId)
-  //     return res.status(400).json({ error: 'Bad request' });
-  //   const doc = new GoogleSpreadsheet(spreadId);
-  //   doc.useServiceAccountAuth({
-  //     client_email: credentials.client_email,
-  //     private_key: credentials.private_key,
-  //   });
-  //   await doc.loadInfo();
-  //   const sheet = doc.sheetsByIndex[1];
-  //   const rows = await sheet.getRows();
-  //   let fila = [];
-  //   let updated = false;
-  //   rows.forEach(async (row, i) => {
-  //     if (row.id == id) {
-  //       editedProduct.name ? (row.nombre = editedProduct.name) : null;
-  //       editedProduct.salePrice
-  //         ? (row['precio_oferta'] = editedProduct.salePrice)
-  //         : null;
-  //       editedProduct.regularPrice
-  //         ? (row['precio_regular'] = editedProduct.regularPrice)
-  //         : null;
-  //       editedProduct.height ? (row['Alto (cm)'] = editedProduct.height) : null;
-  //       editedProduct.width ? (row['Ancho (cm)'] = editedProduct.width) : null;
-  //       editedProduct.longitude
-  //         ? (row['Longitud (cm)'] = editedProduct.longitude)
-  //         : null;
-  //       editedProduct.weight ? (row['Peso (kg)'] = editedProduct.weight) : null;
-  //       editedProduct.description
-  //         ? (row['descripcion'] = editedProduct.description)
-  //         : null;
-  //       editedProduct.sku ? (row['SKU'] = editedProduct.sku) : null;
-  //       await row.save();
-  //       console.log(fila);
-  //       return res.send('Updated');
-  //     } else if (i === rows.length - 1) {
-  //       console.log(true);
-  //       return res.status(404).json({ error: 'Could not update it' });
-  //     }
-  //   });
-  //   };
 }
 
 module.exports = GoogleSheetsRepository;
