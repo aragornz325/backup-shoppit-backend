@@ -29,23 +29,26 @@ class ProductsRepository {
     return { msg: 'batch ok' };
   }
 
-  async getProductById(id) {
-    let product = {};
+  async getProducts(limit, offset) {
+    const products = [];
     await db
-      .collection('productodPrueba')
-      .doc(id)
+      .collection('products')
+      .orderBy('name')
+      .limit(parseInt(limit, 10))
+      .startAfter(parseInt(offset, 10))
       .get()
-      .then((doc) => {
-        if (doc.exists) {
-          product = doc.data();
-        } else {
-          throw boom.badData(`The product with id ${id} does not exist`);
-        }
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          products.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        });
       })
       .catch((error) => {
         throw boom.badData(error);
       });
-    return product;
+    return products;
   }
 
   async updateProduct(id, payload) {
@@ -57,6 +60,53 @@ class ProductsRepository {
         throw boom.badData(error);
       });
     return { msg: 'updated' };
+  }
+
+  async getProductByFilter(search, offset, limit) {
+    let productN = [];
+    const parameter = Object.keys(search).toString();
+    let objetive = '';
+    if (Number.isInteger(parseInt(Object.values(search), 10))) {
+      objetive = parseInt(Object.values(search), 10);
+    } else {
+      objetive = Object.values(search);
+      console.log('objetivo', objetive);
+    }
+    const collectionRef = db
+      .collection('products')
+      .where(parameter, '==', objetive[0]);
+    await collectionRef.get().then((snapshot) => {
+      snapshot.forEach((doc) => {
+        productN.push(doc.data());
+      });
+    });
+    return {
+      ...productN,
+      total: productN.length,
+    };
+  }
+
+  async getProductByOwner(ownerId, limit, offset) {
+    console.log('voy a buscar por owner', ownerId);
+    const products = [];
+    await db
+      .collection('products')
+      .where('owner_id', '==', ownerId)
+      .limit(limit)
+      .startAfter(offset)
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          products.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        });
+      })
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    return products;
   }
 }
 

@@ -15,17 +15,59 @@ const {
 
 const validatorHandler = require('../middlewares/validatorHandler');
 
-router.get('', productsController.getProducts);
-router.post('/batch/:id', productsController.initSheet);
-router.get('/batch/:id', productsController.getProductSheet);
-// router.patch('/batch/:id', productsController.updateProductSheet);
+router.get('', checkApiKey, productsController.getProducts);
+router.post(
+  '/batch/:id',
+  checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin', 'seller'],
+    allowSameUser: false,
+  }),
+  productsController.initSheet
+);
+router.get(
+  '/batch/:id',
+  checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin', 'seller'],
+    allowSameUser: false,
+  }),
+  productsController.getProductSheet
+);
+
 router.post(
   '/:id',
+  checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin', 'seller'],
+    allowSameUser: false,
+  }),
   validatorHandler(createProduct, 'body'),
   productsController.createProduct
 );
-router.get('/:id', productsController.getProductById);
-router.put('/:id', productsController.updateProduct);
-router.delete('/:id', productsController.deleteProduct);
+router.get('/:id', checkApiKey, productsController.getProductById);
+router.put(
+  '/:id',
+  checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin', 'seller'],
+    allowSameUser: false,
+  }),
+  productsController.updateProduct
+);
+router.delete(
+  '/:id',
+  checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin'],
+    allowSameUser: false,
+  }),
+  productsController.deleteProduct
+);
 
 module.exports = router;
