@@ -95,7 +95,6 @@ class GoogleSheetsRepository {
   }
 
   async getProduct(spreadId, userId) {
-    console.log(userId);
     const doc = await this.docConstructor(spreadId);
     await doc.loadInfo();
     const sheet = doc.sheetsByIndex[1];

@@ -24,8 +24,22 @@ class ProductsController {
   }
 
   async getProducts(req, res, next) {
+    let search = '';
+    if (Object.keys(req.query).length === 0) {
+      search = undefined;
+    } else {
+      search = req.query;
+    }
+    const { owner_id } = req.query;
+    const limit = req.query.limit || 25;
+    const offset = req.query.offset || 0;
     try {
-      const products = await productsServices.getProducts(req.query);
+      const products = await productsServices.getProducts(
+        search,
+        limit,
+        offset,
+        owner_id
+      );
       res.status(200).send(products);
     } catch (error) {
       next(error);
@@ -69,7 +83,6 @@ class ProductsController {
   async getProductSheet(req, res, next) {
     try {
       const userId = req.headers['x-user-id'];
-      console.log(userId);
       const id = req.params.id;
       const sheet = await productsServices.getProductSheet(id, userId);
       res.status(200).send(sheet);
