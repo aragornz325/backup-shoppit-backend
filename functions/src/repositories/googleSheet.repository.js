@@ -30,16 +30,14 @@ const headers = [
 let userSheet = null;
 
 class GoogleSheetsRepository {
-  async createProductObject(spreadId, item, rowRef) {
+  async createProductObject(spreadId, item, rowRef, userId) {
     const product = {
       name: item.name,
       currency: item.currency,
-      regular_price: parseInt(item.offer_price, 10),
+      regular_price: parseInt(item.regular_price, 10),
       description: item.description,
       state: item.state,
-      images_url: [item.images_url] || [
-        'https://cdn.shopify.com/s/files/1/0986/0842/products/21XMEfB8BFL.gif?v=1571515951',
-      ],
+      images_url: [item.images_url] || [''],
       category: item.category,
       variations: [
         {
@@ -57,9 +55,11 @@ class GoogleSheetsRepository {
         longitude: parseFloat(item.longitude),
         weight: parseFloat(item.weight),
       },
-      offer_price: parseInt(item.offer_price, 10),
+      offer_price: parseFloat(item.offer_price, 10),
       min_sell_amount: parseInt(item.min_sell_amount, 10),
       publish: true,
+      owner_id: userId,
+      total_stock: parseInt(item.quantity, 10),
     };
 
     return product;
@@ -94,7 +94,8 @@ class GoogleSheetsRepository {
     return 'ok';
   }
 
-  async getProduct(spreadId) {
+  async getProduct(spreadId, userId) {
+    console.log(userId);
     const doc = await this.docConstructor(spreadId);
     await doc.loadInfo();
     const sheet = doc.sheetsByIndex[1];
@@ -111,7 +112,13 @@ class GoogleSheetsRepository {
         continue;
       }
       const rowRef = parseInt(item._rowNumber, 10);
-      let payload = await this.createProductObject(spreadId, item, rowRef);
+      let payload = await this.createProductObject(
+        spreadId,
+        item,
+        rowRef,
+        userId
+      );
+
       const { error } = createProduct.validate(payload);
       if (error) {
         functions.logger.log(`error in item ${rows[i].name}, ${error}`);

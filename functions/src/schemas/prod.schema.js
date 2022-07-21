@@ -17,7 +17,7 @@ const height = joi.number().positive();
 const id = joi.string().alphanum(); //TODO: requiere confirmacion del largo del ID
 const image_url = joi.string().uri();
 const images = joi.array().items(joi.string().uri());
-const images_url = joi.array().items(joi.string().uri());
+const images_url = joi.array();
 const in_stock = joi.boolean();
 const is_published = joi.boolean();
 const longitude = joi.number().positive();
@@ -28,6 +28,7 @@ const min_sell_amount = joi.number().integer();
 const name = joi.string().max(40);
 const origin = joi.string().max(20);
 const offer_price = joi.number().positive();
+const owner_id = joi.string().alphanum();
 const permalink = joi.string().uri();
 const plataform = joi.string().max(5);
 const price = joi.any();
@@ -35,10 +36,10 @@ const productAttributes = joi.string();
 const publish = joi.boolean();
 const quantity = joi.number().integer();
 const quantity_to_cart = joi.string();
-const regular_price = joi.number().integer().positive();
+const regular_price = joi.number().integer();
 const sale_price = joi.number().integer().positive();
 const selected_variation = joi.string();
-const size = joi.string().valid('XS', 'S', 'M', 'L', 'XL', 'XXL');
+const size = joi.string().min(2).max(25);
 const sku = joi.string();
 const state = joi.string().valid('new', 'used');
 const status = joi.string();
@@ -55,7 +56,7 @@ const total_stock = joi.number().positive();
 const type = joi.string();
 const updated = joi.array();
 const variable_products = joi.array();
-const variation_type = joi.string().valid('tech', 'clotehs');
+const variation_type = joi.string().min(3).max(15);
 
 const variations = joi.array().items({
   variation_type,
@@ -95,6 +96,8 @@ const createProduct = joi.object({
   min_sell_amount: min_sell_amount.required(),
   dimensions: dimensions.required(),
   currency: currency.required(),
+  owner_id: owner_id.required(),
+  total_stock: total_stock.required(),
 });
 
 const validateSheetsProduct = joi.object({

@@ -68,8 +68,10 @@ class ProductsController {
   }
   async getProductSheet(req, res, next) {
     try {
+      const userId = req.headers['x-user-id'];
+      console.log(userId);
       const id = req.params.id;
-      const sheet = await productsServices.getProductSheet(id);
+      const sheet = await productsServices.getProductSheet(id, userId);
       res.status(200).send(sheet);
     } catch (error) {
       next(error);

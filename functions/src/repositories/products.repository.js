@@ -6,7 +6,7 @@ class ProductsRepository {
   async createProduct(payload) {
     let productID = '';
     await db
-      .collection('productodPruebasheet')
+      .collection('productspruebasheet')
       .add(payload)
       .then((docRef) => {
         productID = docRef.id;
@@ -20,7 +20,7 @@ class ProductsRepository {
   async createdInBatch(payload) {
     const batch = db.batch();
     payload.forEach((product) => {
-      const productRef = db.collection('productodPrueba');
+      const productRef = db.collection('products');
       batch.set(productRef, product);
     });
     functions.logger.log('Batch created');
