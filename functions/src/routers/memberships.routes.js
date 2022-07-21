@@ -15,16 +15,7 @@ const {
 
 const validatorHandler = require('../middlewares/validatorHandler');
 
-router.get(
-  '/',
-  checkApiKey,
-  isAuthenticated,
-  isAuthorized({
-    hasRole: ['admin'],
-    allowSameUser: false,
-  }),
-  membershipscontroller.getMemberships
-);
+router.get('/', checkApiKey, membershipscontroller.getMemberships);
 router.post(
   '/',
   checkApiKey,
