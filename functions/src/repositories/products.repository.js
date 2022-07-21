@@ -63,7 +63,6 @@ class ProductsRepository {
   }
 
   async getProductByFilter(search, offset, limit) {
-    console.log('voy a buscar por filtro', search);
     let productN = [];
     const parameter = Object.keys(search).toString();
     let objetive = '';
@@ -71,10 +70,11 @@ class ProductsRepository {
       objetive = parseInt(Object.values(search), 10);
     } else {
       objetive = Object.values(search);
+      console.log('objetivo', objetive);
     }
     const collectionRef = db
       .collection('products')
-      .where(parameter, '==', objetive);
+      .where(parameter, '==', objetive[0]);
     await collectionRef.get().then((snapshot) => {
       snapshot.forEach((doc) => {
         productN.push(doc.data());
