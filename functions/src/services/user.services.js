@@ -5,13 +5,13 @@ const { sendEmail } = require('../utils/mailer');
 const { activeSeller } = require('../utils/baseMails.js');
 const Mercadopago = require('./mercadopago.services');
 const UserRepository = require('../repositories/user.repository');
-const { auth } = require('firebase-admin');
 const userRepository = new UserRepository();
 const mercadopago = new Mercadopago();
 
 class UserServices {
   async setCustomerClaimToUser(user) {
     const auth = getAuth();
+    functions.logger.info('seting customer claim to user');
     await auth.setCustomUserClaims(user.uid, { role: ['customer'] });
     functions.logger.info(`seting claim to user ${JSON.stringify(user)}`);
     await userRepository.createUser(user);
@@ -64,7 +64,9 @@ class UserServices {
     await userRepository.updateUser(
       id,
       {
+        pagaId: body.pagoId,
         status: 'active',
+        role: 'seller',
         isVender: true,
         activeVender: true,
         user_membership: {

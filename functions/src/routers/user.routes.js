@@ -31,7 +31,6 @@ router.patch(
   '/:id',
   checkApiKey,
   isAuthenticated,
-  isAuthorized,
   isAuthorized({
     hasRole: ['admin'],
     allowSameUser: true,

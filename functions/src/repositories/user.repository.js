@@ -13,6 +13,7 @@ const index = client.initIndex(`${config.algoliaUsersIndexName}`);
 
 class UserRepository {
   async createUser(user) {
+    functions.logger.info('execute create user');
     try {
       functions.logger.info(
         `check if the user with email: ${user.email} already exists`
@@ -22,6 +23,7 @@ class UserRepository {
         functions.logger.info(
           `the user with email ${user.email} already exists`
         );
+        return { msg: 'ok' };
       } else {
         if (!user.displayName) {
           user.displayName = ' ';
@@ -93,7 +95,7 @@ class UserRepository {
     }
     await userRef.set(payload, { merge: merge });
     functions.logger.info(`update ok`);
-    return;
+    return { msg: 'ok' };
   }
 
   async getUsersByFilter(search) {
@@ -115,15 +117,21 @@ class UserRepository {
     };
   }
 
-  // async getUserByEmail(email) {
-  //   const userRef = db.collection('users').where('email', '==', email);
-  //   const user = await userRef.get();
-  //   if (!user.exists) {
-  //     functions.logger.error(`user with email ${email} not found`);
-  //     throw boom.badData(`user with email ${email} not found`);
-  //   }
-  //   return user.data();
-  // }
+  async getUserByEmail(email) {
+    const userRef = db.collection('users').where('email', '==', email);
+    let user = '';
+    await userRef
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          user = doc.data();
+        });
+      })
+      .catch((err) => {
+        functions.logger.info(err);
+      });
+    return user;
+  }
 
   async getUsers(search, role, status, limit, offset) {
     if (!search) {
@@ -180,7 +188,6 @@ class UserRepository {
     }
 
     const users = [];
-    console.log('voy a buscar');
     await collectionRef
       .limit(parseInt(limit, 10))
       .orderBy('lastName', 'asc')

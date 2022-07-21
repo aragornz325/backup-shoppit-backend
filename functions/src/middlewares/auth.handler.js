@@ -45,6 +45,9 @@ function isAuthorized({ hasRole, allowSameUser }) {
 }
 
 function checkApiKey(req, res, next) {
+  if (!req.headers['api']) {
+    next(boom.unauthorized('unauthorized - need api key'));
+  }
   const apiKey = req.headers['api'];
   if (apiKey === config.apiKeyShoppit) {
     next();

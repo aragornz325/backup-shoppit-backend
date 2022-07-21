@@ -13,13 +13,14 @@ const description = joi.string().max(255);
 const featured = joi.boolean();
 const featuredImage = joi.string().uri();
 const freeShipping = joi.boolean();
-const height = joi.number();
+const height = joi.number().positive();
 const id = joi.string().alphanum(); //TODO: requiere confirmacion del largo del ID
+const image_url = joi.string().uri();
 const images = joi.array().items(joi.string().uri());
-const images_url = joi.array().items(joi.string().uri());
+const images_url = joi.array();
 const in_stock = joi.boolean();
 const is_published = joi.boolean();
-const longitude = joi.number();
+const longitude = joi.number().positive();
 const manage_colors = joi.boolean();
 const manage_size = joi.boolean();
 const manage_stock = joi.boolean();
@@ -27,6 +28,7 @@ const min_sell_amount = joi.number().integer();
 const name = joi.string().max(40);
 const origin = joi.string().max(20);
 const offer_price = joi.number().positive();
+const owner_id = joi.string().alphanum();
 const permalink = joi.string().uri();
 const plataform = joi.string().max(5);
 const price = joi.any();
@@ -34,14 +36,19 @@ const productAttributes = joi.string();
 const publish = joi.boolean();
 const quantity = joi.number().integer();
 const quantity_to_cart = joi.string();
-const regular_price = joi.number().integer().positive();
+const regular_price = joi.number().integer();
 const sale_price = joi.number().integer().positive();
 const selected_variation = joi.string();
-const size = joi.string().valid('XS', 'S', 'M', 'L', 'XL', 'XXL');
-const sku = joi.number();
+const size = joi.string().min(2).max(25);
+const sku = joi.string();
 const state = joi.string().valid('new', 'used');
 const status = joi.string();
 const stock_quantity = joi.number().positive();
+const stock_XS = joi.number().integer().positive();
+const stock_S = joi.number().integer().positive();
+const stock_M = joi.number().integer().positive();
+const stock_L = joi.number().integer().positive();
+const stock_XL = joi.number().integer().positive();
 const short_description = joi.string().max(250);
 const tags = joi.array();
 const total_sales = joi.number();
@@ -49,7 +56,7 @@ const total_stock = joi.number().positive();
 const type = joi.string();
 const updated = joi.array();
 const variable_products = joi.array();
-const variation_type = joi.string().valid('tech', 'clotehs');
+const variation_type = joi.string().min(3).max(15);
 
 const variations = joi.array().items({
   variation_type,
@@ -66,8 +73,8 @@ const vendor = joi.object({
   vendor_id: joi.string().alphanum(),
 });
 const volumen = joi.number();
-const weight = joi.number();
-const width = joi.number();
+const weight = joi.number().positive();
+const width = joi.number().positive();
 const withError = joi.boolean();
 const dimensions = joi.object({
   height,
@@ -82,15 +89,54 @@ const createProduct = joi.object({
   regular_price: regular_price.required(),
   state: state.required(),
   variations: variations.required(),
-  images_url: images_url.required(),
+  images_url: images_url,
   category: category.required(),
   publish: publish.required(),
   offer_price: offer_price.required(),
   min_sell_amount: min_sell_amount.required(),
   dimensions: dimensions.required(),
   currency: currency.required(),
+  owner_id: owner_id.required(),
+  total_stock: total_stock.required(),
 });
 
+const validateSheetsProduct = joi.object({
+  name: name.required(),
+  offer_price: offer_price.required(),
+  regular_price: regular_price.required(),
+  description: description.required(),
+  image_url: image_url.required(),
+  height: height.required(),
+  width: width.required(),
+  weight: weight.required(),
+  longitude: longitude.required(),
+  sku: sku.required(),
+  stock_XS: stock_XS.required(),
+  stock_S: stock_S.required(),
+  stock_M: stock_M.required(),
+  stock_L: stock_L.required(),
+  stock_XL: stock_XL.required(),
+});
+
+const validateItem = joi
+  .array()
+  .items(
+    name,
+    offer_price,
+    regular_price,
+    description,
+    image_url,
+    height,
+    width,
+    weight,
+    longitude,
+    sku,
+    stock_XS,
+    stock_S,
+    stock_M,
+    stock_L,
+    stock_XL
+  );
 const updateProduct = joi.object({
   name,
   description,
@@ -115,4 +161,5 @@ module.exports = {
   createProduct,
   updateProduct,
   getOne,
+  validateItem,
 };
