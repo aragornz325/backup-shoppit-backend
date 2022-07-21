@@ -30,13 +30,12 @@ class ProductsRepository {
   }
 
   async getProducts(limit, offset) {
-    console.log('voy a buscar todos');
     const products = [];
     await db
       .collection('products')
       .orderBy('name')
-      .limit(limit)
-      .startAfter(offset)
+      .limit(parseInt(limit, 10))
+      .startAfter(parseInt(offset, 10))
       .get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
@@ -67,12 +66,15 @@ class ProductsRepository {
     console.log('voy a buscar por filtro', search);
     let productN = [];
     const parameter = Object.keys(search).toString();
-    const objetive = search[parameter];
+    let objetive = '';
+    if (Number.isInteger(parseInt(Object.values(search), 10))) {
+      objetive = parseInt(Object.values(search), 10);
+    } else {
+      objetive = Object.values(search);
+    }
     const collectionRef = db
       .collection('products')
-      .where(parameter, '==', objetive)
-      .limit(limit);
-
+      .where(parameter, '==', objetive);
     await collectionRef.get().then((snapshot) => {
       snapshot.forEach((doc) => {
         productN.push(doc.data());
