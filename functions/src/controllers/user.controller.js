@@ -1,5 +1,7 @@
 const UserServices = require('../services/user.services');
 const service = new UserServices();
+const MembershipsRepository = require('../repositories/memberships.repository');
+const membershipsRepository = new MembershipsRepository();
 
 class UserController {
   async setCustomerClaimToNewUser(user) {
@@ -13,10 +15,21 @@ class UserController {
 
   async transformCustomerToSeller(req, res, next) {
     try {
+      let result = '';
       const body = req.body;
       const { id } = req.params;
-      const update = await service.transformCustomerToSeller(body, id);
-      res.status(202).send(update);
+
+      const checkmembership = await membershipsRepository.getMembershipById(
+        body.membership_id
+      );
+      if (checkmembership.name !== 'trial') {
+        const update = await service.transformCustomerToSeller(body, id);
+        result = update;
+      } else {
+        const update = await service.transforCustomerToTrialSeller(body, id);
+        result = update;
+      }
+      res.status(202).send(result);
     } catch (error) {
       next(error);
     }
