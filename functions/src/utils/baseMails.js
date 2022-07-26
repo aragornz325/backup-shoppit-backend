@@ -272,7 +272,7 @@ const freeTrial = function () {
 																	<div class="txtTinyMce-wrapper" style="font-size: 12px; mso-line-height-alt: 18px; color: #ffffff; line-height: 1.5; font-family: Nunito, Arial, Helvetica Neue, Helvetica, sans-serif;">
 																		<p style="margin: 0; font-size: 14px; text-align: center; mso-line-height-alt: 24px;"><span style="color:#e03add;font-size:16px;"><strong>RECEIPT INFORMATION:</strong></span></p>
 																		<p style="margin: 0; font-size: 14px; text-align: center; mso-line-height-alt: 24px;"><span style="color:#6720b0;font-size:16px;"><strong>Your Plan:</strong> Free Trial</span></p>
-																		<p style="margin: 0; font-size: 14px; text-align: center; mso-line-height-alt: 24px;"><span style="color:#6720b0;font-size:16px;"><strong>Price:</strong> free</span><br><span style="color:#6720b0;font-size:16px;"><strong>Purchase Date:</strong> xx/xx/xxxx</span></p>
+																		<p style="margin: 0; font-size: 14px; text-align: center; mso-line-height-alt: 24px;"><span style="color:#6720b0;font-size:16px;"><strong>Price:</strong> free</span><br><span style="color:#6720b0;font-size:16px;"><strong>Purchase Date:</strong> ${new Date()}</span></p>
 																	</div>
 																</div>
 															</td>
