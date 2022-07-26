@@ -15,20 +15,10 @@ class UserController {
 
   async transformCustomerToSeller(req, res, next) {
     try {
-      let result = '';
       const body = req.body;
       const { id } = req.params;
+      const result = await service.transformToSeller(body, id);
 
-      const checkmembership = await membershipsRepository.getMembershipById(
-        body.membership_id
-      );
-      if (checkmembership.name !== 'trial') {
-        const update = await service.transformCustomerToSeller(body, id);
-        result = update;
-      } else {
-        const update = await service.transforCustomerToTrialSeller(body, id);
-        result = update;
-      }
       res.status(202).send(result);
     } catch (error) {
       next(error);
