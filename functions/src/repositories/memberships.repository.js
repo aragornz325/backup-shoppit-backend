@@ -78,6 +78,16 @@ class MembershipsRepository {
     }
     return memberships.data();
   }
+
+  async createMembershipHistory(payload) {
+    const membershipsRef = db.collection('memberships_history');
+    await membershipsRef.add({
+      ...payload,
+      createdAt: Math.floor(Date.now() / 1000),
+    });
+    functions.logger.info('Membership history created');
+    return { msg: 'ok' };
+  }
 }
 
 module.exports = MembershipsRepository;
