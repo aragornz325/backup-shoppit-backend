@@ -92,8 +92,6 @@ class ProductsRepository {
     await db
       .collection('products')
       .where('owner_id', '==', ownerId)
-      .limit(limit)
-      .startAfter(offset)
       .get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
@@ -106,6 +104,22 @@ class ProductsRepository {
       .catch((error) => {
         throw boom.badData(error);
       });
+    await db
+      .collection('products')
+      .where('vendor.vendor_id', '==', ownerId)
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          products.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        });
+      })
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+
     return products;
   }
 }

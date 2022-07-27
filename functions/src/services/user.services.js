@@ -10,6 +10,8 @@ const mercadopago = new Mercadopago();
 const MembershipsRepository = require('../repositories/memberships.repository');
 const { date } = require('joi');
 const membershipsRepository = new MembershipsRepository();
+const ProductsRepository = require('../repositories/products.repository');
+const productsRepository = new ProductsRepository();
 
 class UserServices {
   async transformToSeller(body, id) {
@@ -217,6 +219,11 @@ class UserServices {
       limit,
       offset
     );
+    return user;
+  }
+
+  async getUserProductsByOwner(id, limit, offset) {
+    const user = await productsRepository.getProductByOwner(id, limit, offset);
     return user;
   }
 }

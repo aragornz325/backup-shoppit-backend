@@ -80,4 +80,6 @@ router.patch(
   usercontroller.activateUser
 );
 
+router.get('/:id/products', usercontroller.getUserProductsByOwner);
+
 module.exports = router;
