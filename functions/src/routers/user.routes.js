@@ -85,8 +85,8 @@ router.get(
   checkApiKey,
   isAuthenticated,
   isAuthorized({
-    hasRole: ['admin'],
-    allowSameUser: false,
+    hasRole: ['seller', 'admin'],
+    allowSameUser: true,
   }),
   usercontroller.getUserProductsByOwner
 );
