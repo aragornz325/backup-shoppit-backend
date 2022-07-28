@@ -80,4 +80,17 @@ router.patch(
   usercontroller.activateUser
 );
 
+router.get(
+  '/:id/products',
+  checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['seller', 'admin'],
+    allowSameUser: true,
+  }),
+  usercontroller.getUserProductsByOwner
+);
+
+router.post('/register', checkApiKey, usercontroller.registerUser);
+
 module.exports = router;

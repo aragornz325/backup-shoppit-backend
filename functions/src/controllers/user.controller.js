@@ -91,6 +91,32 @@ class UserController {
       next(error);
     }
   }
+
+  async getUserProductsByOwner(req, res, next) {
+    try {
+      const limit = req.query.limit || 10;
+      const offset = req.query.offset || 0;
+      const userId = req.headers['x-user-id'];
+      const products = await service.getUserProductsByOwner(
+        userId,
+        limit,
+        offset
+      );
+      res.status(200).send(products);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async registerUser(req, res, next) {
+    try {
+      const payload = req.body;
+      const newUser = await service.registerUser(payload);
+      res.status(201).send(newUser);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = UserController;

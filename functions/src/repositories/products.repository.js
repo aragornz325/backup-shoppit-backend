@@ -4,10 +4,21 @@ const boom = require('@hapi/boom');
 
 class ProductsRepository {
   async createProduct(payload) {
+    console.log(payload);
+
+    let total_stock = 0;
+    if (payload.variations.length === 1) {
+      total_stock = payload.variations[0].quantity;
+    } else {
+      for (let i = 0; i < payload.variations.length; i++) {
+        total_stock += payload.variations[i].quantity;
+      }
+    }
+
     let productID = '';
     await db
-      .collection('productspruebasheet')
-      .add(payload)
+      .collection('productspruebamap')
+      .add({ total_stock, ...payload })
       .then((docRef) => {
         productID = docRef.id;
       })
@@ -92,8 +103,6 @@ class ProductsRepository {
     await db
       .collection('products')
       .where('owner_id', '==', ownerId)
-      .limit(limit)
-      .startAfter(offset)
       .get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
@@ -106,6 +115,22 @@ class ProductsRepository {
       .catch((error) => {
         throw boom.badData(error);
       });
+    await db
+      .collection('products')
+      .where('vendor.vendor_id', '==', ownerId)
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          products.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        });
+      })
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+
     return products;
   }
 }

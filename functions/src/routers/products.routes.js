@@ -73,7 +73,7 @@ router.post(
   isAuthenticated,
   isAuthorized({
     hasRole: ['admin', 'seller'],
-    allowSameUser: false,
+    allowSameUser: true,
   }),
   validatorHandler(createProduct, 'body'),
   productsController.createProduct

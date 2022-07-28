@@ -10,6 +10,8 @@ const mercadopago = new Mercadopago();
 const MembershipsRepository = require('../repositories/memberships.repository');
 const { date } = require('joi');
 const membershipsRepository = new MembershipsRepository();
+const ProductsRepository = require('../repositories/products.repository');
+const productsRepository = new ProductsRepository();
 
 class UserServices {
   async transformToSeller(body, id) {
@@ -218,6 +220,36 @@ class UserServices {
       offset
     );
     return user;
+  }
+
+  async getUserProductsByOwner(id, limit, offset) {
+    const user = await productsRepository.getProductByOwner(id, limit, offset);
+    return user;
+  }
+
+  async registerUser(payload) {
+    console.log(payload);
+    let result = '';
+    await getAuth()
+      .createUser({
+        email: payload.email,
+        emailVerified: false,
+        phoneNumber: payload.phoneNumber,
+        password: payload.password,
+        displayName: payload.displayName,
+        photoURL: payload.photoURL,
+        disabled: false,
+      })
+      .then((userrecord) => {
+        functions.logger.info(
+          (result = userrecord),
+          `user with email:${userrecord.email} has been created, id:${userrecord.uid}`
+        );
+      })
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    return result;
   }
 }
 
