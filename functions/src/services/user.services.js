@@ -226,6 +226,31 @@ class UserServices {
     const user = await productsRepository.getProductByOwner(id, limit, offset);
     return user;
   }
+
+  async registerUser(payload) {
+    console.log(payload);
+    let result = '';
+    await getAuth()
+      .createUser({
+        email: payload.email,
+        emailVerified: false,
+        phoneNumber: payload.phoneNumber,
+        password: payload.password,
+        displayName: payload.displayName,
+        photoURL: payload.photoURL,
+        disabled: false,
+      })
+      .then((userrecord) => {
+        functions.logger.info(
+          (result = userrecord),
+          `user with email:${userrecord.email} has been created, id:${userrecord.uid}`
+        );
+      })
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    return result;
+  }
 }
 
 module.exports = UserServices;

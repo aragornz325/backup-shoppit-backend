@@ -5,7 +5,12 @@ const googleSheetsRepository = new GoogleSheetsRepository();
 
 class ProductsServices {
   async createProduct(payload, id) {
-    return await productsRepository.createProduct(payload, id);
+    payload = {
+      ...payload,
+      published: true,
+    };
+
+    return await productsRepository.createProduct(payload);
   }
 
   async getProductById(id) {

@@ -107,6 +107,16 @@ class UserController {
       next(error);
     }
   }
+
+  async registerUser(req, res, next) {
+    try {
+      const payload = req.body;
+      const newUser = await service.registerUser(payload);
+      res.status(201).send(newUser);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = UserController;

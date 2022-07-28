@@ -91,4 +91,6 @@ router.get(
   usercontroller.getUserProductsByOwner
 );
 
+router.post('/register', checkApiKey, usercontroller.registerUser);
+
 module.exports = router;

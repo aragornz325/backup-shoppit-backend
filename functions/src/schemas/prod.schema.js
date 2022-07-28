@@ -4,18 +4,18 @@ const isAstroselling = joi.boolean();
 const channel_id = joi.number().integer();
 const available_colors = joi.string();
 const available_size = joi.string();
-const category = joi.string().valid('clothes', 'shoes', 'accessories', 'tech');
+const category = joi.string();
 const color = joi.string().max(20);
 const currency = joi.string().valid('ARS', 'USD', 'BRL', 'PYG').default('ARS');
 const stock = joi.number().integer();
 const description = joi.string().max(255);
-
+const features = joi.string().max(255);
 const featured = joi.boolean();
 const featuredImage = joi.string().uri();
 const freeShipping = joi.boolean();
 const height = joi.number().positive();
 const id = joi.string().alphanum(); //TODO: requiere confirmacion del largo del ID
-const image_url = joi.string().uri();
+const image_url = joi.array().items(joi.string().uri());
 const images = joi.array().items(joi.string().uri());
 const images_url = joi.array();
 const in_stock = joi.boolean();
@@ -39,7 +39,7 @@ const quantity_to_cart = joi.string();
 const regular_price = joi.number().integer();
 const sale_price = joi.number().integer().positive();
 const selected_variation = joi.string();
-const size = joi.string().min(2).max(25);
+const size = joi.string();
 const sku = joi.string();
 const state = joi.string().valid('new', 'used');
 const status = joi.string();
@@ -87,17 +87,16 @@ const createProduct = joi.object({
   name: name.required(),
   description: description.required(),
   regular_price: regular_price.required(),
-  state: state.required(),
-  variations: variations.required(),
-  images_url: images_url,
+  state,
+  variations,
+  images_url,
   category: category.required(),
-  publish: publish.required(),
-  offer_price: offer_price.required(),
+  offer_price,
   min_sell_amount: min_sell_amount.required(),
-  dimensions: dimensions.required(),
-  currency: currency.required(),
+  dimensions,
+  currency,
   owner_id: owner_id.required(),
-  total_stock: total_stock.required(),
+  features: features.required(),
 });
 
 const validateSheetsProduct = joi.object({
