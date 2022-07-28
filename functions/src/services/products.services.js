@@ -1,6 +1,7 @@
 const ProductsRepository = require('../repositories/products.repository');
 const productsRepository = new ProductsRepository();
 const GoogleSheetsRepository = require('../repositories/googleSheet.repository');
+
 const googleSheetsRepository = new GoogleSheetsRepository();
 
 class ProductsServices {
@@ -8,8 +9,15 @@ class ProductsServices {
     payload = {
       ...payload,
       published: true,
+      variations: payload.variations.map((variation) => {
+        return {
+          ...variation,
+          sku:
+            variation.sku ||
+            `${payload.name}/${variation.color}/${variation.size}/${id}`,
+        };
+      }),
     };
-
     return await productsRepository.createProduct(payload);
   }
 
