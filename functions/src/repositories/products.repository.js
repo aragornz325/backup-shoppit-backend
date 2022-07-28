@@ -11,14 +11,13 @@ class ProductsRepository {
       total_stock = payload.variations[0].quantity;
     } else {
       for (let i = 0; i < payload.variations.length; i++) {
-        console.log(payload.variations[i].quantity);
         total_stock += payload.variations[i].quantity;
       }
     }
 
     let productID = '';
     await db
-      .collection('productsjoako')
+      .collection('products')
       .add({ total_stock, ...payload })
       .then((docRef) => {
         productID = docRef.id;
