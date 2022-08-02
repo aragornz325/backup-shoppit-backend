@@ -8,6 +8,7 @@ class ProductsServices {
   async createProduct(payload, id) {
     payload = {
       ...payload,
+      owner_id: id,
       published: true,
       variations: payload.variations.map((variation) => {
         return {
@@ -18,7 +19,7 @@ class ProductsServices {
         };
       }),
     };
-    return await productsRepository.createProduct(payload);
+    return await productsRepository.createProduct(payload, id);
   }
 
   async getProductById(id) {

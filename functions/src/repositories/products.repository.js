@@ -1,11 +1,12 @@
 const { db } = require('../../config/firebase');
 const functions = require('firebase-functions');
 const boom = require('@hapi/boom');
+const UserRepository = require('../repositories/user.repository');
+const userRepository = new UserRepository();
 
 class ProductsRepository {
-  async createProduct(payload) {
-    console.log(payload);
-
+  async createProduct(payload, id) {
+    await userRepository.getUserById(id);
     let total_stock = 0;
     if (payload.variations.length === 1) {
       total_stock = payload.variations[0].quantity;
@@ -17,7 +18,7 @@ class ProductsRepository {
 
     let productID = '';
     await db
-      .collection('productspruebamap')
+      .collection('products')
       .add({ total_stock, ...payload })
       .then((docRef) => {
         productID = docRef.id;
