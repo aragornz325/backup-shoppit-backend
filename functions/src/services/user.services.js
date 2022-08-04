@@ -2,7 +2,7 @@ const { getAuth } = require('firebase-admin/auth');
 const boom = require('@hapi/boom');
 const functions = require('firebase-functions');
 const { sendEmail } = require('../utils/mailer');
-const { activeSeller, freeTrial } = require('../utils/baseMails.js');
+const { activeSeller, freeTrial, creteUser } = require('../utils/baseMails.js');
 const Mercadopago = require('./mercadopago.services');
 const UserRepository = require('../repositories/user.repository');
 const userRepository = new UserRepository();
@@ -33,6 +33,13 @@ class UserServices {
     await auth.setCustomUserClaims(user.uid, { role: ['customer'] });
     functions.logger.info(`seting claim to user ${JSON.stringify(user)}`);
     await userRepository.createUser(user);
+    const mail = {
+      from: 'shoppit info',
+      to: user.email,
+      subject: 'tu cuenta ha sido activada',
+      html: creteUser(),
+    };
+    sendEmail(mail);
     return { msg: 'ok' };
   }
 
@@ -96,7 +103,7 @@ class UserServices {
     const mail = {
       from: 'shoppit info',
       to: user.email,
-      subject: 'tu cuenta ha sido activada',
+      subject: 'tu cuenta de vendedor ha sido activada',
       html: freeTrial(),
     };
     sendEmail(mail);
