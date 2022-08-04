@@ -2,7 +2,11 @@ const { getAuth } = require('firebase-admin/auth');
 const boom = require('@hapi/boom');
 const functions = require('firebase-functions');
 const { sendEmail } = require('../utils/mailer');
-const { activeSeller, freeTrial, creteUser } = require('../utils/baseMails.js');
+const {
+  activeSeller,
+  freeTrial,
+  createUser,
+} = require('../utils/baseMails.js');
 const Mercadopago = require('./mercadopago.services');
 const UserRepository = require('../repositories/user.repository');
 const userRepository = new UserRepository();
@@ -37,7 +41,7 @@ class UserServices {
       from: 'shoppit info',
       to: user.email,
       subject: 'tu cuenta ha sido activada',
-      html: creteUser(),
+      html: createUser(),
     };
     sendEmail(mail);
     return { msg: 'ok' };
