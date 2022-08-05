@@ -6,7 +6,6 @@ const userRepository = new UserRepository();
 
 class ProductsRepository {
   async createProduct(payload, id) {
-    console.log('en el repossitory');
     await userRepository.getUserById(id);
     let total_stock = 0;
     if (payload.variations.length === 1) {
