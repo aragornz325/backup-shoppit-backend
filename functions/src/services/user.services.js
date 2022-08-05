@@ -27,7 +27,7 @@ class UserServices {
       return { msg: 'ok' };
     } else {
       await this.transforCustomerToTrialSeller(body, id);
-      return { msg: 'ok' };
+      return { msg: 'ok is trial' };
     }
   }
 
@@ -76,9 +76,11 @@ class UserServices {
     functions.logger.info('seting customer claim to user');
     await auth.setCustomUserClaims(id, { role: ['seller'] });
     functions.logger.info('updateing user');
+    delete body.pagoId;
     await userRepository.updateUser(
       id,
       {
+        billing: { ...body },
         pagoId: 'no payment, is trial',
         status: 'active',
         role: 'seller',

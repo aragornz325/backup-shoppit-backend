@@ -104,6 +104,9 @@ class ProductsRepository {
     await db
       .collection('products')
       .where('owner_id', '==', ownerId)
+      .orderBy('name')
+      .limit(parseInt(limit, 10))
+      .startAfter(parseInt(offset, 10))
       .get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
@@ -119,6 +122,9 @@ class ProductsRepository {
     await db
       .collection('products')
       .where('vendor.vendor_id', '==', ownerId)
+      .orderBy('name')
+      .limit(parseInt(limit, 10))
+      .startAfter(parseInt(offset, 10))
       .get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {

@@ -90,6 +90,22 @@ class ProductsController {
       next(error);
     }
   }
+
+  async getproductByOwner(req, res, next) {
+    try {
+      const owner_id = req.headers['x-user-id'];
+      const limit = req.query.limit || 25;
+      const offset = req.query.offset || 0;
+      const products = await productsServices.getProductByOwner(
+        owner_id,
+        limit,
+        offset
+      );
+      res.status(200).send(products);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = ProductsController;

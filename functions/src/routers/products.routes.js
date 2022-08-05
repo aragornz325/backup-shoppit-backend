@@ -29,6 +29,7 @@ router.post(
   categoriesController.createCategory
 );
 router.get('/categories', checkApiKey, categoriesController.getAllCategories);
+router.get('/ownership/:id', checkApiKey, productsController.getproductByOwner);
 router.patch(
   '/categories/:id',
   checkApiKey,
@@ -70,7 +71,13 @@ router.get(
 router.get('/:id', checkApiKey, productsController.getProductById);
 router.post(
   '/:id',
-
+  checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin', 'seller'],
+    allowSameUser: false,
+  }),
+  validatorHandler(createProduct, 'body'),
   productsController.createProduct
 );
 router.put(

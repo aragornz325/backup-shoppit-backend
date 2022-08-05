@@ -11,12 +11,17 @@ class ProductsServices {
       owner_id: id,
       published: true,
       variations: payload.variations.map((variation) => {
-        return {
-          ...variation,
-          sku:
-            variation.sku ||
-            `${payload.name}/${variation.color}/${variation.size}/${id}`,
-        };
+        for (let i = 0; i < variation.sizes.length; i++) {
+          return {
+            variation: variation.variation,
+            color: variation.color,
+            size: variation.sizes[i].size,
+            quantity: parseInt(variation.sizes[i].quantity[i], 10),
+            sku:
+              variation.sizes.sku ||
+              `${payload.name}-${variation.color}-${variation.sizes[i].size}-${id}`,
+          };
+        }
       }),
     };
     return await productsRepository.createProduct(payload, id);
@@ -59,6 +64,10 @@ class ProductsServices {
   }
   async getProductSheet(id, userId) {
     return await googleSheetsRepository.getProduct(id, userId);
+  }
+
+  async getProductByOwner(owner_id, limit, offset) {
+    return await productsRepository.getProductByOwner(owner_id, limit, offset);
   }
 }
 
