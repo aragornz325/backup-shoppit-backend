@@ -71,6 +71,11 @@ router.get('/:id', checkApiKey, productsController.getProductById);
 router.post(
   '/:id',
   checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin', 'seller'],
+    allowSameUser: false,
+  }),
   validatorHandler(createProduct, 'body'),
   productsController.createProduct
 );
