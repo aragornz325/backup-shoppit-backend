@@ -59,9 +59,11 @@ const variable_products = joi.array();
 const variation = joi.string().min(3).max(15);
 
 const variations = joi.array().items({
-  variation,
-  color,
-  sizes: joi.array().items({ size, quantity, sku }),
+  variation: variation.required(),
+  color: color.required(),
+  size: size.required(),
+  quantity: quantity.required(),
+  sku,
 });
 const vendor = joi.object({
   minimum_purchase: joi.number(),
