@@ -11,17 +11,18 @@ class ProductsServices {
       owner_id: id,
       published: true,
       variations: payload.variations.map((variation) => {
-        return {
-          ...variation,
-          sku:
-            variation.sku ||
-            `${payload.name}/${variation.color}/${variation.size}/${id}`,
-        };
+        for (let i = 0; i < variation.sizes.length; i++) {
+          return {
+            variation: variation.variation,
+            color: variation.color,
+            size: variation.sizes[i].size,
+            quantity: parseInt(variation.sizes[i].quantity[i], 10),
+          };
+        }
       }),
     };
     return await productsRepository.createProduct(payload, id);
   }
-
   async getProductById(id) {
     return await productsRepository.getProductById(id);
   }
