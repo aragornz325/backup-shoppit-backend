@@ -24,7 +24,7 @@ const swaggerEdit = {
       },
     ],
   },
-  apis: [`${path.join(__dirname, './*.js')}`],
+  apis: [`${path.join(__dirname, './index.js')}`],
 };
 
 module.exports = swaggerEdit;
