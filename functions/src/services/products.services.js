@@ -65,6 +65,10 @@ class ProductsServices {
   async getProductSheet(id, userId) {
     return await googleSheetsRepository.getProduct(id, userId);
   }
+
+  async getProductByOwner(owner_id, limit, offset) {
+    return await productsRepository.getProductByOwner(owner_id, limit, offset);
+  }
 }
 
 module.exports = ProductsServices;
