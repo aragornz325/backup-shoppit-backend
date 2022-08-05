@@ -17,6 +17,9 @@ class ProductsServices {
             color: variation.color,
             size: variation.sizes[i].size,
             quantity: parseInt(variation.sizes[i].quantity[i], 10),
+            sku:
+              variation.sizes.sku ||
+              `${payload.name}-${variation.color}-${variation.sizes[i].size}-${id}`,
           };
         }
       }),
