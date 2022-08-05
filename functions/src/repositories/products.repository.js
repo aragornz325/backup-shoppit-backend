@@ -18,7 +18,7 @@ class ProductsRepository {
 
     let productID = '';
     await db
-      .collection('productspruebamapvariations')
+      .collection('products')
       .add({ total_stock, ...payload })
       .then((docRef) => {
         productID = docRef.id;
