@@ -26,6 +26,7 @@ class ProductsServices {
     };
     return await productsRepository.createProduct(payload, id);
   }
+
   async getProductById(id) {
     return await productsRepository.getProductById(id);
   }
