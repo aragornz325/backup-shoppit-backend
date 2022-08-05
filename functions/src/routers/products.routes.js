@@ -70,7 +70,8 @@ router.get(
 router.get('/:id', checkApiKey, productsController.getProductById);
 router.post(
   '/:id',
-
+  checkApiKey,
+  validatorHandler(createProduct, 'body'),
   productsController.createProduct
 );
 router.put(

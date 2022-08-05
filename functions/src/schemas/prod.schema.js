@@ -60,6 +60,7 @@ const variation = joi.string().min(3).max(15);
 
 const variations = joi.array().items({
   variation,
+  color,
   sizes: joi.array().items({ size, quantity, sku }),
 });
 const vendor = joi.object({
@@ -92,7 +93,6 @@ const createProduct = joi.object({
   min_sell_amount: min_sell_amount.required(),
   dimensions,
   currency,
-  owner_id: owner_id.required(),
   features: features.required(),
 });
 
