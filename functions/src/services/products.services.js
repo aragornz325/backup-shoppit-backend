@@ -8,20 +8,12 @@ class ProductsServices {
   async createProduct(payload, id) {
     payload = {
       ...payload,
-      owner_id: id,
       published: true,
       variations: payload.variations.map((variation) => {
-        for (let i = 0; i < variation.sizes.length; i++) {
-          return {
-            variation: variation.variation,
-            color: variation.color,
-            size: variation.sizes[i].size,
-            quantity: parseInt(variation.sizes[i].quantity[i], 10),
-            sku:
-              variation.sizes.sku ||
-              `${payload.name}-${variation.color}-${variation.sizes[i].size}-${id}`,
-          };
-        }
+        return {
+          ...variation,
+          sku: variation.sku || `${payload.name}-${variation.size}-${id}`,
+        };
       }),
     };
     return await productsRepository.createProduct(payload, id);
