@@ -275,5 +275,17 @@ class UserRepository {
       return { users, total: users.length };
     }
   }
+
+  async deleteUser(uid) {
+    const userRef = db.collection('users').doc(uid);
+    const user = await userRef.get();
+    if (!user.exists) {
+      functions.logger.error(`user with ID ${uid} not found`);
+      throw boom.badData(`user with ID ${uid} not found`);
+    }
+    await userRef.delete();
+    functions.logger.info(`delete ok`);
+    return { msg: 'ok' };
+  }
 }
 module.exports = UserRepository;

@@ -264,6 +264,10 @@ class UserServices {
       });
     return result;
   }
+
+  async deleteUserFromDb(uid) {
+    return await userRepository.deleteUser(uid);
+  }
 }
 
 module.exports = UserServices;

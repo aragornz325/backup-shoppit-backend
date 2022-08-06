@@ -13,6 +13,14 @@ class UserController {
     }
   }
 
+  async deleteUserFromDb(user) {
+    try {
+      return await service.deleteUserFromDb(user.uid);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   async transformCustomerToSeller(req, res, next) {
     try {
       const body = req.body;

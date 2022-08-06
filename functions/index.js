@@ -49,4 +49,8 @@ app.use(logErrors);
 app.use(boomErrorHandler);
 app.use(errorHandler);
 
+exports.deleteUserFromDb = functions.auth
+  .user()
+  .onDelete((user) => userController.deleteUserFromDb(user));
+
 exports.api = functions.https.onRequest(app);
