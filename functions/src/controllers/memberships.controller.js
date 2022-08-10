@@ -1,6 +1,8 @@
 const MembershipsService = require('../services/memberships.service');
 const membershipsService = new MembershipsService();
 const boom = require('@hapi/boom');
+const MercadopagoServices = require('../services/mercadopago.services');
+const mercadopagoServices = new MercadopagoServices();
 
 class MembershipsController {
   async createMembership(req, res, next) {
@@ -53,6 +55,16 @@ class MembershipsController {
       }
       const membership = await membershipsService.getMembership(id);
       res.status(200).send(membership);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async cancelOrPausedSuscription(req, res, next) {
+    const payload = req.body;
+    try {
+      await mercadopagoServices.cancelOrPausedSuscription(payload);
+      res.status(200).send({ msg: 'membership updated' });
     } catch (error) {
       next(error);
     }

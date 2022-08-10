@@ -64,12 +64,13 @@ class MercadopagoServices {
 
   async createSubscription() {
     console.log('ejecutando suscripcion');
+
     const body = {
       reason: 'Suscripción de ejemplo',
       auto_recurring: {
         frequency: 1,
         frequency_type: 'months',
-        transaction_amount: 1000000,
+        transaction_amount: 1000,
         currency_id: 'ARS',
       },
       back_url: 'https://google.com.ar',
@@ -84,6 +85,19 @@ class MercadopagoServices {
     });
 
     return subscription.data;
+  }
+
+  async cancelOrPausedSuscription(payload) {
+    console.log(payload);
+    const url = `${config.urlConsult}/${payload.id}`;
+    console.log(config.urlConsult);
+    const paused = await axios.put(url, payload.status, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${config.accesTokenMp}`,
+      },
+    });
+    return paused.data;
   }
 }
 
