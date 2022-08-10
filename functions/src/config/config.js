@@ -12,6 +12,7 @@ const config = {
   secretJWT: process.env.AUTH_JWT_SECRET,
   urlConsult: process.env.URL_CONSULTA_MP,
   tokenConsult: process.env.TOKEN_CONSULTA_MP,
+  accesTokenMp: process.env.ACCESS_TOKEN_MP,
   urlConsultaPagos: process.env.URL_CONSULTA_PAGO_MP,
   backUrlMp: process.env.BACK_URL,
   apiWeb: process.env.API_WEB_FIREBASE,

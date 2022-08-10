@@ -80,9 +80,9 @@ class UserServices {
     await userRepository.updateUser(
       id,
       {
+        status: 'active',
         billing: { ...body },
         pagoId: 'no payment, is trial',
-        status: 'active',
         role: 'seller',
         isVender: true,
         activeVender: true,

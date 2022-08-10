@@ -13,7 +13,7 @@ const { querySchema } = require('../schemas/user.schema');
 const validatorHandler = require('../middlewares/validatorHandler');
 const { masivecustomClaim } = require('../utils/masiveCostumerClaim');
 
-router.get('', validatorHandler(querySchema, 'query'), usercontroller.getUsers);
+router.get('', checkApiKey, usercontroller.getUsers);
 router.get('/masiveclaims', masivecustomClaim);
 
 router.get(
@@ -37,6 +37,7 @@ router.patch(
   }),
   usercontroller.updateUser
 );
+
 router.put(
   '/:id/seller',
   checkApiKey,
@@ -85,7 +86,7 @@ router.get(
   checkApiKey,
   isAuthenticated,
   isAuthorized({
-    hasRole: ['seller', 'admin'],
+    hasRole: ['admin'],
     allowSameUser: true,
   }),
   usercontroller.getUserProductsByOwner
