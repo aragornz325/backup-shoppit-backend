@@ -153,7 +153,7 @@ class UserServices {
         isVender: true,
         activeVender: true,
         user_membership: {
-          membarship_id: body.membershipId,
+          membership_id: body.membershipId,
           due_date: response.data.next_payment_date,
           membership_status: 'active',
           membership_payments: [
