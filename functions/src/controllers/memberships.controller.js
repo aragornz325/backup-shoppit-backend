@@ -3,6 +3,8 @@ const membershipsService = new MembershipsService();
 const boom = require('@hapi/boom');
 const MercadopagoServices = require('../services/mercadopago.services');
 const mercadopagoServices = new MercadopagoServices();
+const UserServices = require('../services/user.services');
+const userServices = new UserServices();
 
 class MembershipsController {
   async createMembership(req, res, next) {
@@ -69,6 +71,7 @@ class MembershipsController {
       next(error);
     }
   }
-}
 
+  async changeMembership(req, res, next) {}
+}
 module.exports = MembershipsController;

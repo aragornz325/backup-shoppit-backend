@@ -92,25 +92,32 @@ class MercadopagoServices {
 
   async updatedSuscription(payload) {
     //url con el id de la suscripcion
+    console.log('ejecutano actualizacion de suscripcion');
     const url = `${config.urlConsult}/${payload.preapproval_id}`;
+    console.log(payload);
 
-    const paused = await axios.put(
-      url,
-      { status: payload.status },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${config.accesTokenMp}`,
+    try {
+      const paused = await axios.put(
+        url,
+        { status: payload.status },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${config.tokenConsult}`,
+          },
+        }
+      );
+
+      const body = {
+        user_membership: {
+          membership_status: payload.status,
         },
-      }
-    );
-    const body = {
-      user_membership: {
-        membership_status: payload.status,
-      },
-    };
-    await userRepository.updateUser(payload.userId, body, true);
-    return paused.data;
+      };
+      await userRepository.updateUser(payload.userId, body, true);
+      return paused.data;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 }
 
