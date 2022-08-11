@@ -19,7 +19,6 @@ async function isAuthenticated(req, res, next) {
   const token = split[1];
   try {
     const decodedToken = await getAuth().verifyIdToken(token);
-    console.log(decodedToken);
     res.locals = {
       ...res.locals,
       uid: decodedToken.uid,

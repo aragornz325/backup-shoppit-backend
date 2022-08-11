@@ -60,10 +60,10 @@ class MembershipsController {
     }
   }
 
-  async cancelOrPausedSuscription(req, res, next) {
+  async updatedSuscription(req, res, next) {
     const payload = req.body;
     try {
-      await mercadopagoServices.cancelOrPausedSuscription(payload);
+      await mercadopagoServices.updatedSuscription(payload);
       res.status(200).send({ msg: 'membership updated' });
     } catch (error) {
       next(error);

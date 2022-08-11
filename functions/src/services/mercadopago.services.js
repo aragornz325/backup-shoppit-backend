@@ -4,6 +4,8 @@ const boom = require('@hapi/boom');
 const axios = require('axios');
 const MercadoPagoRepository = require('../repositories/mercadoPago.repository');
 const mercadoPagoRepository = new MercadoPagoRepository();
+const UserRepository = require('../repositories/user.repository');
+const userRepository = new UserRepository();
 
 class MercadopagoServices {
   async consultSubscription(id) {
@@ -16,6 +18,7 @@ class MercadopagoServices {
           Authorization: `Bearer ${config.tokenConsult}`,
         },
       });
+
       return consult;
     } catch (error) {
       throw new Error(error);
@@ -87,16 +90,26 @@ class MercadopagoServices {
     return subscription.data;
   }
 
-  async cancelOrPausedSuscription(payload) {
-    console.log(payload);
-    const url = `${config.urlConsult}/${payload.id}`;
-    console.log(config.urlConsult);
-    const paused = await axios.put(url, payload.status, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${config.accesTokenMp}`,
+  async updatedSuscription(payload) {
+    //url con el id de la suscripcion
+    const url = `${config.urlConsult}/${payload.preapproval_id}`;
+
+    const paused = await axios.put(
+      url,
+      { status: payload.status },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${config.accesTokenMp}`,
+        },
+      }
+    );
+    const body = {
+      user_membership: {
+        membership_status: payload.status,
       },
-    });
+    };
+    await userRepository.updateUser(payload.userId, body, true);
     return paused.data;
   }
 }

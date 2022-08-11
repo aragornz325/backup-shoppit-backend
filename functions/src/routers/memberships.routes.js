@@ -27,7 +27,7 @@ router.post(
   validatorHandler(createMembershipDTO, 'body'),
   membershipscontroller.createMembership
 );
-router.put('/payments', membershipscontroller.cancelOrPausedSuscription);
+router.put('/payments', membershipscontroller.updatedSuscription);
 router.get(
   '/:id',
   checkApiKey,

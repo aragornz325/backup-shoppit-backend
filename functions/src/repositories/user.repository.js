@@ -87,6 +87,7 @@ class UserRepository {
   }
 
   async updateUser(id, payload, merge) {
+    console.log('entrando en update', id, merge);
     const userRef = db.collection('users').doc(id);
     const user = await userRef.get();
     if (!user.exists) {
@@ -95,6 +96,7 @@ class UserRepository {
     }
     await userRef.set(payload, { merge: merge });
     functions.logger.info(`update ok`);
+    console.log('saliendo de users');
     return { msg: 'ok' };
   }
 

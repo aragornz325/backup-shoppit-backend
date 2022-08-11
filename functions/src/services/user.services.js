@@ -143,10 +143,11 @@ class UserServices {
 
     await auth.setCustomUserClaims(id, { role: ['seller'] });
 
+    functions.logger.info('excuting update users');
     await userRepository.updateUser(
       id,
       {
-        pagaId: body.pagoId,
+        pagoId: body.pagoId,
         status: 'active',
         role: 'seller',
         isVender: true,
@@ -154,19 +155,22 @@ class UserServices {
         user_membership: {
           membarship_id: body.membershipId,
           due_date: '', //TODO: revisar fecha de caducidad de la membresia
+          membership_status: 'active',
           membership_payments: [
             {
               platform_name: 'mercadopago', //TODO: revisar nombre de la plataforma
               payment_platform_id: body.pagoId,
               payment_date: Math.floor(Date.now() / 1000), //TODO: revisar pasar a UNIX
               payment_status: response.data.status,
+              next_payment_date: response.data.next_payment_date,
+              preapproval_plan_id: response.data.preapproval_plan_id,
             },
           ],
         },
       },
       true
     );
-
+    functions.logger.info('sending email');
     const mail = {
       from: 'shoppit info',
       to: user.email,

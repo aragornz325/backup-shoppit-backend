@@ -37,6 +37,7 @@ class UserController {
     try {
       const body = req.body;
       const { id } = req.params;
+      console.log('id del usuario', id);
       const update = await service.verifySellerPayment(body, id);
       res.status(200).send(update);
     } catch (error) {
