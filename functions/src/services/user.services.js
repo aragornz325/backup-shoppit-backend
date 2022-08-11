@@ -154,7 +154,7 @@ class UserServices {
         activeVender: true,
         user_membership: {
           membarship_id: body.membershipId,
-          due_date: '', //TODO: revisar fecha de caducidad de la membresia
+          due_date: response.data.next_payment_date,
           membership_status: 'active',
           membership_payments: [
             {
@@ -162,7 +162,6 @@ class UserServices {
               payment_platform_id: body.pagoId,
               payment_date: Math.floor(Date.now() / 1000), //TODO: revisar pasar a UNIX
               payment_status: response.data.status,
-              next_payment_date: response.data.next_payment_date,
               preapproval_plan_id: response.data.preapproval_plan_id,
             },
           ],
