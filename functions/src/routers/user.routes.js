@@ -37,6 +37,7 @@ router.patch(
   }),
   usercontroller.updateUser
 );
+router.patch('/:id/changesuscription', usercontroller.changeSuscription);
 
 router.put(
   '/:id/seller',

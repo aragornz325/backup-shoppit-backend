@@ -22,6 +22,7 @@ const config = {
   client_email: process.env.CLIENT_EMAIL,
   private_key: process.env.PRIVATE_KEY,
   project_id: process.env.PROJECT_ID,
+  trial_membership_id: process.env.TRIAL_MEMBERSHIP_ID,
 };
 
 module.exports = { config };

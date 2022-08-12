@@ -6,6 +6,8 @@ const MercadoPagoRepository = require('../repositories/mercadoPago.repository');
 const mercadoPagoRepository = new MercadoPagoRepository();
 const UserRepository = require('../repositories/user.repository');
 const userRepository = new UserRepository();
+// const UserServices = require('../services/user.services');
+// const userServices = new UserServices();
 
 class MercadopagoServices {
   async consultSubscription(id) {
@@ -90,16 +92,14 @@ class MercadopagoServices {
     return subscription.data;
   }
 
-  async updatedSuscription(payload) {
+  async updatedSuscription(body) {
     //url con el id de la suscripcion
-    console.log('ejecutano actualizacion de suscripcion');
-    const url = `${config.urlConsult}/${payload.preapproval_id}`;
-    console.log(payload);
 
+    const url = `${config.urlConsult}/${body.preapproval_id}`;
     try {
       const paused = await axios.put(
         url,
-        { status: payload.status },
+        { status: body.status },
         {
           headers: {
             'Content-Type': 'application/json',
@@ -108,12 +108,12 @@ class MercadopagoServices {
         }
       );
 
-      const body = {
+      const payload = {
         user_membership: {
-          membership_status: payload.status,
+          membership_status: body.status,
         },
       };
-      await userRepository.updateUser(payload.userId, body, true);
+      await userRepository.updateUser(body.userId, payload, true);
       return paused.data;
     } catch (error) {
       throw new Error(error);

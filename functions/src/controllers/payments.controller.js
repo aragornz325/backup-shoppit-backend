@@ -19,8 +19,6 @@ class PaymentsController {
       next(error);
     }
   }
-
-  async;
 }
 
 module.exports = PaymentsController;

@@ -72,6 +72,14 @@ class MembershipsController {
     }
   }
 
-  async changeMembership(req, res, next) {}
+  async changeMembership(req, res, next) {
+    const body = req.body;
+    const id = body.id;
+    try {
+      mercadopagoServices.changeSuscription(body, id);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 module.exports = MembershipsController;
