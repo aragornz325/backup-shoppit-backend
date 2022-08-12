@@ -12,7 +12,7 @@ const UserRepository = require('../repositories/user.repository');
 const userRepository = new UserRepository();
 const mercadopago = new Mercadopago();
 const MembershipsRepository = require('../repositories/memberships.repository');
-const { date } = require('joi');
+
 const membershipsRepository = new MembershipsRepository();
 const ProductsRepository = require('../repositories/products.repository');
 const productsRepository = new ProductsRepository();
@@ -244,7 +244,6 @@ class UserServices {
   }
 
   async registerUser(payload) {
-    console.log(payload);
     let result = '';
     await getAuth()
       .createUser({

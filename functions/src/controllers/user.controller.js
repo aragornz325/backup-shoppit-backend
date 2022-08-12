@@ -1,7 +1,5 @@
 const UserServices = require('../services/user.services');
 const service = new UserServices();
-const MembershipsRepository = require('../repositories/memberships.repository');
-const membershipsRepository = new MembershipsRepository();
 
 class UserController {
   async setCustomerClaimToNewUser(user) {
@@ -37,7 +35,6 @@ class UserController {
     try {
       const body = req.body;
       const { id } = req.params;
-      console.log('id del usuario', id);
       const update = await service.verifySellerPayment(body, id);
       res.status(200).send(update);
     } catch (error) {
