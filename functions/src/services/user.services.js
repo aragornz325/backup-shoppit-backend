@@ -308,7 +308,7 @@ class UserServices {
 
     const options = {
       userId: id,
-      status: 'paused',
+      status: 'cancelled',
       preapproval_id:
         user.user_membership.membership_payments[
           user.user_membership.membership_payments.length - 2
