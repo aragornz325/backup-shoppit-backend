@@ -172,6 +172,7 @@ class UserServices {
       user_membership: {
         membership_id,
         membership_payments,
+        due_date: response.data.next_payment_date,
       },
       pagoId: body.pagoId,
       status: 'active',
