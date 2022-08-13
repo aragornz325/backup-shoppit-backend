@@ -1,7 +1,5 @@
 const UserServices = require('../services/user.services');
 const service = new UserServices();
-const MembershipsRepository = require('../repositories/memberships.repository');
-const membershipsRepository = new MembershipsRepository();
 
 class UserController {
   async setCustomerClaimToNewUser(user) {
@@ -121,6 +119,16 @@ class UserController {
       const payload = req.body;
       const newUser = await service.registerUser(payload);
       res.status(201).send(newUser);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async changeSuscription(req, res, next) {
+    const body = req.body;
+    const { id } = req.params;
+    try {
+      await service.changeSuscription(body, id);
+      res.status(200).send({ msg: 'Ok' });
     } catch (error) {
       next(error);
     }

@@ -65,7 +65,7 @@ class ProductsRepository {
 
   async updateProduct(id, payload) {
     await db
-      .collection('productodPrueba')
+      .collection('products')
       .doc(id)
       .set(payload, { merge: true })
       .catch((error) => {
@@ -82,7 +82,6 @@ class ProductsRepository {
       objetive = parseInt(Object.values(search), 10);
     } else {
       objetive = Object.values(search);
-      console.log('objetivo', objetive);
     }
     const collectionRef = db
       .collection('products')
@@ -99,7 +98,6 @@ class ProductsRepository {
   }
 
   async getProductByOwner(ownerId, limit, offset) {
-    console.log('voy a buscar por owner', ownerId);
     const products = [];
     await db
       .collection('products')

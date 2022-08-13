@@ -12,6 +12,7 @@ const config = {
   secretJWT: process.env.AUTH_JWT_SECRET,
   urlConsult: process.env.URL_CONSULTA_MP,
   tokenConsult: process.env.TOKEN_CONSULTA_MP,
+  accesTokenMp: process.env.ACCESS_TOKEN_MP,
   urlConsultaPagos: process.env.URL_CONSULTA_PAGO_MP,
   backUrlMp: process.env.BACK_URL,
   apiWeb: process.env.API_WEB_FIREBASE,
@@ -21,6 +22,7 @@ const config = {
   client_email: process.env.CLIENT_EMAIL,
   private_key: process.env.PRIVATE_KEY,
   project_id: process.env.PROJECT_ID,
+  trial_membership_id: process.env.TRIAL_MEMBERSHIP_ID,
 };
 
 module.exports = { config };

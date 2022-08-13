@@ -21,10 +21,15 @@ const {
 
 const validatorHandler = require('../middlewares/validatorHandler');
 
-router.get('', checkApiKey, checkApiKey, productsController.getProducts);
+router.get('', checkApiKey, productsController.getProducts);
 router.post(
   '/categories',
   checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin'],
+    allowSameUser: false,
+  }),
   validatorHandler(createCategory, 'body'),
   categoriesController.createCategory
 );
@@ -33,6 +38,11 @@ router.get('/ownership/:id', checkApiKey, productsController.getproductByOwner);
 router.patch(
   '/categories/:id',
   checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin'],
+    allowSameUser: false,
+  }),
   validatorHandler(updateCategory, 'body'),
   categoriesController.updateCategory
 );
@@ -44,6 +54,11 @@ router.get(
 router.delete(
   '/categories/:id',
   checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin'],
+    allowSameUser: false,
+  }),
   categoriesController.deleteCategory
 );
 
@@ -88,14 +103,14 @@ router.put(
     hasRole: ['admin', 'seller'],
     allowSameUser: false,
   }),
-  productsController.updateProduct
+  productsController.updateProduct //TODO: validatorHandler(updateProduct, 'body')
 );
 router.delete(
   '/:id',
   checkApiKey,
   isAuthenticated,
   isAuthorized({
-    hasRole: ['admin'],
+    hasRole: ['admin', 'seller'],
     allowSameUser: false,
   }),
   productsController.deleteProduct

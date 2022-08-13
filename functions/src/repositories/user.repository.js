@@ -95,6 +95,7 @@ class UserRepository {
     }
     await userRef.set(payload, { merge: merge });
     functions.logger.info(`update ok`);
+
     return { msg: 'ok' };
   }
 

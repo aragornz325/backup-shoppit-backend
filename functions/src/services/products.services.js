@@ -9,6 +9,7 @@ class ProductsServices {
     payload = {
       ...payload,
       published: true,
+      owner_id: id,
       variations: payload.variations.map((variation) => {
         return {
           ...variation,

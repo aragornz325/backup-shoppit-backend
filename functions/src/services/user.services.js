@@ -12,10 +12,11 @@ const UserRepository = require('../repositories/user.repository');
 const userRepository = new UserRepository();
 const mercadopago = new Mercadopago();
 const MembershipsRepository = require('../repositories/memberships.repository');
-const { date } = require('joi');
+
 const membershipsRepository = new MembershipsRepository();
 const ProductsRepository = require('../repositories/products.repository');
 const productsRepository = new ProductsRepository();
+const { config } = require('../config/config');
 
 class UserServices {
   async transformToSeller(body, id) {
@@ -53,6 +54,10 @@ class UserServices {
       {
         status: 'pending',
         activeVender: false,
+        user_membership: {
+          membership_id: body.membership_id,
+        },
+
         billing: {
           ...body,
         },
@@ -80,14 +85,14 @@ class UserServices {
     await userRepository.updateUser(
       id,
       {
+        status: 'active',
         billing: { ...body },
         pagoId: 'no payment, is trial',
-        status: 'active',
         role: 'seller',
         isVender: true,
         activeVender: true,
         user_membership: {
-          membarship_id: body.membership_id,
+          membership_id: body.membership_id,
           due_date: '', //TODO: revisar fecha de caducidad de la membresia
           membership_payments: [
             {
@@ -127,7 +132,6 @@ class UserServices {
       throw boom.notAcceptable('missing data to verify seller payment');
     }
     const response = await mercadopago.consultSubscription(body.pagoId);
-    functions.logger.info(response.data);
 
     if (response.data.status !== 'authorized') {
       await userRepository.updateUser(
@@ -143,30 +147,43 @@ class UserServices {
 
     await auth.setCustomUserClaims(id, { role: ['seller'] });
 
-    await userRepository.updateUser(
-      id,
-      {
-        pagaId: body.pagoId,
-        status: 'active',
-        role: 'seller',
-        isVender: true,
-        activeVender: true,
-        user_membership: {
-          membarship_id: body.membershipId,
-          due_date: '', //TODO: revisar fecha de caducidad de la membresia
-          membership_payments: [
-            {
-              platform_name: 'mercadopago', //TODO: revisar nombre de la plataforma
-              payment_platform_id: body.pagoId,
-              payment_date: Math.floor(Date.now() / 1000), //TODO: revisar pasar a UNIX
-              payment_status: response.data.status,
-            },
-          ],
-        },
-      },
-      true
-    );
+    const payment = {
+      platform_name: 'mercadopago', //TODO: revisar nombre de la plataforma
+      payment_platform_id: body.pagoId,
+      payment_date: Math.floor(Date.now() / 1000), //TODO: revisar pasar a UNIX
+      payment_status: response.data.status,
+      preapproval_plan_id: response.data.preapproval_plan_id,
+    };
 
+    let membership_payments = user.user_membership.membership_payments ?? [];
+    membership_payments.push(payment);
+
+    let membership_id = user.user_membership.membership_id;
+    if (body.membership_id !== null) {
+      membership_id = body.membership_id;
+    }
+
+    const payloadtoupdate = {
+      ...user,
+      billing: {
+        ...user.billing,
+        membership_id,
+      },
+      user_membership: {
+        membership_id,
+        membership_payments,
+        due_date: response.data.next_payment_date,
+      },
+      pagoId: body.pagoId,
+      status: 'active',
+      role: 'seller',
+      isVender: true,
+      activeVender: true,
+    };
+
+    functions.logger.info('excuting update users');
+    await userRepository.updateUser(id, payloadtoupdate, true);
+    functions.logger.info('sending email');
     const mail = {
       from: 'shoppit info',
       to: user.email,
@@ -241,7 +258,6 @@ class UserServices {
   }
 
   async registerUser(payload) {
-    console.log(payload);
     let result = '';
     await getAuth()
       .createUser({
@@ -267,6 +283,41 @@ class UserServices {
 
   async deleteUserFromDb(uid) {
     return await userRepository.deleteUser(uid);
+  }
+
+  async changeSuscription(body, id) {
+    const verifyPayment = await this.verifySellerPayment(body, id);
+    if (verifyPayment.msg !== 'ok') {
+      throw boom.paymentRequired(
+        'The subscription change was not made due to problems in the payment process'
+      );
+    }
+
+    const user = await this.getUserById(id);
+    console.log(
+      user.user_membership.membership_payments[
+        user.user_membership.membership_payments.length - 2
+      ]
+    );
+    if (
+      user.user_membership.membership_payments[
+        user.user_membership.membership_payments.length - 2
+      ].platform_name === 'free Trial'
+    ) {
+      return { msg: 'ok' };
+    }
+
+    const options = {
+      userId: id,
+      status: 'cancelled',
+      preapproval_id:
+        user.user_membership.membership_payments[
+          user.user_membership.membership_payments.length - 2
+        ].payment_platform_id,
+    };
+
+    const updated = await mercadopago.updatedSuscription(options);
+    return updated;
   }
 }
 
