@@ -43,8 +43,9 @@ const createMemberships = async () => {
         'integracion con Mercadopago',
         'Publicación de productos y ventas sin limites',
       ],
-      payment_url: '',
-      createdAt: { _seconds: 1659128135, _nanoseconds: 923000000 },
+      payment_url:
+        'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084813ff7860181630c02be1061',
+      createdAt: Math.floor(Date.now() / 1000),
       memberships_discounts: [100],
       payment_cycle: 'trimestral',
       name: 'Premium',
@@ -57,7 +58,7 @@ const createMemberships = async () => {
       active: false,
       price: 19200,
       payment_cycle: 'semestral',
-      createdAt: { _seconds: 1659128127, _nanoseconds: 541000000 },
+      createdAt: Math.floor(Date.now() / 1000),
       payment_url:
         'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084815db1a80181630e027803ae',
       membership_benefits: [
@@ -77,7 +78,7 @@ const createMemberships = async () => {
         'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084813ff7c601816309fa4e10b6',
       description: 'free trial membershp',
       price: 18000,
-      createdAt: { _seconds: 1659128142, _nanoseconds: 953000000 },
+      createdAt: Math.floor(Date.now() / 1000),
       name: 'Premium',
       payment_cycle: 'mensual',
       active: false,
@@ -104,7 +105,7 @@ const createMemberships = async () => {
       payment_url:
         'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084815db1a80181630b397b03a9',
       payment_cycle: 'mensual',
-      createdAt: { _seconds: 1659128269, _nanoseconds: 637000000 },
+      createdAt: Math.floor(Date.now() / 1000),
       id: 'N1OcXCjS38QuOUUREWhW',
     },
     {
@@ -122,7 +123,7 @@ const createMemberships = async () => {
       active: false,
       payment_url:
         'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084815db1a80181630c874903ac',
-      createdAt: { _seconds: 1659128288, _nanoseconds: 531000000 },
+      createdAt: Math.floor(Date.now() / 1000),
       id: 'lUVFJvj7sC6u0YRVackP',
     },
     {
@@ -130,7 +131,7 @@ const createMemberships = async () => {
       payment_url:
         'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084813ff78601816312c4711066',
       payment_cycle: 'semestral',
-      createdAt: { _seconds: 1659128298, _nanoseconds: 964000000 },
+      createdAt: Math.floor(Date.now() / 1000),
       memberships_discounts: [100],
       membership_benefits: [
         'Exposición máxima',
@@ -146,7 +147,7 @@ const createMemberships = async () => {
     {
       active: false,
       payment_cycle: 'trimestral',
-      createdAt: { _seconds: 1659128187, _nanoseconds: 649000000 },
+      createdAt: Math.floor(Date.now() / 1000),
       name: 'Standard',
       price: 9600,
       memberships_discounts: [0],
@@ -172,7 +173,7 @@ const createMemberships = async () => {
         'Publicación de productos y ventas sin limites',
       ],
       name: 'Standard',
-      createdAt: { _seconds: 1659128177, _nanoseconds: 227000000 },
+      createdAt: Math.floor(Date.now() / 1000),
       payment_cycle: 'semestral',
       payment_url:
         'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084813ff7c60181630cdfff10ba',
@@ -193,7 +194,7 @@ const createMemberships = async () => {
       payment_cycle: 'mensual',
       description: 'standart mensual',
       active: false,
-      createdAt: { _seconds: 1659128165, _nanoseconds: 40000000 },
+      createdAt: Math.floor(Date.now() / 1000),
       name: 'Standard',
       id: 'lAEDDo2RzRwmx9vAWw7a',
     },
@@ -207,10 +208,10 @@ const createMemberships = async () => {
         'Publicación de productos y ventas sin limites',
         'Integracion con Mercadopago',
       ],
-      payment_url: 'http://foto.jpg',
+      payment_url: '',
       payment_cycle: 'mensual',
       name: 'Trial',
-      createdAt: { _seconds: 1659128087, _nanoseconds: 569000000 },
+      createdAt: Math.floor(Date.now() / 1000),
       description: 'free trial membershp',
       id: 'eV0jqp9Yg9bNqNWnGgg6',
     },
