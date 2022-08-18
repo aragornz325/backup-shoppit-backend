@@ -3,6 +3,14 @@ const functions = require('firebase-functions');
 const boom = require('@hapi/boom');
 const UserRepository = require('../repositories/user.repository');
 const userRepository = new UserRepository();
+const { config } = require('../config/config');
+
+const algoliasearch = require('algoliasearch');
+const client = algoliasearch(
+  `${config.algoliaAppId}`,
+  `${config.algoliaApiSearch}`
+);
+const index = client.initIndex(`${config.algoliaUsersIndexName}`);
 
 class ProductsRepository {
   async createProduct(payload, id) {
