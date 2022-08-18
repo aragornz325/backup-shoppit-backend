@@ -20,15 +20,13 @@ const { config } = require('../config/config');
 
 class UserServices {
   async transformToSeller(body, id) {
-    const check_trial = await membershipsRepository.getMembershipById(
-      body.membership_id
-    );
-    if (check_trial.name !== 'trial') {
-      await this.transformCustomerToSeller(body, id);
-      return { msg: 'ok' };
-    } else {
+    console.log(body.membership_id, config.trial_membership_id);
+    if (body.membership_id === config.trial_membership_id) {
       await this.transforCustomerToTrialSeller(body, id);
       return { msg: 'ok is trial' };
+    } else {
+      await this.transformCustomerToSeller(body, id);
+      return { msg: 'ok' };
     }
   }
 
@@ -119,7 +117,7 @@ class UserServices {
     };
     sendEmail(mail);
     return {
-      msg: 'ok',
+      msg: 'ok is trial',
     };
   }
 
