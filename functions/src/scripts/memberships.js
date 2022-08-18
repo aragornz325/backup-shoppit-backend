@@ -35,18 +35,189 @@ const createMemberships = async () => {
     await delRef.delete();
   }
 
-  const membershipsprod = await axios.get(
-    `https://us-central1-ecommerce-mp.cloudfunctions.net/api/memberships`,
+  const membershipsMock = [
     {
-      headers: {
-        api: '@60*lady*THEN*noon*TRUCK*84@@01|sound|BONE|score|PUSH|90@+65=mark=TALK=nail=STORY=54+',
-      },
-    }
-  );
+      membership_benefits: [
+        'Exposición alta',
+        'Soporte via Whatsapp',
+        'integracion con Mercadopago',
+        'Publicación de productos y ventas sin limites',
+      ],
+      payment_url:
+        'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084813ff7860181630c02be1061',
+      createdAt: { _seconds: 1659128135, _nanoseconds: 923000000 },
+      memberships_discounts: [100],
+      payment_cycle: 'trimestral',
+      name: 'Premium',
+      description: 'free trial membershp',
+      price: 16200,
+      active: false,
+      id: 'RgZsIIKESOSLj4eS6AwR',
+    },
+    {
+      active: false,
+      price: 19200,
+      payment_cycle: 'semestral',
+      createdAt: { _seconds: 1659128127, _nanoseconds: 541000000 },
+      payment_url:
+        'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084815db1a80181630e027803ae',
+      membership_benefits: [
+        'Exposición máxima',
+        'Atención personalizada via whatsapp y telefono',
+        'Integración con mercadopago',
+        'Publicación de productos y ventas sin limites',
+      ],
+      memberships_discounts: [100],
+      description: 'premium semestral',
+      name: 'Premium',
+      id: 'WoMgTJLpvtIGQIhm7wNY',
+    },
+    {
+      memberships_discounts: [100],
+      payment_url:
+        'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084813ff7c601816309fa4e10b6',
+      description: 'free trial membershp',
+      price: 18000,
+      createdAt: { _seconds: 1659128142, _nanoseconds: 953000000 },
+      name: 'Premium',
+      payment_cycle: 'mensual',
+      active: false,
+      membership_benefits: [
+        'Exposición alta',
+        'Soporte via Whatsapp',
+        'integracion con Mercadopago',
+        'Publicacion de Productos y Ventas sin limites',
+      ],
+      id: 'n72WW1hPLjtsiHRpWAxI',
+    },
+    {
+      description: 'professional mensual',
+      name: 'Professional',
+      membership_benefits: [
+        'Exposición Máxima ',
+        'Atención personalizada via Whatsapp y Telefono',
+        'integracion con mercadopago',
+        'Publicacion de productos y ventas sin limites',
+      ],
+      memberships_discounts: [0],
+      active: false,
+      price: 24000,
+      payment_url:
+        'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084815db1a80181630b397b03a9',
+      payment_cycle: 'mensual',
+      createdAt: { _seconds: 1659128269, _nanoseconds: 637000000 },
+      id: 'N1OcXCjS38QuOUUREWhW',
+    },
+    {
+      memberships_discounts: [100],
+      price: 21600,
+      name: 'Professional',
+      description: 'professional trimestral',
+      payment_cycle: 'trimestral',
+      membership_benefits: [
+        'Exposición máxima',
+        'Atencion Personalizada via Whatsapp y Telefono',
+        'Integracion con Mercadopago',
+        'Publicación de Productos y Ventas sin limites',
+      ],
+      active: false,
+      payment_url:
+        'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084815db1a80181630c874903ac',
+      createdAt: { _seconds: 1659128288, _nanoseconds: 531000000 },
+      id: 'lUVFJvj7sC6u0YRVackP',
+    },
+    {
+      active: false,
+      payment_url:
+        'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084813ff78601816312c4711066',
+      payment_cycle: 'semestral',
+      createdAt: { _seconds: 1659128298, _nanoseconds: 964000000 },
+      memberships_discounts: [100],
+      membership_benefits: [
+        'Exposición máxima',
+        'Atención personalizada via Whatsapp y telefono',
+        'Integracion con Mercadopago',
+        'Publicacion de Productos y Ventas sin limites',
+      ],
+      name: 'Professional',
+      price: 19200,
+      description: 'professional semestral',
+      id: 'xuqjl1ublE4CA6pCOOYa',
+    },
+    {
+      active: false,
+      payment_cycle: 'trimestral',
+      createdAt: { _seconds: 1659128187, _nanoseconds: 649000000 },
+      name: 'Standard',
+      price: 9600,
+      memberships_discounts: [0],
+      description: 'standart trimestral',
+      payment_url:
+        'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084813ff7c60181630bc39e10b8',
+      membership_benefits: [
+        'Exposicion estandar',
+        'Soporte via E-mail',
+        'Integracion con Mercadopago',
+        'Publicación de productos y ventas sin limites',
+      ],
+      id: 'Z2Ulpo7jvR0jhn1r3FVK',
+    },
+    {
+      memberships_discounts: [100],
+      price: 9600,
+      active: false,
+      membership_benefits: [
+        'Exposición estandart',
+        'Soporte via E-mail',
+        'Integracion con Mercadopago',
+        'Publicación de productos y ventas sin limites',
+      ],
+      name: 'Standard',
+      createdAt: { _seconds: 1659128177, _nanoseconds: 227000000 },
+      payment_cycle: 'semestral',
+      payment_url:
+        'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084813ff7c60181630cdfff10ba',
+      description: 'standart trimestral',
+      id: 'jbDRYwVD6gPfDFTDOdZV',
+    },
+    {
+      memberships_discounts: [100],
+      payment_url:
+        'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084815db1a801815ed0e8440116',
+      membership_benefits: [
+        'Exposición estandar',
+        'Soporte via E-mail',
+        'Integracion con Mercadopago',
+        'Publicacion de Productos y ventas sin limite',
+      ],
+      price: 12000,
+      payment_cycle: 'mensual',
+      description: 'standart mensual',
+      active: false,
+      createdAt: { _seconds: 1659128165, _nanoseconds: 40000000 },
+      name: 'Standard',
+      id: 'lAEDDo2RzRwmx9vAWw7a',
+    },
+    {
+      active: false,
+      price: 0,
+      memberships_discounts: [100],
+      membership_benefits: [
+        'Exposicion estandar',
+        'Gratis por 120 dias',
+        'Publicación de productos y ventas sin limites',
+        'Integracion con Mercadopago',
+      ],
+      payment_url: 'http://foto.jpg',
+      payment_cycle: 'mensual',
+      name: 'Trial',
+      createdAt: { _seconds: 1659128087, _nanoseconds: 569000000 },
+      description: 'free trial membershp',
+      id: 'eV0jqp9Yg9bNqNWnGgg6',
+    },
+  ];
 
-  const data = membershipsprod.data;
-
-  data.forEach((membership) => {
+  membershipsMock.forEach((membership) => {
     db.collection('memberships').doc(membership.id).set(membership);
   });
 

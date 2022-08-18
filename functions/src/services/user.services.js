@@ -119,7 +119,7 @@ class UserServices {
     };
     sendEmail(mail);
     return {
-      msg: 'ok',
+      msg: 'ok is trial',
     };
   }
 
