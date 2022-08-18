@@ -43,8 +43,7 @@ const createMemberships = async () => {
         'integracion con Mercadopago',
         'Publicación de productos y ventas sin limites',
       ],
-      payment_url:
-        'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084813ff7860181630c02be1061',
+      payment_url: '',
       createdAt: { _seconds: 1659128135, _nanoseconds: 923000000 },
       memberships_discounts: [100],
       payment_cycle: 'trimestral',
