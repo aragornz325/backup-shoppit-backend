@@ -30,9 +30,6 @@ const createMemberships = async () => {
     ids.push(doc.id);
   });
 
-  console.log(result);
-  console.log(ids);
-
   for (let i = 0; i < ids.length; i++) {
     const delRef = db.collection('memberships').doc(ids[i]);
     await delRef.delete();
@@ -48,7 +45,7 @@ const createMemberships = async () => {
   );
 
   const data = membershipsprod.data;
-  console.log(data);
+
   data.forEach((membership) => {
     db.collection('memberships').doc(membership.id).set(membership);
   });
