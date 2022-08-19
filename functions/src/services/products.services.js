@@ -62,6 +62,14 @@ class ProductsServices {
   async getProductByOwner(owner_id, limit, offset) {
     return await productsRepository.getProductByOwner(owner_id, limit, offset);
   }
+
+  async getProductWithAlgolia(search, limit, offset) {
+    return await productsRepository.getProductWithAlgolia(
+      search,
+      limit,
+      offset
+    );
+  }
 }
 
 module.exports = ProductsServices;

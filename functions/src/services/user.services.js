@@ -292,11 +292,6 @@ class UserServices {
     }
 
     const user = await this.getUserById(id);
-    console.log(
-      user.user_membership.membership_payments[
-        user.user_membership.membership_payments.length - 2
-      ]
-    );
     if (
       user.user_membership.membership_payments[
         user.user_membership.membership_payments.length - 2
