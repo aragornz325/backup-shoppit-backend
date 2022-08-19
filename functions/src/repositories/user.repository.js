@@ -6,10 +6,10 @@ const algoliasearch = require('algoliasearch');
 const { chunckarray } = require('../utils/auxiliar');
 
 const client = algoliasearch(
-  `${config.algoliaAppId}`,
-  `${config.algoliaApiSearch}`
+  `${config.algolia.algoliaUserAppId}`,
+  `${config.algolia.algoliaUserApiSearch}`
 );
-const index = client.initIndex(`${config.algoliaUsersIndexName}`);
+const index = client.initIndex(`${config.algolia.algoliaUsersIndexName}`);
 
 class UserRepository {
   async createUser(user) {

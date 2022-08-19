@@ -1,8 +1,15 @@
 const { db } = require('../../config/firebase');
+const { config } = require('../config/config');
 const functions = require('firebase-functions');
 const boom = require('@hapi/boom');
 const UserRepository = require('../repositories/user.repository');
 const userRepository = new UserRepository();
+const algoliaserch = require('algoliasearch');
+const client = algoliaserch(
+  `${config.algolia.algoliaProductsAppId}`,
+  `${config.algolia.algoliaProductsApiSerch}`
+);
+const index = client.initIndex(`${config.algolia.algoliaProductsIndexName}`);
 
 class ProductsRepository {
   async createProduct(payload, id) {
@@ -136,6 +143,51 @@ class ProductsRepository {
         throw boom.badData(error);
       });
 
+    return products;
+  }
+
+  async getIndexAlgolia(search, limit, offset) {
+    let usersAlgolia = [];
+    let result = [];
+    await index
+      .search(
+        `${search}`,
+        {
+          hitsPerPage: limit,
+        },
+        { offset: offset }
+      )
+      .then(({ hits }) => (usersAlgolia = hits))
+      .catch((err) => {
+        throw boom.badData(err);
+      });
+    usersAlgolia.forEach((user) => {
+      result.push(user.objectID);
+    });
+
+    return result;
+  }
+
+  async getProductWithAlgolia(search, limit, offset) {
+    const products = [];
+    const productIds = await this.getIndexAlgolia(search, limit, offset);
+    await Promise.all(
+      productIds.map(async (productId) => {
+        await db
+          .collection('products')
+          .doc(productId)
+          .get()
+          .then((doc) => {
+            products.push({
+              id: doc.id,
+              ...doc.data(),
+            });
+          })
+          .catch((error) => {
+            throw boom.badData(error);
+          });
+      })
+    );
     return products;
   }
 }

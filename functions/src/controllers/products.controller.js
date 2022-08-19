@@ -106,6 +106,22 @@ class ProductsController {
       next(error);
     }
   }
+
+  async getProductWithAlgolia(req, res, next) {
+    try {
+      const search = req.query.search;
+      const limit = req.query.limit || 25;
+      const offset = req.query.offset || 0;
+      const products = await productsServices.getProductWithAlgolia(
+        search,
+        limit,
+        offset
+      );
+      res.status(200).send(products);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = ProductsController;
