@@ -109,6 +109,8 @@ class MercadopagoServices {
       );
 
       const payload = {
+        status: body.status,
+        isVender: false,
         user_membership: {
           membership_status: body.status,
         },
