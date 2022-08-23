@@ -4,6 +4,7 @@ const membershipsRouter = require('./memberships.routes');
 const productRouter = require('./products.routes');
 const mercadopagoRouter = require('./mercadoPago.routes');
 const paymentsRouter = require('./payments.routes');
+const cartsRouter = require('./carts.routes');
 
 function routerApi(app) {
   app.use('/users', useRouter);
@@ -12,6 +13,7 @@ function routerApi(app) {
   app.use('/products', productRouter);
   app.use('/mercadopago', mercadopagoRouter);
   app.use('/payments', paymentsRouter);
+  app.use('/shoppit-carts', cartsRouter);
 }
 
 module.exports = routerApi;
