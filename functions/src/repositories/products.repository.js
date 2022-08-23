@@ -149,24 +149,24 @@ class ProductsRepository {
   async getIndexAlgolia(search, limit, offset) {
     let result = [];
 
-    const resultAlgolia = await index.search(`${search}`);
+    const resultAlgolia = await index.search(`${search}`, {
+      hitsPerPage: parseInt(limit, 10),
+      length: parseInt(limit, 10),
+      offset: parseInt(offset, 10),
+    });
 
     resultAlgolia.hits.forEach((product) => {
       result.push(product.objectID);
     });
+    console.log(resultAlgolia);
     return result;
   }
 
   async getProductWithAlgolia(search, limit, offset) {
     let products = [];
     const productIds = await this.getIndexAlgolia(search, limit, offset);
-    const pruductsWhitLimitandOffset = productIds.slice(
-      parseInt(offset),
-      parseInt(offset) + parseInt(limit)
-    );
-    console.log(productIds, pruductsWhitLimitandOffset);
 
-    for (let i = 0; i < pruductsWhitLimitandOffset.length; i++) {
+    for (let i = 0; i < productIds.length; i++) {
       await db
         .collection('products')
         .doc(productIds[i])
@@ -182,10 +182,7 @@ class ProductsRepository {
         });
     }
 
-    return {
-      products,
-      total: productIds.length,
-    };
+    return products;
   }
 }
 
