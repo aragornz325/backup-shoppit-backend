@@ -4,10 +4,19 @@ const GoogleSheetsRepository = require('../repositories/googleSheet.repository')
 
 const googleSheetsRepository = new GoogleSheetsRepository();
 
+const dimensions = {
+  width: 0,
+  height: 0,
+  longitude: 0,
+  weight: 0,
+};
+
 class ProductsServices {
   async createProduct(payload, id) {
     payload = {
       ...payload,
+      offer_price: payload.offer_price || 0,
+      dimensions: payload.dimensions || dimensions,
       published: true,
       owner_id: id,
       variations: payload.variations.map((variation) => {
