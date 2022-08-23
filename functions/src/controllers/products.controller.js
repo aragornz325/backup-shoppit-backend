@@ -110,7 +110,7 @@ class ProductsController {
   async getProductWithAlgolia(req, res, next) {
     try {
       const search = req.query.search;
-      const limit = req.query.limit || 25;
+      const limit = req.query.limit || 400;
       const offset = req.query.offset || 0;
       const products = await productsServices.getProductWithAlgolia(
         search,

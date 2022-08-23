@@ -147,48 +147,45 @@ class ProductsRepository {
   }
 
   async getIndexAlgolia(search, limit, offset) {
-    let usersAlgolia = [];
     let result = [];
-    await index
-      .search(
-        `${search}`,
-        {
-          hitsPerPage: limit,
-        },
-        { offset: offset }
-      )
-      .then(({ hits }) => (usersAlgolia = hits))
-      .catch((err) => {
-        throw boom.badData(err);
-      });
-    usersAlgolia.forEach((user) => {
-      result.push(user.objectID);
-    });
 
+    const resultAlgolia = await index.search(`${search}`);
+
+    resultAlgolia.hits.forEach((product) => {
+      result.push(product.objectID);
+    });
     return result;
   }
 
   async getProductWithAlgolia(search, limit, offset) {
-    const products = [];
+    let products = [];
     const productIds = await this.getIndexAlgolia(search, limit, offset);
-    await Promise.all(
-      productIds.map(async (productId) => {
-        await db
-          .collection('products')
-          .doc(productId)
-          .get()
-          .then((doc) => {
-            products.push({
-              id: doc.id,
-              ...doc.data(),
-            });
-          })
-          .catch((error) => {
-            throw boom.badData(error);
-          });
-      })
+    const pruductsWhitLimitandOffset = productIds.slice(
+      parseInt(offset),
+      parseInt(offset) + parseInt(limit)
     );
-    return products;
+    console.log(productIds, pruductsWhitLimitandOffset);
+
+    for (let i = 0; i < pruductsWhitLimitandOffset.length; i++) {
+      await db
+        .collection('products')
+        .doc(productIds[i])
+        .get()
+        .then((doc) => {
+          products.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        })
+        .catch((error) => {
+          throw boom.badData(error);
+        });
+    }
+
+    return {
+      products,
+      total: productIds.length,
+    };
   }
 }
 
