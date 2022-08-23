@@ -182,10 +182,7 @@ class ProductsRepository {
         });
     }
 
-    return {
-      products,
-      total: productIds.length,
-    };
+    return products;
   }
 }
 
