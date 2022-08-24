@@ -5,7 +5,8 @@ const cartsController = new CartsController();
 
 router.post('', cartsController.createCart);
 router.get('', cartsController.getAllCarts);
-//router.patch('', cartsController.updateCart);
-//router.delete('', cartsController.deleteCart);
+router.get('/:cart_id', cartsController.getCartById);
+router.patch('/:cart_id', cartsController.updateCart);
+router.delete('/:cart_id', cartsController.deleteCart);
 
 module.exports = router;

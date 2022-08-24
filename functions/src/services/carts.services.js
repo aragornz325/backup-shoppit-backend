@@ -37,32 +37,40 @@ class CartsServices {
   }
 
   async updateCart(payload, cart_id) {
-    await cartsRepository.updateCart(payload, cart_id);
-    const cart = await cartsRepository.getCartById(cart_id);
-
     let total_quantity = 0;
     let amount = 0;
-    if (cart.products_list.length == 1) {
-      total_quantity = cart.products_list[0].quantity;
+
+    if (payload.products_list.length == 1) {
+      total_quantity = payload.products_list[0].quantity;
     } else {
-      for (let i = 0; i < cart.products_list.length; i++) {
-        total_quantity += cart.products_list[i].quantity;
+      for (let i = 0; i < payload.products_list.length; i++) {
+        total_quantity += payload.products_list[i].quantity;
       }
     }
-    for (let i = 0; i < cart.products_list.length; i++) {
+    for (let i = 0; i < payload.products_list.length; i++) {
       const prioductDb = await db
         .collection('products')
-        .doc(cart.products_list[i].product_id)
+        .doc(payload.products_list[i].product_id)
         .get();
       amount +=
-        prioductDb.data().regular_price * cart.products_list[i].quantity;
+        prioductDb.data().regular_price * payload.products_list[i].quantity;
     }
     const cartUpdate = {
-      ...cart,
+      ...payload,
       total_price: amount,
       total_quantity: total_quantity,
     };
+
     await cartsRepository.setCart(cartUpdate, cart_id, false);
+    return { msg: 'ok' };
+  }
+
+  async getCartById(cart_id) {
+    return await cartsRepository.getCartById(cart_id);
+  }
+
+  async deleteCart(cart_id) {
+    return await cartsRepository.deleteCart(cart_id);
   }
 }
 

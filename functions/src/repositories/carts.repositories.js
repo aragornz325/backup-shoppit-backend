@@ -33,5 +33,10 @@ class CartsRepository {
     await db.collection('carts').doc(cart_id).set(payload, { merge });
     return { msg: 'ok' };
   }
+
+  async deleteCart(cart_id) {
+    await db.collection('carts').doc(cart_id).delete();
+    return { msg: 'ok' };
+  }
 }
 module.exports = CartsRepository;
