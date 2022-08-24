@@ -20,7 +20,6 @@ const { config } = require('../config/config');
 
 class UserServices {
   async transformToSeller(body, id) {
-    console.log(body.membership_id, config.trial_membership_id);
     if (body.membership_id === config.trial_membership_id) {
       await this.transforCustomerToTrialSeller(body, id);
       return { msg: 'ok is trial' };
