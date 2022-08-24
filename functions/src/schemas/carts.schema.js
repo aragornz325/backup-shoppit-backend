@@ -1,53 +1,28 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable camelcase */
 const joi = require('joi');
-const { createProduct, updateProduct } = require('./prod.schema')
 
-const buyer_id = joi.string().alphanum();
-const cart_paid = joi.boolean();
-const name = joi.string();
-const minimum_purchase = joi.number();
-const picture = joi.string().uri();
-const storeName = joi.string();
-const vendor_id = joi.string().alphanum();
-const vendor_image = joi.string().uri();
+const owner_id = joi.string().required();
+const products_list = joi.array().items(
+  joi.object().keys({
+    product_id: joi.string().required(),
+    quantity: joi.number().required(),
+  })
+);
+const created_at = joi.number();
+const updated_at = joi.number();
 
-const createCartsSc = joi.object({
-  buyer_id: buyer_id.required(),
-  cart_paid: cart_paid.required(),
-  name: name.required(),
-  products: createProduct.required(),
-  vendor: joi.object({
-    minimum_purchase: minimum_purchase.required(),
-    name: name.required(),
-    picture: picture.required(),
-    storeName: storeName.required(),
-    vendor_id: vendor_image.required(),
-  }).required(),
-  vendor_image: vendor_image.required(),
+const cartSchema = joi.object().keys({
+  owner_id,
+  products_list,
 });
 
-const updateCartsSc = joi.object({
-  buyer_id,
-  cart_paid,
-  name,
-  products: updateProduct,
-  vendor: joi.object({
-    minimum_purchase,
-    name,
-    picture,
-    storeName,
-    vendor_id,
-  }),
-  vendor_image,
-});
-
-const getOneCartSc = joi.object({
-  id: joi.string().alphanum().min(20).max(20),
+const cartUpdateSchema = joi.object().keys({
+  owner_id,
+  products_list,
+  created_at,
+  updated_at,
 });
 
 module.exports = {
-  createCartsSc,
-  updateCartsSc,
-  getOneCartSc,
+  cartSchema,
+  cartUpdateSchema,
 };
