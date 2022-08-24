@@ -7,12 +7,22 @@ const products_list = joi.array().items(
     quantity: joi.number().required(),
   })
 );
+const created_at = joi.number();
+const updated_at = joi.number();
 
 const cartSchema = joi.object().keys({
   owner_id,
   products_list,
 });
 
+const cartUpdateSchema = joi.object().keys({
+  owner_id,
+  products_list,
+  created_at,
+  updated_at,
+});
+
 module.exports = {
   cartSchema,
+  cartUpdateSchema,
 };

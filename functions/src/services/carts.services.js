@@ -5,13 +5,11 @@ const { db } = require('../../config/firebase');
 class CartsServices {
   async createCart(payload) {
     let total_quantity = 0;
-    if (payload.products_list.length == 1) {
-      total_quantity = payload.products_list[0].quantity;
-    } else {
-      for (let i = 0; i < payload.products_list.length; i++) {
-        total_quantity += payload.products_list[i].quantity;
-      }
+
+    for (let i = 0; i < payload.products_list.length; i++) {
+      total_quantity += payload.products_list[i].quantity;
     }
+
     let amount = 0;
     for (let i = 0; i < payload.products_list.length; i++) {
       const prioductDb = await db
@@ -27,6 +25,7 @@ class CartsServices {
       products_list: payload.products_list,
       total_price: amount,
       total_quantity: total_quantity,
+      created_at: Math.floor(Date.now() / 1000),
     };
 
     return await cartsRepository.createCart(cart);
@@ -59,6 +58,7 @@ class CartsServices {
       ...payload,
       total_price: amount,
       total_quantity: total_quantity,
+      updated_at: Math.floor(Date.now() / 1000),
     };
 
     await cartsRepository.setCart(cartUpdate, cart_id, false);

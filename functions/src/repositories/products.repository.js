@@ -158,7 +158,7 @@ class ProductsRepository {
     resultAlgolia.hits.forEach((product) => {
       result.push(product.objectID);
     });
-    console.log(resultAlgolia);
+
     return result;
   }
 
