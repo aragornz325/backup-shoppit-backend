@@ -12,6 +12,16 @@ class CartsController {
     }
   }
 
+  async updateCart(req, res, next) {
+    try {
+      const payload = req.body;
+      const result = await cartsServices.updateCart(payload);
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getAllCarts(req, res, next) {
     try {
       const result = await cartsServices.getAllCarts();

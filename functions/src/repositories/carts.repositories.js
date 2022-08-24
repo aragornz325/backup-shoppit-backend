@@ -12,14 +12,26 @@ class CartsRepository {
     const carts = await db.collection('carts').get();
     const cartsList = [];
     carts.forEach((doc) => {
-      cartsList.push(doc.data());
+      cartsList.push({ ...doc.data(), id: doc.id });
     });
     return cartsList;
   }
 
-  updateCart(payload) {
-    return db.collection('carts').doc(payload.cart_id).update(payload);
+  async updateCart(payload, cart_id) {
+    return db.collection('carts').doc(cart_id).update(payload);
+  }
+
+  async getCartById(cart_id) {
+    const cart = await db.collection('carts').doc(cart_id).get();
+    if (!cart.exists) {
+      throw boom.notFound('Cart not found');
+    }
+    return { ...cart.data(), id: cart.id };
+  }
+
+  async setCart(payload, cart_id, merge) {
+    await db.collection('carts').doc(cart_id).set(payload, { merge });
+    return { msg: 'ok' };
   }
 }
-
 module.exports = CartsRepository;
