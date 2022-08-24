@@ -12,7 +12,11 @@ router.post(
 );
 router.get('', cartsController.getAllCarts);
 router.get('/:cart_id', cartsController.getCartById);
-router.patch('/:cart_id', cartsController.updateCart);
+router.patch(
+  '/:cart_id',
+  validatorHandler(cartSchema, 'body'),
+  cartsController.updateCart
+);
 router.delete('/:cart_id', cartsController.deleteCart);
 
 module.exports = router;
