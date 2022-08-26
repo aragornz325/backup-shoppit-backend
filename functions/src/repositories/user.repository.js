@@ -159,13 +159,11 @@ class UserRepository {
     let usersAlgolia = [];
     let result = [];
     await index
-      .search(
-        `${search}`,
-        {
-          hitsPerPage: limit,
-        },
-        { offset: offset }
-      )
+      .search(`${search}`, {
+        hitsPerPage: parseInt(limit, 10),
+        length: parseInt(limit, 10),
+        offset: parseInt(offset, 10),
+      })
       .then(({ hits }) => (usersAlgolia = hits))
       .catch((err) => {
         throw boom.badData(err);
@@ -182,7 +180,7 @@ class UserRepository {
     functions.logger.info('execute search users without algolia');
     let collectionRef = db.collection('users');
     if (role) {
-      collectionRef = collectionRef.where('rol', '==', role);
+      collectionRef = collectionRef.where('role', '==', role);
     }
     if (status) {
       collectionRef = collectionRef.where('status', '==', status);
@@ -192,7 +190,7 @@ class UserRepository {
     await collectionRef
       .limit(parseInt(limit, 10))
       .orderBy('lastName', 'asc')
-      .startAfter(offset)
+      .startAfter(parseInt(offset, 10))
       .get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
