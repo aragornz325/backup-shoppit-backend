@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const { initializeApp, cert } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
 require('dotenv').config();
@@ -37,11 +38,26 @@ const createCategories = async () => {
 
   console.log('delete done');
   const categoriesMock = [
-    { name: 'Tecnología', description: 'Tecnología', image: 'food.png' },
-    { name: 'Moda', description: 'Moda', image: 'Moda.png' },
+    {
+      name: 'Tecnología',
+      description: 'Tecnología',
+      image:
+        'https://res.cloudinary.com/devf9b8bv/image/upload/v1661454066/categories/Group_6_jjt2an.png',
+    },
+    {
+      name: 'Moda',
+      description: 'Moda',
+      image:
+        'https://res.cloudinary.com/devf9b8bv/image/upload/v1661454066/categories/Indumentaria_wiopvd.png',
+    },
     { name: 'Deporte', description: 'Deporte', image: 'Deporte.png' },
     { name: 'Animales', description: 'Animales', image: 'Animales.png' },
-    { name: 'Hogar', description: 'Hogar', image: 'Hogar.png' },
+    {
+      name: 'Hogar',
+      description: 'Hogar',
+      image:
+        'https://res.cloudinary.com/devf9b8bv/image/upload/v1661454066/categories/hogar_y_deco_f6otnm.png',
+    },
   ];
   console.log('create new categories');
   categoriesMock.forEach((category) => {
