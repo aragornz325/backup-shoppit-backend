@@ -87,7 +87,7 @@ class UserController {
     const search = req.query.search;
     const role = req.query.role;
     const status = req.query.status;
-    const limit = req.query.limit || 10;
+    const limit = req.query.limit || 25;
     const offset = req.query.offset || 0;
     try {
       const users = await service.getUsers(search, role, status, limit, offset);

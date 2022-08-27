@@ -1,5 +1,6 @@
 const { db } = require('../../config/firebase');
 const functions = require('firebase-functions');
+
 const boom = require('@hapi/boom');
 
 class CartsRepository {
@@ -37,6 +38,18 @@ class CartsRepository {
   async deleteCart(cart_id) {
     await db.collection('carts').doc(cart_id).delete();
     return { msg: 'ok' };
+  }
+
+  async getCartByOwner(owner_id) {
+    const carts = [];
+    const cart = await db
+      .collection('carts')
+      .where('owner_id', '==', owner_id)
+      .get();
+    cart.forEach((doc) => {
+      carts.push({ ...doc.data(), id: doc.id });
+    });
+    return carts;
   }
 }
 module.exports = CartsRepository;
