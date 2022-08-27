@@ -39,25 +39,66 @@ const createCategories = async () => {
   console.log('delete done');
   const categoriesMock = [
     {
+      name: 'Ropa & Accesorios',
+      description: 'Ropa & Accesorios',
+      image:
+        'https://res.cloudinary.com/devf9b8bv/image/upload/v1661454066/categories/Indumentaria_wiopvd.png',
+    },
+    {
+      name: 'Indumentaria Laboral',
+      description: 'Indumentaria Laboral',
+      image:
+        'https://res.cloudinary.com/devf9b8bv/image/upload/v1661454066/categories/indumentaria_laboral_i9tkj2.png',
+    },
+    {
+      name: 'Alimentos & Bebidas',
+      description: 'Alimentos & Bebidas',
+      image:
+        ' https://res.cloudinary.com/devf9b8bv/image/upload/v1661454066/categories/alimentos_y_bebidas_wqa8ji.png',
+    },
+    {
+      name: 'Belleza & Cuidado Personal',
+      description: 'Belleza & Cuidado Personal',
+      image:
+        ' https://res.cloudinary.com/devf9b8bv/image/upload/v1661454066/categories/belleza_y_cuidado_personal_wvk6nj.png',
+    },
+    {
+      name: 'Bazar & Casa',
+      description: 'Bazar & Casa',
+      image:
+        'https://res.cloudinary.com/devf9b8bv/image/upload/v1661454066/categories/hogar_y_deco_f6otnm.png',
+    },
+    {
+      name: 'Entretenimiento',
+      description: 'Entretenimiento',
+      image:
+        'https://res.cloudinary.com/devf9b8bv/image/upload/v1661454066/categories/videojuegos_axyijv.png',
+    },
+    {
+      name: 'Herramientas',
+      description: 'Herramientas',
+      image:
+        'https://res.cloudinary.com/devf9b8bv/image/upload/v1661454066/categories/herramientas_nxplfz.png',
+    },
+    {
       name: 'Tecnología',
       description: 'Tecnología',
       image:
         'https://res.cloudinary.com/devf9b8bv/image/upload/v1661454066/categories/Group_6_jjt2an.png',
     },
     {
-      name: 'Moda',
-      description: 'Moda',
+      name: 'Tabaquería',
+      description: 'Tabaquería',
       image:
-        'https://res.cloudinary.com/devf9b8bv/image/upload/v1661454066/categories/Indumentaria_wiopvd.png',
+        'https://res.cloudinary.com/devf9b8bv/image/upload/v1661454066/categories/tabaqueria_vcp6ag.png',
     },
-    { name: 'Deporte', description: 'Deporte', image: 'Deporte.png' },
-    { name: 'Animales', description: 'Animales', image: 'Animales.png' },
     {
-      name: 'Hogar',
-      description: 'Hogar',
+      name: 'Insumos',
+      description: 'Insumos',
       image:
-        'https://res.cloudinary.com/devf9b8bv/image/upload/v1661454066/categories/hogar_y_deco_f6otnm.png',
+        'https://res.cloudinary.com/devf9b8bv/image/upload/v1661454066/categories/insumos_okepbb.png',
     },
+    { name: 'otros', description: 'otros', image: '' },
   ];
   console.log('create new categories');
   categoriesMock.forEach((category) => {
