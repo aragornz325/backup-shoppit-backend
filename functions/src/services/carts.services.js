@@ -1,9 +1,21 @@
 const CartsRepository = require('../repositories/carts.repositories');
 const cartsRepository = new CartsRepository();
+const UserRepository = require('../repositories/user.repository');
+const userRepository = new UserRepository();
+const boom = require('@hapi/boom');
 const { db } = require('../../config/firebase');
 
 class CartsServices {
   async createCart(payload) {
+    const checkUser = await userRepository.getUserById(payload.owner_id);
+    if (!checkUser) {
+      throw boom.notFound('User not found');
+    }
+    const checkCart = await cartsRepository.getCartByOwner(payload.owner_id);
+
+    if (checkCart.length > 0 && checkCart[0].products_list.length > 0) {
+      throw boom.conflict('user already have open cart');
+    }
     let total_quantity = 0;
 
     for (let i = 0; i < payload.products_list.length; i++) {
