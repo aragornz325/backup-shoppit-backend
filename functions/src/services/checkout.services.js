@@ -3,6 +3,10 @@ const CheckoutRepository = require('../repositories/checkout.repository');
 const checkoutRepository = new CheckoutRepository();
 const UserRepository = require('../repositories/user.repository');
 const userRepository = new UserRepository();
+const ProductsRepository = require('../repositories/products.repository');
+const productsRepository = new ProductsRepository();
+const CartsRepository = require('../repositories/carts.repositories');
+const cartsRepository = new CartsRepository();
 const functions = require('firebase-functions');
 
 class CheckoutServices {
@@ -19,12 +23,10 @@ class CheckoutServices {
     // calculate total amount
     let amount = 0;
     for (let i = 0; i < order.products_list.length; i++) {
-      const prioductDb = await db
-        .collection('products')
-        .doc(order.products_list[i].product_id)
-        .get();
-      amount +=
-        prioductDb.data().regular_price * order.products_list[i].quantity;
+      const prioductDb = await productsRepository.getProductById(
+        order.products_list[i].product_id
+      );
+      amount += prioductDb[0].regular_price * order.products_list[i].quantity;
     }
 
     // create order
@@ -42,6 +44,19 @@ class CheckoutServices {
     //save order to db
     await checkoutRepository.createOrder(setStatus);
 
+    //set user cart to empty
+    const cart = {
+      owner_id: order.owner_id,
+      products_list: [],
+      total_quantity: 0,
+      total_price: 0,
+    };
+    const check_cart = await cartsRepository.getCartByOwner(order.owner_id);
+    if (check_cart.length <= 0) {
+      await cartsRepository.createCart(cart);
+    } else {
+      await cartsRepository.setCart(cart, check_cart[0].id, false);
+    }
     return { msg: 'ok' };
   }
 }
