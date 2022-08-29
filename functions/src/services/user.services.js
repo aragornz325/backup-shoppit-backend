@@ -357,7 +357,6 @@ class UserServices {
       limit,
       offset
     );
-    console.log(user);
     const usersToMobile = [];
     for (let i = 0; i < user.users.length; i++) {
       const userToMobile = {
