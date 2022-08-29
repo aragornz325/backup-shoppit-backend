@@ -33,7 +33,7 @@ app.use(
   swaggerUI.setup(swaggerJsDoc(swaggerSpec))
 );
 app.get('/status', (req, res) => {
-  res.status(200).end('ok');
+  res.status(200).end('server is running');
 });
 app.head('/status', (req, res) => {
   res.status(200).end();

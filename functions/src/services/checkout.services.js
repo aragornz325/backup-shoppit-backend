@@ -3,6 +3,10 @@ const CheckoutRepository = require('../repositories/checkout.repository');
 const checkoutRepository = new CheckoutRepository();
 const UserRepository = require('../repositories/user.repository');
 const userRepository = new UserRepository();
+const ProductsRepository = require('../repositories/products.repository');
+const productsRepository = new ProductsRepository();
+const CartsRepository = require('../repositories/carts.repositories');
+const cartsRepository = new CartsRepository();
 const functions = require('firebase-functions');
 
 class CheckoutServices {
@@ -19,29 +23,47 @@ class CheckoutServices {
     // calculate total amount
     let amount = 0;
     for (let i = 0; i < order.products_list.length; i++) {
-      const prioductDb = await db
-        .collection('products')
-        .doc(order.products_list[i].product_id)
-        .get();
-      amount +=
-        prioductDb.data().regular_price * order.products_list[i].quantity;
+      const prioductDb = await productsRepository.getProductById(
+        order.products_list[i].product_id
+      );
+      amount += prioductDb[0].regular_price * order.products_list[i].quantity;
     }
 
     // create order
+    const order_items = order.products_list.map((product) => {
+      return {
+        product_id: product.product_id,
+        quantity: product.quantity,
+        status_by_seller: 'pending',
+        status_by_buyer: 'approved',
+      };
+    });
+
     const orderToDb = {
       owner_id: order.owner_id,
-      products_list: order.products_list,
+      order_items,
       total_price: amount,
       total_quantity: total_quantity,
       created_at: Math.floor(Date.now() / 1000),
-      status_by_seller: 'pending',
-      status_by_buyer: 'approved',
+      status: 'pending',
     };
-    const setStatus = await checkoutRepository.changeOrderStatus(orderToDb);
 
     //save order to db
-    await checkoutRepository.createOrder(setStatus);
+    await checkoutRepository.createOrder(orderToDb);
 
+    //set user cart to empty
+    const cart = {
+      owner_id: order.owner_id,
+      products_list: [],
+      total_quantity: 0,
+      total_price: 0,
+    };
+    const check_cart = await cartsRepository.getCartByOwner(order.owner_id);
+    if (check_cart.length <= 0) {
+      await cartsRepository.createCart(cart);
+    } else {
+      await cartsRepository.setCart(cart, check_cart[0].id, false);
+    }
     return { msg: 'ok' };
   }
 }

@@ -184,6 +184,24 @@ class ProductsRepository {
 
     return products;
   }
+
+  async getProductById(id) {
+    let product = [];
+    await db
+      .collection('products')
+      .doc(id)
+      .get()
+      .then((doc) => {
+        product.push({
+          id: doc.id,
+          ...doc.data(),
+        });
+      })
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    return product;
+  }
 }
 
 module.exports = ProductsRepository;

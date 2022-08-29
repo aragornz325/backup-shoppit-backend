@@ -34,7 +34,18 @@ class UserRepository {
           .set(
             {
               email: user.email,
-              addresses: {},
+              addresses: {
+                id: '',
+                addressLine1: '',
+                addressLine2: '',
+                postalCode: '',
+                country: '',
+                state: '',
+                city: '',
+                latitude: '',
+                longitude: '',
+                isMain: '',
+              },
               billing: {},
               cookie: '',
               firstName: newName[0] || '',
