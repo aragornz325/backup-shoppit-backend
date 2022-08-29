@@ -30,19 +30,26 @@ class CheckoutServices {
     }
 
     // create order
+    const order_items = order.products_list.map((product) => {
+      return {
+        product_id: product.product_id,
+        quantity: product.quantity,
+        status_by_seller: 'pending',
+        status_by_buyer: 'approved',
+      };
+    });
+
     const orderToDb = {
       owner_id: order.owner_id,
-      products_list: order.products_list,
+      order_items,
       total_price: amount,
       total_quantity: total_quantity,
       created_at: Math.floor(Date.now() / 1000),
-      status_by_seller: 'pending',
-      status_by_buyer: 'approved',
+      status: 'pending',
     };
-    const setStatus = await checkoutRepository.changeOrderStatus(orderToDb);
 
     //save order to db
-    await checkoutRepository.createOrder(setStatus);
+    await checkoutRepository.createOrder(orderToDb);
 
     //set user cart to empty
     const cart = {
