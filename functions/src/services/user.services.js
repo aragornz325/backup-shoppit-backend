@@ -311,6 +311,92 @@ class UserServices {
     const updated = await mercadopago.updatedSuscription(options);
     return updated;
   }
+  async getUserByIdToMobile(id) {
+    const user = await userRepository.getUserById(id);
+
+    const userToMobile = {
+      email: user.email || '',
+      addresses: {
+        id: user.addresses.id || '',
+        addressLine1: user.addresses.addressLine1 || '',
+        addressLine2: user.addresses.addressLine2 || '',
+        postalCode: user.addresses.postalCode || '',
+        country: user.addresses.country || '',
+        state: user.addresses.state || '',
+        city: user.addresses.city || '',
+        latitude: user.addresses.latitude || '',
+        longitude: user.addresses.longitude || '',
+        isMain: user.addresses.isMain || '',
+      },
+      billing: user.billing || {},
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      id: user.uid || '',
+      isConsultor: user.isConsultor || '',
+      isSocial: user.isSocial || '',
+      isAdmin: user.isAdmin || '',
+      isVender: user.isVender || '',
+      loggedIn: user.loggedIn || '',
+      minimum_purchase: user.minimum_purchase || '',
+      picture: user.photoURL || '',
+      purchases: user.purchases || '',
+      sheetsId: user.sheetsId || '',
+      storeName: user.displayName || '',
+      storePicture: user.photoURL || '',
+      url: user.photoURL || '',
+      username: user.username || '',
+      role: user.role || '',
+    };
+    return userToMobile;
+  }
+  async getUsersToMobile(search, role, status, limit, offset) {
+    const user = await userRepository.getUsers(
+      search,
+      role,
+      status,
+      limit,
+      offset
+    );
+    console.log(user);
+    const usersToMobile = [];
+    for (let i = 0; i < user.users.length; i++) {
+      const userToMobile = {
+        email: user.users[i].email || '',
+        addresses: {
+          id: user.users[i].addresses.id || '',
+          addressLine1: user.users[i].addresses.addressLine1 || '',
+          addressLine2: user.users[i].addresses.addressLine2 || '',
+          postalCode: user.users[i].addresses.postalCode || '',
+          country: user.users[i].addresses.country || '',
+          state: user.users[i].addresses.state || '',
+          city: user.users[i].addresses.city || '',
+          latitude: user.users[i].addresses.latitude || '',
+          longitude: user.users[i].addresses.longitude || '',
+          isMain: user.users[i].addresses.isMain || '',
+        },
+        billing: user.users[i].billing || {},
+        firstName: user.users[i].firstName || '',
+        lastName: user.users[i].lastName || '',
+        id: user.users[i].uid || '',
+        isConsultor: user.users[i].isConsultor || '',
+        isSocial: user.users[i].isSocial || '',
+        isAdmin: user.users[i].isAdmin || '',
+        isVender: user.users[i].isVender || '',
+        loggedIn: user.users[i].loggedIn || '',
+        minimum_purchase: user.users[i].minimum_purchase || '',
+        picture: user.users[i].photoURL || '',
+        purchases: user.users[i].purchases || '',
+        sheetsId: user.users[i].sheetsId || '',
+        storeName: user.users[i].displayName || '',
+        storePicture: user.users[i].photoURL || '',
+        url: user.users[i].photoURL || '',
+        username: user.users[i].username || '',
+        role: user.users[i].role || '',
+      };
+      usersToMobile.push(userToMobile);
+    }
+    return usersToMobile;
+  }
 }
 
 module.exports = UserServices;
