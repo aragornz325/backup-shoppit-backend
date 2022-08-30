@@ -7,6 +7,7 @@ const paymentsRouter = require('./payments.routes');
 const cartsRouter = require('./carts.routes');
 const ordersRouter = require('./orders.router');
 const checkoutRouter = require('./checkout.routes');
+const adsRouter = require('./ads.routes');
 
 function routerApi(app) {
   app.use('/users', useRouter);
@@ -18,6 +19,7 @@ function routerApi(app) {
   app.use('/shoppit-carts', cartsRouter);
   app.use('/orders', ordersRouter);
   app.use('/checkout', checkoutRouter);
+  app.use('/ads', adsRouter);
 }
 
 module.exports = routerApi;
