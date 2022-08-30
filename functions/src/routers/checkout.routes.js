@@ -3,6 +3,21 @@ const router = express.Router();
 const CheckoutControllers = require('../controllers/checkout.controllers');
 const checkoutControllers = new CheckoutControllers();
 
-router.post('', checkoutControllers.createOrder);
+const {
+  isAuthenticated,
+  isAuthorized,
+  checkApiKey,
+} = require('../middlewares/auth.handler');
+
+router.post(
+  '',
+  checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['customer', 'admin', 'seller'],
+    allowSameUser: true,
+  }),
+  checkoutControllers.createOrder
+);
 
 module.exports = router;
