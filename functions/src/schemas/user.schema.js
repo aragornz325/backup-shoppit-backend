@@ -2,7 +2,18 @@ const joi = require('joi');
 
 const firstName = joi.string();
 const lastName = joi.string();
-const addresses = joi.array();
+const addresses = joi.object({
+  id: joi.string(),
+  addressLine1: joi.string(),
+  addressLine2: joi.string(),
+  postalCode: joi.string(),
+  country: joi.string(),
+  state: joi.string(),
+  city: joi.string(),
+  latitude: joi.string(),
+  longitude: joi.string(),
+  isMain: joi.boolean(),
+});
 const billing = joi.object();
 const cookie = joi.string();
 const id = joi.string().alphanum();

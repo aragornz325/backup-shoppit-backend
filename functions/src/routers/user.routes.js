@@ -9,7 +9,7 @@ const {
   checkApiKey,
 } = require('../middlewares/auth.handler');
 
-const { querySchema } = require('../schemas/user.schema');
+const { querySchema, updateUser } = require('../schemas/user.schema');
 const validatorHandler = require('../middlewares/validatorHandler');
 const { masivecustomClaim } = require('../utils/masiveCostumerClaim');
 
@@ -35,6 +35,7 @@ router.patch(
     hasRole: ['admin'],
     allowSameUser: true,
   }),
+  validatorHandler(updateUser, 'body'),
   usercontroller.updateUser
 );
 router.patch('/:id/changesuscription', usercontroller.changeSuscription);
