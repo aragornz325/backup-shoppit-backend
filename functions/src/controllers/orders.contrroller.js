@@ -15,6 +15,7 @@ class OrderController {
   async getOrders(req, res, next) {
     try {
       const limit = req.query.limit || 25;
+
       const offset = req.query.offset || 0;
       const result = await orderService.getOrders(limit, offset);
       res.status(200).send(result);
