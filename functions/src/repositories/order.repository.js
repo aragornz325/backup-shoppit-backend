@@ -9,12 +9,14 @@ class OrderRepository {
   }
 
   async getOrders(limit, offset) {
+    console.log(limit);
     const orders = [];
-    await db
+    const query = db
       .collection('orders')
       .orderBy('created_at', 'desc')
       .limit(parseInt(limit, 10))
-      .startAfter(parseInt(offset, 10))
+      .offset(parseInt(offset, 10));
+    await query
       .get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
@@ -23,6 +25,7 @@ class OrderRepository {
       })
       .catch((err) => {
         functions.logger.info(err);
+        throw new Error(err);
       });
     return {
       orders,
