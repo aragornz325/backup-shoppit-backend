@@ -339,7 +339,6 @@ class UserServices {
       loggedIn: user.loggedIn || '',
       minimum_purchase: user.minimum_purchase || '',
       picture: user.photoURL || '',
-      purchases: user.purchases || '',
       sheetsId: user.sheetsId || '',
       storeName: user.displayName || '',
       storePicture: user.photoURL || '',
@@ -358,7 +357,7 @@ class UserServices {
       offset
     );
     const usersToMobile = [];
-    console.log(user.users[3]);
+
     for (let i = 0; i < user.users.length; i++) {
       const userToMobile = {
         email: user.users[i].email || '',
@@ -385,7 +384,6 @@ class UserServices {
         loggedIn: user.users[i].loggedIn || '',
         minimum_purchase: user.users[i].minimum_purchase || '',
         picture: user.users[i].photoURL || '',
-        purchases: user.users[i].purchases || '',
         sheetsId: user.users[i].sheetsId || '',
         storeName: user.users[i].displayName || '',
         storePicture: user.users[i].photoURL || '',
