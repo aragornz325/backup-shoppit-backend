@@ -10,7 +10,7 @@ class CheckoutRepository {
   async getOrderById(id) {
     let order = {};
     await db
-      .collection('ordersfake')
+      .collection('orders')
       .doc(id)
       .get()
       .then((doc) => {
