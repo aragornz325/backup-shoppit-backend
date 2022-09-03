@@ -10,7 +10,7 @@ const cartsRepository = new CartsRepository();
 const functions = require('firebase-functions');
 
 class CheckoutServices {
-  async createOrder(order) {
+  async createOrder1(order) {
     // check if user exists
     await userRepository.getUserById(order.owner_id);
 
@@ -66,6 +66,98 @@ class CheckoutServices {
     }
     return { msg: 'ok' };
   }
-}
 
+  async createOrder(order) {
+    const productsByIdMap = new Map();
+    for (let i = 0; i < order.products_list.length; i++) {
+      if (!productsByIdMap.has(order.products_list[i].product_id)) {
+        let varitionsMap = new Map();
+        varitionsMap.set(
+          order.products_list[i].variation,
+          order.products_list[i].quantity
+        );
+        productsByIdMap.set(order.products_list[i].product_id, varitionsMap);
+      } else {
+        let variationsMap = productsByIdMap.get(
+          order.products_list[i].product_id
+        );
+        if (!variationsMap.has(order.products_list[i].variation)) {
+          variationsMap.set(
+            order.products_list[i].variation,
+            order.products_list[i].quantity
+          );
+        } else {
+          let quantity = variationsMap.get(order.products_list[i].variation);
+          variationsMap.set(
+            order.products_list[i].variation,
+            quantity + order.products_list[i].quantity
+          );
+        }
+      }
+    }
+    //create orders from productsByIdMap
+    const order_items = [];
+    for (let product_id of productsByIdMap.keys()) {
+      const product = await productsRepository.getProductById(product_id);
+      const variationsMap = productsByIdMap.get(product_id);
+      for (let variation of variationsMap.keys()) {
+        const quantity = variationsMap.get(variation);
+        order_items.push({
+          product_id,
+          variation,
+          quantity,
+          status_by_seller: 'pending',
+          status_by_buyer: 'approved',
+        });
+      }
+    }
+
+    const ordersBySellerMap = new Map();
+    for (let i = 0; i < order_items.length; i++) {
+      const order_item = order_items[i];
+      const product = await productsRepository.getProductById(
+        order_item.product_id
+      );
+      const seller_id = product[0].owner_id;
+      if (!ordersBySellerMap.has(seller_id)) {
+        let order_items = [];
+        order_items.push(order_item);
+        ordersBySellerMap.set(seller_id, order_items);
+      } else {
+        let order_items = ordersBySellerMap.get(seller_id);
+        order_items.push(order_item);
+        ordersBySellerMap.set(seller_id, order_items);
+      }
+    }
+    //create orders from ordersBySellerMap
+    let finalOrders = [];
+    for (let seller_id of ordersBySellerMap.keys()) {
+      const order_items = ordersBySellerMap.get(seller_id);
+      let total_quantity = 0;
+      let total_price = 0;
+      for (let i = 0; i < order_items.length; i++) {
+        const order_item = order_items[i];
+        const product = await productsRepository.getProductById(
+          order_item.product_id
+        );
+
+        total_quantity += order_item.quantity;
+
+        total_price += product[0].regular_price * order_item.quantity;
+      }
+      const orderToDb = {
+        seller_id,
+        owner_id: order.owner_id,
+        order_items,
+        total_price,
+        total_quantity,
+        created_at: Math.floor(Date.now() / 1000),
+        status: 'pending',
+      };
+
+      finalOrders.push(orderToDb);
+    }
+    return finalOrders;
+  }
+}
 module.exports = CheckoutServices;
