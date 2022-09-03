@@ -155,9 +155,10 @@ class CheckoutServices {
         status: 'pending',
       };
 
-      finalOrders.push(orderToDb);
+      //save order to db
+      await checkoutRepository.createOrder(orderToDb);
     }
-    return finalOrders;
+    return { msg: 'ok' };
   }
 }
 module.exports = CheckoutServices;
