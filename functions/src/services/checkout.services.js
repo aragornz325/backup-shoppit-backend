@@ -41,7 +41,6 @@ class CheckoutServices {
     //create orders from productsByIdMap
     const order_items = [];
     for (let product_id of productsByIdMap.keys()) {
-      const product = await productsRepository.getProductById(product_id);
       const variationsMap = productsByIdMap.get(product_id);
       for (let variation of variationsMap.keys()) {
         const quantity = variationsMap.get(variation);
@@ -73,7 +72,7 @@ class CheckoutServices {
       }
     }
     //create orders from ordersBySellerMap
-    let finalOrders = [];
+
     for (let seller_id of ordersBySellerMap.keys()) {
       const order_items = ordersBySellerMap.get(seller_id);
       let total_quantity = 0;
