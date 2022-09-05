@@ -38,69 +38,71 @@ class CheckoutServices {
         }
       }
     }
-    //create orders from productsByIdMap
-    const order_items = [];
-    for (let product_id of productsByIdMap.keys()) {
-      const variationsMap = productsByIdMap.get(product_id);
-      for (let variation of variationsMap.keys()) {
-        const quantity = variationsMap.get(variation);
-        order_items.push({
-          product_id,
-          variation,
-          quantity,
-          status_by_seller: 'pending',
-          status_by_buyer: 'approved',
-        });
-      }
-    }
 
-    const ordersBySellerMap = new Map();
-    for (let i = 0; i < order_items.length; i++) {
-      const order_item = order_items[i];
-      const product = await productsRepository.getProductById(
-        order_item.product_id
-      );
-      const seller_id = product[0].owner_id;
-      if (!ordersBySellerMap.has(seller_id)) {
-        let order_items = [];
-        order_items.push(order_item);
-        ordersBySellerMap.set(seller_id, order_items);
+    let ids = [...productsByIdMap.keys()];
+    const productFromDb = await productsRepository.getProductsByIds(ids);
+
+    const ordersByOwner = new Map();
+
+    for (let i = 0; i < productFromDb.length; i++) {
+      const product = productFromDb[i];
+      if (!ordersByOwner.has(product.owner_id)) {
+        let variationMap = productsByIdMap.get(product.id);
+        let newOrder = {
+          owner_id: order.owner_id,
+          seller_id: product.owner_id,
+          created_at: Math.floor(Date.now() / 1000),
+          status: 'pending',
+          order_items: [],
+        };
+        for (let [variation, quantity] of variationMap) {
+          let orderItem = {
+            product_id: product.id,
+            variation,
+            quantity,
+            price: product.regular_price,
+            status_by_buyer: 'approved',
+            status_by_seller: 'pending',
+          };
+          newOrder.order_items.push(orderItem);
+        }
+        ordersByOwner.set(product.owner_id, newOrder);
       } else {
-        let order_items = ordersBySellerMap.get(seller_id);
-        order_items.push(order_item);
-        ordersBySellerMap.set(seller_id, order_items);
+        let variationMap = productsByIdMap.get(product.id);
+        let order = ordersByOwner.get(product.owner_id);
+        for (let [variation, quantity] of variationMap) {
+          let orderItem = {
+            product_id: product.id,
+            variation,
+            quantity,
+            price: product.regular_price,
+            status_by_buyer: 'approved',
+            status_by_seller: 'pending',
+          };
+          order.order_items.push(orderItem);
+        }
+        ordersByOwner.set(product.owner_id, order);
       }
     }
-    //create orders from ordersBySellerMap
-
-    for (let seller_id of ordersBySellerMap.keys()) {
-      const order_items = ordersBySellerMap.get(seller_id);
-      let total_quantity = 0;
-      let total_price = 0;
-      for (let i = 0; i < order_items.length; i++) {
-        const order_item = order_items[i];
-        const product = await productsRepository.getProductById(
-          order_item.product_id
-        );
-
-        total_quantity += order_item.quantity;
-
-        total_price += product[0].regular_price * order_item.quantity;
+    //calculate total quantity and total price
+    for (let [key, value] of ordersByOwner) {
+      let totalQuantity = 0;
+      let totalPrice = 0;
+      for (let i = 0; i < value.order_items.length; i++) {
+        totalQuantity += value.order_items[i].quantity;
+        totalPrice +=
+          value.order_items[i].quantity * value.order_items[i].price;
       }
-      const orderToDb = {
-        seller_id,
-        owner_id: order.owner_id,
-        order_items,
-        total_price,
-        total_quantity,
-        created_at: Math.floor(Date.now() / 1000),
-        status: 'pending',
-      };
-
-      //save order to db
-      await checkoutRepository.createOrder(orderToDb);
+      value.total_quantity = totalQuantity;
+      value.total_price = totalPrice;
     }
-    return { msg: 'ok' };
+    //create order
+    let ordersToDb = [];
+    for (let [key, value] of ordersByOwner) {
+      ordersToDb.push(value);
+    }
+
+    return ordersToDb;
   }
 }
 module.exports = CheckoutServices;

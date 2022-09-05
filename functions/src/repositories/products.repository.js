@@ -202,6 +202,26 @@ class ProductsRepository {
       });
     return product;
   }
+
+  async getProductsByIds(ids) {
+    // get product in batch
+    const products = [];
+    const docRef = ids.map((id) => db.collection('products').doc(id));
+    await db
+      .getAll(...docRef)
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          products.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        });
+      })
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    return products;
+  }
 }
 
 module.exports = ProductsRepository;
