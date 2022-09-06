@@ -27,10 +27,7 @@ class OrderRepository {
         functions.logger.info(err);
         throw new Error(err);
       });
-    return {
-      orders,
-      total: orders.length,
-    };
+    return orders;
   }
 
   async getOrder(id) {
@@ -56,6 +53,28 @@ class OrderRepository {
   async deleteOrder(id) {
     await db.collection('orders').doc(id).delete();
     return { msg: 'ok' };
+  }
+
+  async getOrdersBySeller(sellerId, limit, offset) {
+    const orders = [];
+    const query = db
+      .collection('orders')
+      .where('seller_id', '==', sellerId)
+      .orderBy('created_at', 'desc')
+      .limit(parseInt(limit, 10))
+      .offset(parseInt(offset, 10));
+    await query
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          orders.push(doc.data());
+        });
+      })
+      .catch((err) => {
+        functions.logger.info(err);
+        throw new Error(err);
+      });
+    return orders;
   }
 }
 

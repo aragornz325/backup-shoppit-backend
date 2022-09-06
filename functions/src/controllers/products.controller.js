@@ -122,6 +122,22 @@ class ProductsController {
       next(error);
     }
   }
+
+  async getProductsByCategory(req, res, next) {
+    try {
+      const category = req.query.category;
+      const limit = req.query.limit || 50;
+      const offset = req.query.offset || 0;
+      const products = await productsServices.getProductsByCategory(
+        category,
+        limit,
+        offset
+      );
+      res.status(200).send(products);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = ProductsController;

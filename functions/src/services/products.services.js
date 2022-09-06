@@ -79,6 +79,14 @@ class ProductsServices {
       offset
     );
   }
+
+  async getProductsByCategory(category, limit, offset) {
+    return await productsRepository.getProductsByCategory(
+      category,
+      limit,
+      offset
+    );
+  }
 }
 
 module.exports = ProductsServices;

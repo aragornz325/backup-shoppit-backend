@@ -12,6 +12,7 @@ const functions = require('firebase-functions');
 class CheckoutServices {
   async createOrder(order) {
     const productsByIdMap = new Map();
+    functions.logger.info('seting products map by id and variation');
     for (let i = 0; i < order.products_list.length; i++) {
       if (!productsByIdMap.has(order.products_list[i].product_id)) {
         let varitionsMap = new Map();
@@ -42,6 +43,7 @@ class CheckoutServices {
     let ids = [...productsByIdMap.keys()];
     const productFromDb = await productsRepository.getProductsByIds(ids);
 
+    functions.logger.info('creating order');
     const ordersByOwner = new Map();
 
     for (let i = 0; i < productFromDb.length; i++) {
@@ -85,6 +87,7 @@ class CheckoutServices {
       }
     }
     //calculate total quantity and total price
+    functions.logger.info('calculate total quantity and total price');
     for (let [key, value] of ordersByOwner) {
       let totalQuantity = 0;
       let totalPrice = 0;
@@ -96,13 +99,15 @@ class CheckoutServices {
       value.total_quantity = totalQuantity;
       value.total_price = totalPrice;
     }
-    //create order
-    let ordersToDb = [];
+    // create order in db
+    functions.logger.info('create order in db');
     for (let [key, value] of ordersByOwner) {
-      ordersToDb.push(value);
+      await checkoutRepository.createOrder(value);
     }
-
-    return ordersToDb;
+    // set empty cart
+    functions.logger.info('seting cart to empty');
+    await cartsRepository.setEmptyCart(order.owner_id);
+    return { message: 'Order created successfully' };
   }
 }
 module.exports = CheckoutServices;

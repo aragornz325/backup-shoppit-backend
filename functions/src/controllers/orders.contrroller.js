@@ -53,6 +53,22 @@ class OrderController {
       next(error);
     }
   }
+
+  async getOrdersBySeller(req, res, next) {
+    try {
+      const sellerId = req.headers['x-user-id'];
+      const limit = req.query.limit || 25;
+      const offset = req.query.offset || 0;
+      const result = await orderService.getOrdersBySeller(
+        sellerId,
+        limit,
+        offset
+      );
+      res.status(200).send(result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = OrderController;

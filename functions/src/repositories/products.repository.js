@@ -222,6 +222,29 @@ class ProductsRepository {
       });
     return products;
   }
+
+  async getProductsByCategory(category, limit, offset) {
+    const products = [];
+    await db
+      .collection('products')
+      .where('category', '==', category)
+      .orderBy('name')
+      .limit(parseInt(limit, 10))
+      .startAfter(parseInt(offset, 10))
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          products.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        });
+      })
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    return products;
+  }
 }
 
 module.exports = ProductsRepository;

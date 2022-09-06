@@ -51,5 +51,28 @@ class CartsRepository {
     });
     return carts;
   }
+
+  async setEmptyCart(user_id) {
+    const cartRef = await db
+      .collection('carts')
+      .where('owner_id', '==', user_id)
+      .get();
+    if (!cartRef.exists) {
+      await db.collection('carts').add({
+        owner_id: user_id,
+        products_list: [],
+        total_price: '',
+        total_quantity: '',
+        created_at: Math.floor(Date.now() / 1000),
+      });
+    } else {
+      await db.collection('carts').doc(cartRef.id).update({
+        products_list: [],
+        total_price: '',
+        total_quantity: '',
+      });
+    }
+    return { msg: 'ok' };
+  }
 }
 module.exports = CartsRepository;
