@@ -61,11 +61,9 @@ class OrderService {
       }
       ordersWithProducts.push({
         id: order.id,
-        owner: {
-          id: owner.id,
-          name: owner.firstName,
-          lastname: owner.lastName,
-        },
+        owner_id: owner.id,
+        ownerName: owner.firstName,
+        ownerLastname: owner.lastName,
         orders_items: orders_items,
         total_quantity: order.total_quantity,
         created_at: order.created_at,
