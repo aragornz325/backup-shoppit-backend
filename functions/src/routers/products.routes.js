@@ -33,6 +33,11 @@ router.post(
   validatorHandler(createCategory, 'body'),
   categoriesController.createCategory
 );
+router.get(
+  '/bycaterory',
+  checkApiKey,
+  productsController.getProductsByCategory
+);
 router.get('/categories', checkApiKey, categoriesController.getAllCategories);
 router.get('/search', productsController.getProductWithAlgolia);
 router.get('/ownership/:id', checkApiKey, productsController.getproductByOwner);
