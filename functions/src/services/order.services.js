@@ -46,7 +46,6 @@ class OrderService {
           (variation) => variation.variation === product.variation
         );
         const details = variationfilterd[0];
-
         orders_items.push({
           ...details,
           name: productData[0].name,
@@ -56,7 +55,7 @@ class OrderService {
           status_by_buyer: product.status_by_buyer,
           varition: product.variation,
           price: product.price || productData.price,
-          //image: productData.images_url[0] || '',
+          picture: productData[0].images_url[0] || '',
         });
       }
       ordersWithProducts.push({
