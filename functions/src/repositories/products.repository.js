@@ -255,7 +255,7 @@ class ProductsRepository {
     );
 
     const productArrayChuncked = await chunckarray(productAlgolia, 10);
-    console.log(productArrayChuncked);
+
     const productArray = [];
     for (let i = 0; i < productArrayChuncked.length; i++) {
       let collectionRef = db
