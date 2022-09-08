@@ -10,6 +10,7 @@ const client = algoliaserch(
   `${config.algolia.algoliaProductsApiSerch}`
 );
 const index = client.initIndex(`${config.algolia.algoliaProductsIndexName}`);
+const { chunckarray } = require('../utils/auxiliar');
 
 class ProductsRepository {
   async createProduct(payload, id) {
@@ -244,6 +245,38 @@ class ProductsRepository {
         throw boom.badData(error);
       });
     return products;
+  }
+
+  async getProductsByCategoryAndSearch(category, search, limit, offset) {
+    const productAlgolia = await this.getProductWithAlgolia(
+      search,
+      limit,
+      offset
+    );
+
+    const productArrayChuncked = await chunckarray(productAlgolia, 10);
+    console.log(productArrayChuncked);
+    const productArray = [];
+    for (let i = 0; i < productArrayChuncked.length; i++) {
+      let collectionRef = db
+        .collection('products')
+        .where('id', 'in', productArrayChuncked[i])
+        .where('category', '==', category);
+      await collectionRef
+        .get()
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            productArray.push({
+              id: doc.id,
+              ...doc.data(),
+            });
+          });
+        })
+        .catch((error) => {
+          throw boom.badData(error);
+        });
+    }
+    return productArray;
   }
 }
 
