@@ -113,6 +113,7 @@ const updateProduct = joi.object({
   offer_price,
   min_sell_amount,
   dimensions,
+  thumbnail,
 });
 
 const getOne = joi.object({
