@@ -30,12 +30,14 @@ class ProductsController {
     } else {
       search = req.query;
     }
+    const category = req.query.category || undefined;
     const { owner_id } = req.query;
     const limit = req.query.limit || 25;
     const offset = req.query.offset || 0;
     try {
       const products = await productsServices.getProducts(
         search,
+        category,
         limit,
         offset,
         owner_id
@@ -109,9 +111,28 @@ class ProductsController {
 
   async getProductWithAlgolia(req, res, next) {
     try {
-      const search = req.query.search;
+      const search = req.query.search || undefined;
+      const category = req.query.category || undefined;
       const limit = req.query.limit || 50;
       const offset = req.query.offset || 0;
+
+      if (category != undefined && search == undefined) {
+        const products = await productsServices.getProductsByCategory(
+          category,
+          limit,
+          offset
+        );
+        res.status(200).send(products);
+      }
+      if (search !== undefined && category !== undefined) {
+        const products = await productsServices.getProductsByCategoryAndSearch(
+          search,
+          category,
+          limit,
+          offset
+        );
+        res.status(200).send(products);
+      }
       const products = await productsServices.getProductWithAlgolia(
         search,
         limit,

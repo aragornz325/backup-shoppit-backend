@@ -4,15 +4,14 @@ const GoogleSheetsRepository = require('../repositories/googleSheet.repository')
 
 const googleSheetsRepository = new GoogleSheetsRepository();
 
-const dimensions = {
-  width: 0,
-  height: 0,
-  longitude: 0,
-  weight: 0,
-};
-
 class ProductsServices {
   async createProduct(payload, id) {
+    const dimensions = {
+      width: 0,
+      height: 0,
+      longitude: 0,
+      weight: 0,
+    };
     payload = {
       ...payload,
       offer_price: payload.offer_price || 0,
@@ -33,7 +32,7 @@ class ProductsServices {
     return await productsRepository.getProductById(id);
   }
 
-  async getProducts(search, limit, offset, owner_id) {
+  async getProducts(search, category, limit, offset, owner_id) {
     if (owner_id == undefined) {
       if (search) {
         return await productsRepository.getProductByFilter(
@@ -83,6 +82,14 @@ class ProductsServices {
   async getProductsByCategory(category, limit, offset) {
     return await productsRepository.getProductsByCategory(
       category,
+      limit,
+      offset
+    );
+  }
+  async getProductsByCategoryAndSearch(category, search, limit, offset) {
+    return await productsRepository.getProductsByCategoryAndSearch(
+      category,
+      search,
       limit,
       offset
     );
