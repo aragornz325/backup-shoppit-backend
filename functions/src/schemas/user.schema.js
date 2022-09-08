@@ -44,6 +44,7 @@ const status = joi.string().valid('active', 'inactive', 'pending');
 const search = joi.string();
 const limit = joi.string().min(1).max(2);
 const offset = joi.string().min(1).max(2);
+const phoneNumber= joi.string(),
 
 const querySchema = joi.object({
   role,
@@ -76,6 +77,7 @@ const createUser = joi.object({
   url: url.required(),
   username: username.required(),
   wishList: wishList.required(),
+  phoneNumber: phoneNumber.required(),
 });
 
 const updateUser = joi.object({
@@ -104,6 +106,7 @@ const updateUser = joi.object({
   username: username,
   wishList: wishList,
   role: role,
+  phoneNumber: phoneNumber,
 });
 
 const createUssAndPass = joi.object({
