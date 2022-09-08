@@ -257,9 +257,8 @@ class ProductsRepository {
     const productIds = productAlgolia.map((product) => product.name);
     const productIdschuncked = await chunckarray(productIds, 10);
     const products = [];
-    console.log(category);
+
     for (let i = 0; i < productIdschuncked.length; i++) {
-      console.log(productIdschuncked[i]);
       await db
         .collection('products')
         .where('name', 'in', productIdschuncked[i])
@@ -267,15 +266,11 @@ class ProductsRepository {
         .get()
         .then((snapshot) => {
           snapshot.forEach((doc) => {
-            console.log(doc.data());
             products.push({
               id: doc.id,
               ...doc.data(),
             });
           });
-        })
-        .catch((error) => {
-          throw boom.badData(error);
         });
     }
     return products;
