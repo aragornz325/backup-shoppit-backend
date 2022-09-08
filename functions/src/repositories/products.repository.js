@@ -149,7 +149,6 @@ class ProductsRepository {
 
   async getIndexAlgolia(search, limit, offset) {
     let result = [];
-
     const resultAlgolia = await index.search(`${search}`, {
       hitsPerPage: parseInt(limit, 10),
       length: parseInt(limit, 10),
@@ -247,26 +246,29 @@ class ProductsRepository {
     return products;
   }
 
-  async getProductsByCategoryAndSearch(category, search, limit, offset) {
+  async getProductsByCategoryAndSearch(search, category, limit, offset) {
     const productAlgolia = await this.getProductWithAlgolia(
       search,
       limit,
       offset
     );
 
-    const productArrayChuncked = await chunckarray(productAlgolia, 10);
-
-    const productArray = [];
-    for (let i = 0; i < productArrayChuncked.length; i++) {
-      let collectionRef = db
+    //filter ids from productAlgolia
+    const productIds = productAlgolia.map((product) => product.name);
+    const productIdschuncked = await chunckarray(productIds, 10);
+    const products = [];
+    console.log(category);
+    for (let i = 0; i < productIdschuncked.length; i++) {
+      console.log(productIdschuncked[i]);
+      await db
         .collection('products')
-        .where('id', 'in', productArrayChuncked[i])
-        .where('category', '==', category);
-      await collectionRef
+        .where('name', 'in', productIdschuncked[i])
+        .where('category', '==', category)
         .get()
         .then((snapshot) => {
           snapshot.forEach((doc) => {
-            productArray.push({
+            console.log(doc.data());
+            products.push({
               id: doc.id,
               ...doc.data(),
             });
@@ -276,7 +278,7 @@ class ProductsRepository {
           throw boom.badData(error);
         });
     }
-    return productArray;
+    return products;
   }
 }
 

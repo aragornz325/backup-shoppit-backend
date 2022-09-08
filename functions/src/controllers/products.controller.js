@@ -116,7 +116,6 @@ class ProductsController {
       const limit = req.query.limit || 50;
       const offset = req.query.offset || 0;
 
-      console.log(search, category);
       if (category != undefined && search == undefined) {
         const products = await productsServices.getProductsByCategory(
           category,
