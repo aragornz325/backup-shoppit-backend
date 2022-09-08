@@ -44,7 +44,7 @@ const status = joi.string().valid('active', 'inactive', 'pending');
 const search = joi.string();
 const limit = joi.string().min(1).max(2);
 const offset = joi.string().min(1).max(2);
-const phoneNumber= joi.string(),
+const phoneNumber = joi.string();
 
 const querySchema = joi.object({
   role,
