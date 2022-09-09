@@ -1,7 +1,10 @@
+//const { db } = require('../../config/firebase');
+const axios = require('axios');
+
 const { initializeApp, cert } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
-require('dotenv').config();
 const { getAuth } = require('firebase-admin/auth');
+require('dotenv').config();
 
 //credenciales
 
@@ -18,26 +21,182 @@ initializeApp({
 
 const db = getFirestore();
 
-const listAllUsers = (nextPageToken) => {
-  // List batch of users, 1000 at a time.
-  let ids = [];
-  getAuth()
-    .listUsers(1000, nextPageToken)
-    .then((listUsersResult) => {
-      listUsersResult.users.forEach((userRecord) => {
-        console.log('user', userRecord.uid);
-        ids.push(userRecord.uid);
-      });
-      if (listUsersResult.pageToken) {
-        // List next batch of users.
-        listAllUsers(listUsersResult.pageToken);
-      }
-    })
-    .catch((error) => {
-      console.log('Error listing users:', error);
-    });
-  console.log('ids', ids);
-  return ids;
+const payloadUsersStandart = [
+  {
+    email: 'usuario1@standart.com',
+    emailVerified: false,
+    password: '123456',
+    displayName: 'Usuario 1',
+    photoURL: 'http://www.example.com/12345678/photo.png',
+    disabled: false,
+  },
+  {
+    email: 'usuario2@standart.com',
+    emailVerified: false,
+    password: '123456',
+    displayName: 'Usuario 2',
+    photoURL: 'http://www.example.com/12345678/photo.png',
+    disabled: false,
+  },
+  {
+    email: 'usuario3@standart.com',
+    emailVerified: false,
+    password: '123456',
+    displayName: 'Usuario 3',
+    photoURL: 'http://www.example.com/12345678/photo.png',
+    disabled: false,
+  },
+  {
+    email: 'usuario4@standart.com',
+    emailVerified: false,
+    password: '123456',
+    displayName: 'Usuario 4',
+    photoURL: 'http://www.example.com/12345678/photo.png',
+    disabled: false,
+  },
+  {
+    email: 'usuario5@standart.com',
+    emailVerified: false,
+    password: '123456',
+    displayName: 'Usuario 5',
+    photoURL: 'http://www.example.com/12345678/photo.png',
+    disabled: false,
+  },
+];
+
+const payloadUsersWithTrialMembership = [
+  {
+    email: 'usuario1@trialmembership.com',
+    emailVerified: false,
+    password: '123456',
+    displayName: 'Usuario1 trialMembership',
+    photoURL: 'http://www.example.com/12345678/photo.png',
+    disabled: false,
+  },
+  {
+    email: 'usuario2@trialmembership.com',
+    emailVerified: false,
+    password: '123456',
+    displayName: 'Usuario2 trialMembership',
+    photoURL: 'http://www.example.com/12345678/photo.png',
+    disabled: false,
+  },
+  {
+    email: 'usuario3@trialmembership.com',
+    emailVerified: false,
+    password: '123456',
+    displayName: 'Usuario2 trialMembership',
+    photoURL: 'http://www.example.com/12345678/photo.png',
+    disabled: false,
+  },
+  {
+    email: 'usuario4@trialmembership.com',
+    emailVerified: false,
+    password: '123456',
+    displayName: 'Usuario2 trialMembership',
+    photoURL: 'http://www.example.com/12345678/photo.png',
+    disabled: false,
+  },
+  {
+    email: 'usuario5@trialmembership.com',
+    emailVerified: false,
+    password: '123456',
+    displayName: 'Usuario2 trialMembership',
+    photoURL: 'http://www.example.com/12345678/photo.png',
+    disabled: false,
+  },
+];
+
+//registerUser(payload);
+const registerStandartWithApi = async (payload) => {
+  for (let i = 0; i < payload.length; i++) {
+    const user = payload[i];
+    try {
+      const register = await axios.post(
+        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyD2s3gI0TJpwIoZ33WlJdlof5CibLgCRII',
+        user
+      );
+      console.log(`status user${i}`, register.status);
+      console.log(`statusText user${i}`, register.statusText);
+      console.log(`end user${i}`);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  console.log('end');
 };
-// Start listing users from the beginning, 1000 at a time.
-listAllUsers();
+
+const registerTrialMembershipWithApi = async (payload) => {
+  for (let i = 0; i < payload.length; i++) {
+    const user = payload[i];
+    try {
+      const register = await axios.post(
+        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyD2s3gI0TJpwIoZ33WlJdlof5CibLgCRII',
+        user
+      );
+      console.log('status register', register.status);
+      //console.log('data', register.data);
+      console.log('statusText register', register.statusText);
+
+      console.log('transforming customer to seller - trial plan');
+      const auth = getAuth();
+      console.log('seting customer claim to user');
+      await auth.setCustomUserClaims(register.data.localId, {
+        role: ['seller'],
+      });
+      console.log('updateing user');
+      const billing = {
+        storeName: `Tienda de prueba${i}`,
+        phone: '123456789',
+        cuit: `00-123456789-0${i}`,
+        website: `www.tiendaprueba${i}.com`,
+        address: `calle falsa${i}`,
+        addressNumber: '123',
+        province: 'Buenos Aires',
+        postalCode: '1234',
+        city: 'CABA',
+      };
+      const userUpdate = {
+        status: 'active',
+        billing: { ...billing },
+        pagoId: 'no payment, is trial',
+        role: 'seller',
+        isVender: true,
+        activeVender: true,
+        user_membership: {
+          membership_id: 'eV0jqp9Yg9bNqNWnGgg6',
+          due_date: '',
+          membership_payments: [
+            {
+              platform_name: 'free Trial',
+              payment_platform_id: 'trial',
+              payment_date: Math.floor(Date.now() / 1000),
+              payment_status: 'trial',
+            },
+          ],
+        },
+      };
+      console.log('uptading user');
+      const userRef = db.collection('users').doc(register.data.localId);
+      userRef.set(userUpdate, { merge: true });
+      console.log('create membership history');
+      const membershipHistory = {
+        membership_id: 'eV0jqp9Yg9bNqNWnGgg6',
+        user_id: register.data.localId,
+        membership_date: Math.floor(Date.now() / 1000),
+      };
+      const membershipsRef = db.collection('memberships_history');
+      await membershipsRef.add({
+        ...membershipHistory,
+        createdAt: Math.floor(Date.now() / 1000),
+      });
+      console.log(`end user${i}`);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  console.log('end');
+};
+
+registerStandartWithApi(payloadUsersStandart);
+registerTrialMembershipWithApi(payloadUsersWithTrialMembership);

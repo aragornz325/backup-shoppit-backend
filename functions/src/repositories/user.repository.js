@@ -65,7 +65,7 @@ class UserRepository {
               devicesIds: [],
               lastDeviceId: '',
               role: 'customer',
-              phoneNumber: null,
+              phoneNumber: user.phoneNumber || null,
             },
             { merge: true }
           )
