@@ -100,6 +100,11 @@ router.post(
   '/:id/questions',
   checkApiKey,
   validatorHandler(createQuestion, 'body'),
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin', 'seller'],
+    allowSameUser: true,
+  }),
   questionController.createQuestion
 );
 router.get(
@@ -107,7 +112,17 @@ router.get(
   checkApiKey,
   questionController.getQuestionsByProductId
 );
-router.put('/:id/questions', checkApiKey, questionController.updateQuestion);
+router.put(
+  '/:id/questions',
+  checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin'],
+    allowSameUser: true,
+  }),
+  validatorHandler(updateQuestion, 'body'),
+  questionController.updateQuestion
+);
 
 router.get('/:id', checkApiKey, productsController.getProductById);
 router.post(
