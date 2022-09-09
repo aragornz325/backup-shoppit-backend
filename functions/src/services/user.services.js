@@ -106,7 +106,7 @@ class UserServices {
     await membershipsRepository.createMembershipHistory({
       user_id: id,
       membership_id: body.membership_id,
-      membership_date: Date.now(),
+      membership_date: Math.floor(Date.now() / 1000),
     });
     const mail = {
       from: 'shoppit info',
@@ -337,7 +337,7 @@ class UserServices {
       isAdmin: user.isAdmin || '',
       isVender: user.isVender || '',
       loggedIn: user.loggedIn || '',
-      minimum_purchase: user.minimum_purchase || '',
+      minimum_purchase: user.minimum_purchase || 0,
       picture: user.photoURL || '',
       sheetsId: user.sheetsId || '',
       storeName: user.displayName || '',
