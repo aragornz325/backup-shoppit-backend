@@ -32,6 +32,17 @@ router.get(
   }),
   cartsController.getAllCarts
 );
+checkApiKey,
+  router.get(
+    '/byownerid',
+    checkApiKey,
+    isAuthenticated,
+    isAuthorized({
+      hasRole: ['customer', 'admin', 'seller'],
+      allowSameUser: true,
+    }),
+    cartsController.getCartByOwner
+  );
 router.get(
   '/:cart_id',
   checkApiKey,

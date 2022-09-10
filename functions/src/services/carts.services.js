@@ -84,6 +84,10 @@ class CartsServices {
   async deleteCart(cart_id) {
     return await cartsRepository.deleteCart(cart_id);
   }
+
+  async getCartByOwnerId(owner_id) {
+    return await cartsRepository.getCartByOwner(owner_id);
+  }
 }
 
 module.exports = CartsServices;
