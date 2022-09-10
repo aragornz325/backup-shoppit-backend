@@ -74,5 +74,16 @@ class CartsRepository {
     }
     return { msg: 'ok' };
   }
+
+  async getCartByOwnerId(owner_id) {
+    const cart = await db
+      .collection('carts')
+      .where('owner_id', '==', owner_id)
+      .get();
+    if (cart.empty) {
+      throw boom.notFound('Cart not found');
+    }
+    return cart.docs[0].id;
+  }
 }
 module.exports = CartsRepository;

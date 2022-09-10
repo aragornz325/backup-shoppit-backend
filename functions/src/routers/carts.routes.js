@@ -32,6 +32,8 @@ router.get(
   }),
   cartsController.getAllCarts
 );
+checkApiKey,
+  router.get('/byownerid', checkApiKey, cartsController.getCartByOwner);
 router.get(
   '/:cart_id',
   checkApiKey,
