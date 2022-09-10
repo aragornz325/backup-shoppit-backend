@@ -4,11 +4,19 @@ const PrductsController = require('../controllers/products.controller');
 const productsController = new PrductsController();
 const CategoriesController = require('../controllers/categories.controller');
 const categoriesController = new CategoriesController();
+const QuestionController = require('../controllers/question.controller');
+const questionController = new QuestionController();
+
 const {
   createProduct,
   updateProduct,
   getOne,
 } = require('../schemas/prod.schema');
+const {
+  createQuestion,
+  updateQuestion,
+} = require('../schemas/questions.schema');
+
 const {
   createCategory,
   updateCategory,
@@ -87,6 +95,33 @@ router.get(
     allowSameUser: false,
   }),
   productsController.getProductSheet
+);
+router.post(
+  '/:id/questions',
+  checkApiKey,
+  validatorHandler(createQuestion, 'body'),
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin', 'seller'],
+    allowSameUser: true,
+  }),
+  questionController.createQuestion
+);
+router.get(
+  '/:id/questions',
+  checkApiKey,
+  questionController.getQuestionsByProductId
+);
+router.put(
+  '/:id/questions',
+  checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['admin'],
+    allowSameUser: true,
+  }),
+  validatorHandler(updateQuestion, 'body'),
+  questionController.updateQuestion
 );
 
 router.get('/:id', checkApiKey, productsController.getProductById);

@@ -1,6 +1,8 @@
 const ProductsRepository = require('../repositories/products.repository');
 const productsRepository = new ProductsRepository();
 const GoogleSheetsRepository = require('../repositories/googleSheet.repository');
+const QuestionRepository = require('../repositories/question.repository');
+const questionRepository = new QuestionRepository();
 
 const googleSheetsRepository = new GoogleSheetsRepository();
 
@@ -29,7 +31,10 @@ class ProductsServices {
   }
 
   async getProductById(id) {
-    return await productsRepository.getProductById(id);
+    const product = await productsRepository.getProductById(id);
+    const questions = await questionRepository.get5QuestionsByProductId(id);
+    product[0].questions = questions;
+    return product;
   }
 
   async getProducts(search, category, limit, offset, owner_id) {
