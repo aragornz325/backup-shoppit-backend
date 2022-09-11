@@ -95,7 +95,9 @@ class ProductsRepository {
     }
     const collectionRef = db
       .collection('products')
-      .where(parameter, '==', objetive[0]);
+      .where(parameter, '==', objetive[0])
+      .where('published', '==', true)
+      .where('is_valid', '==', true);
     await collectionRef.get().then((snapshot) => {
       snapshot.forEach((doc) => {
         productN.push(doc.data());
@@ -132,6 +134,8 @@ class ProductsRepository {
     await db
       .collection('products')
       .where('vendor.vendor_id', '==', ownerId)
+      .where('published', '==', true)
+      .where('is_valid', '==', true)
       .orderBy('name')
       .limit(parseInt(limit, 10))
       .startAfter(parseInt(offset, 10))
@@ -185,7 +189,9 @@ class ProductsRepository {
           throw boom.badData(error);
         });
     }
-
+    products.filter(
+      (product) => product.published === true && product.is_valid === true
+    );
     return products;
   }
 
