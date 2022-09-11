@@ -259,21 +259,15 @@ class ProductsRepository {
   }
 
   async getProductsByCategoryAndSearch(search, category, limit, offset) {
-    const productAlgolia = await this.getProductWithAlgolia(
-      search,
-      limit,
-      offset
-    );
+    const productAlgolia = await this.getIndexAlgolia(search, limit, offset);
 
-    //filter ids from productAlgolia
-    const productIds = productAlgolia.map((product) => product.name);
-    const productIdschuncked = await chunckarray(productIds, 10);
+    const productIdschuncked = await chunckarray(productAlgolia, 10);
     const products = [];
 
     for (let i = 0; i < productIdschuncked.length; i++) {
       await db
         .collection('products')
-        .where('name', 'in', productIdschuncked[i])
+        .where('id', 'in', productIdschuncked[i])
         .where('category', '==', category)
         .where('published', '==', true)
         .where('is_valid', '==', true)
