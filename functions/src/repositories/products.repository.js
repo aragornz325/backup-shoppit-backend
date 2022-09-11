@@ -53,6 +53,8 @@ class ProductsRepository {
     const products = [];
     await db
       .collection('products')
+      .where('published', '==', true)
+      .where('is_valid', '==', true)
       .orderBy('name')
       .limit(parseInt(limit, 10))
       .startAfter(parseInt(offset, 10))
@@ -110,6 +112,8 @@ class ProductsRepository {
     await db
       .collection('products')
       .where('owner_id', '==', ownerId)
+      .where('published', '==', true)
+      .where('is_valid', '==', true)
       .orderBy('name')
       .limit(parseInt(limit, 10))
       .startAfter(parseInt(offset, 10))
@@ -228,6 +232,8 @@ class ProductsRepository {
     await db
       .collection('products')
       .where('category', '==', category)
+      .where('published', '==', true)
+      .where('is_valid', '==', true)
       .orderBy('name')
       .limit(parseInt(limit, 10))
       .startAfter(parseInt(offset, 10))
@@ -263,6 +269,8 @@ class ProductsRepository {
         .collection('products')
         .where('name', 'in', productIdschuncked[i])
         .where('category', '==', category)
+        .where('published', '==', true)
+        .where('is_valid', '==', true)
         .get()
         .then((snapshot) => {
           snapshot.forEach((doc) => {

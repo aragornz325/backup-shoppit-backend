@@ -104,18 +104,25 @@ class CartsServices {
 
   async dtoGetCart(cart) {
     const owner = await userRepository.getUserById(cart.owner_id);
+
     const products_list = [];
     for (const product of cart.products_list) {
       const productData = await productsRepository.getProductById(
         product.product_id
       );
+      const seller = await userRepository.getUserById(productData[0].owner_id);
+
       const variationfilterd = productData[0].variations.filter(
         (variation) => variation.variation === product.variation
       );
       const details = variationfilterd[0];
       products_list.push({
         ...details,
-        name: productData[0].name,
+        selle_id: seller.id,
+        seller_name: seller.firstName + ' ' + seller.lastName,
+        seller_email: seller.billing.email,
+        storeName: seller.billing.storeName,
+        name: productData.name,
         product_id: product.product_id,
         quantity: product.quantity,
         varition: product.variation,
@@ -126,7 +133,7 @@ class CartsServices {
     return {
       id: cart.id,
       owner_id: owner.id,
-      owner_name: owner.name,
+      owner_name: owner.firstName + ' ' + owner.lastName,
       owner_email: owner.email,
       products_list: products_list,
       total_price: cart.total_price,
