@@ -126,7 +126,7 @@ class CartsServices {
         product_id: product.product_id,
         quantity: product.quantity,
         varition: product.variation,
-        price: product.price || productData.price,
+        price: productData[0].regular_price ?? 0,
         picture: productData[0].images_url[0] || '',
       });
     }
