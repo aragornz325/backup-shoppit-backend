@@ -12,12 +12,12 @@ const {
 const routerApi = require('./src/routers/index');
 const UserController = require('./src/controllers/user.controller');
 const userController = new UserController();
-const swaggerUI = require('swagger-ui-express');
-const swaggerJsDoc = require('swagger-jsdoc');
+//const swaggerUI = require('swagger-ui-express');
+//const swaggerJsDoc = require('swagger-jsdoc');
 const morgan = require('morgan');
 const helmet = require('helmet');
-const swaggerEdit = require('./src/utils/swaggerSpec');
-const swaggerSpec = swaggerEdit;
+//const swaggerEdit = require('./src/utils/swaggerSpec');
+//const swaggerSpec = swaggerEdit;
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -27,11 +27,11 @@ app.use(morgan('dev'));
 app.use(helmet());
 app.use(cors({ origin: true }));
 
-app.use(
-  '/api-doc',
-  swaggerUI.serve,
-  swaggerUI.setup(swaggerJsDoc(swaggerSpec))
-);
+// app.use(
+//   '/api-doc',
+//   swaggerUI.serve,
+//   swaggerUI.setup(swaggerJsDoc(swaggerSpec))
+// );
 app.get('/status', (req, res) => {
   res.status(200).end('server is running');
 });

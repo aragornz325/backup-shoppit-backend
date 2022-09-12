@@ -16,6 +16,7 @@ class ProductsServices {
     };
     payload = {
       ...payload,
+      is_valid: true,
       offer_price: payload.offer_price || 0,
       dimensions: payload.dimensions || dimensions,
       published: true,

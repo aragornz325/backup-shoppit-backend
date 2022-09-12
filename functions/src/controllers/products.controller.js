@@ -133,12 +133,14 @@ class ProductsController {
         );
         res.status(200).send(products);
       }
-      const products = await productsServices.getProductWithAlgolia(
-        search,
-        limit,
-        offset
-      );
-      res.status(200).send(products);
+      if (search !== undefined && category == undefined) {
+        const products = await productsServices.getProductWithAlgolia(
+          search,
+          limit,
+          offset
+        );
+        res.status(200).send(products);
+      }
     } catch (error) {
       next(error);
     }

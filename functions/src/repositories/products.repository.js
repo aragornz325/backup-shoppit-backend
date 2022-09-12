@@ -53,6 +53,8 @@ class ProductsRepository {
     const products = [];
     await db
       .collection('products')
+      .where('published', '==', true)
+      .where('is_valid', '==', true)
       .orderBy('name')
       .limit(parseInt(limit, 10))
       .startAfter(parseInt(offset, 10))
@@ -93,7 +95,9 @@ class ProductsRepository {
     }
     const collectionRef = db
       .collection('products')
-      .where(parameter, '==', objetive[0]);
+      .where(parameter, '==', objetive[0])
+      .where('published', '==', true)
+      .where('is_valid', '==', true);
     await collectionRef.get().then((snapshot) => {
       snapshot.forEach((doc) => {
         productN.push(doc.data());
@@ -110,6 +114,8 @@ class ProductsRepository {
     await db
       .collection('products')
       .where('owner_id', '==', ownerId)
+      .where('published', '==', true)
+      .where('is_valid', '==', true)
       .orderBy('name')
       .limit(parseInt(limit, 10))
       .startAfter(parseInt(offset, 10))
@@ -128,6 +134,8 @@ class ProductsRepository {
     await db
       .collection('products')
       .where('vendor.vendor_id', '==', ownerId)
+      .where('published', '==', true)
+      .where('is_valid', '==', true)
       .orderBy('name')
       .limit(parseInt(limit, 10))
       .startAfter(parseInt(offset, 10))
@@ -181,7 +189,9 @@ class ProductsRepository {
           throw boom.badData(error);
         });
     }
-
+    products.filter(
+      (product) => product.published === true && product.is_valid === true
+    );
     return products;
   }
 
@@ -228,6 +238,8 @@ class ProductsRepository {
     await db
       .collection('products')
       .where('category', '==', category)
+      .where('published', '==', true)
+      .where('is_valid', '==', true)
       .orderBy('name')
       .limit(parseInt(limit, 10))
       .startAfter(parseInt(offset, 10))
@@ -247,22 +259,18 @@ class ProductsRepository {
   }
 
   async getProductsByCategoryAndSearch(search, category, limit, offset) {
-    const productAlgolia = await this.getProductWithAlgolia(
-      search,
-      limit,
-      offset
-    );
+    const productAlgolia = await this.getIndexAlgolia(search, limit, offset);
 
-    //filter ids from productAlgolia
-    const productIds = productAlgolia.map((product) => product.name);
-    const productIdschuncked = await chunckarray(productIds, 10);
+    const productIdschuncked = await chunckarray(productAlgolia, 10);
     const products = [];
 
     for (let i = 0; i < productIdschuncked.length; i++) {
       await db
         .collection('products')
-        .where('name', 'in', productIdschuncked[i])
+        .where('id', 'in', productIdschuncked[i])
         .where('category', '==', category)
+        .where('published', '==', true)
+        .where('is_valid', '==', true)
         .get()
         .then((snapshot) => {
           snapshot.forEach((doc) => {
