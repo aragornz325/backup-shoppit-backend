@@ -9,6 +9,7 @@ const ordersRouter = require('./orders.router');
 const checkoutRouter = require('./checkout.routes');
 const adsRouter = require('./ads.routes');
 const questionRouter = require('./question.routes');
+const files = require('./files.routes');
 
 function routerApi(app) {
   app.use('/users', useRouter);
@@ -22,6 +23,7 @@ function routerApi(app) {
   app.use('/checkout', checkoutRouter);
   app.use('/ads', adsRouter);
   app.use('/questions', questionRouter);
+  app.use('/files', files);
 }
 
 module.exports = routerApi;

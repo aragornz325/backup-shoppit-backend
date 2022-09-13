@@ -3,6 +3,8 @@ const productsRepository = new ProductsRepository();
 const GoogleSheetsRepository = require('../repositories/googleSheet.repository');
 const QuestionRepository = require('../repositories/question.repository');
 const questionRepository = new QuestionRepository();
+const CategoriesRepository = require('../repositories/categories.repositories');
+const categoriesRepository = new CategoriesRepository();
 
 const googleSheetsRepository = new GoogleSheetsRepository();
 
@@ -86,15 +88,19 @@ class ProductsServices {
   }
 
   async getProductsByCategory(category, limit, offset) {
+    const newCategory = await categoriesRepository.getCategoryByName(category);
+
     return await productsRepository.getProductsByCategory(
-      category,
+      newCategory.id,
       limit,
       offset
     );
   }
   async getProductsByCategoryAndSearch(category, search, limit, offset) {
+    const newCategory = await categoriesRepository.getCategoryByName(category);
+
     return await productsRepository.getProductsByCategoryAndSearch(
-      category,
+      newCategory.id,
       search,
       limit,
       offset

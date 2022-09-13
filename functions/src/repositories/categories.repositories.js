@@ -23,17 +23,25 @@ class CategoriesRepository {
 
   async getCategoryByName(name) {
     functions.logger.info(`get category by name: ${name}`);
-    const category = await db
+    let response = {};
+    await db
       .collection('categories')
       .where('name', '==', name)
-      .get();
-    if (category.empty) {
-      functions.logger.info(`category with name ${name} does not exist`);
-      return { msg: 'ok' };
-    } else {
-      functions.logger.info(`category with name ${name} already exists`);
-      return { msg: 'ok' };
-    }
+      .get()
+      .then((snapshot) => {
+        if (snapshot.empty) {
+          functions.logger.info('No matching documents.');
+          throw boom.notFound('No matching documents.');
+        } else {
+          snapshot.forEach((doc) => {
+            response = {
+              id: doc.id,
+              ...doc.data(),
+            };
+          });
+        }
+      });
+    return response;
   }
 
   async getAllCategories() {
