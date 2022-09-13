@@ -96,6 +96,7 @@ class CartsServices {
     let cartToFront = {};
     for (let i = 0; i < carts.length; i++) {
       const cart = carts[i];
+      cart.owner_id = owner_id;
       const newCart = await this.dtoGetCart(cart);
       cartToFront = { ...newCart };
     }
@@ -110,6 +111,7 @@ class CartsServices {
       const productData = await productsRepository.getProductById(
         product.product_id
       );
+      console.log(productData.owner_id);
       const seller = await userRepository.getUserById(productData[0].owner_id);
 
       const variationfilterd = productData[0].variations.filter(

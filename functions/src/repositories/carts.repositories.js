@@ -41,6 +41,7 @@ class CartsRepository {
   }
 
   async getCartByOwner(owner_id) {
+    console.log(owner_id);
     const carts = [];
     const cart = await db
       .collection('carts')
