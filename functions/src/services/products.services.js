@@ -31,7 +31,7 @@ class ProductsServices {
       images_url: payload.images_url || [],
       category: payload.category || 'si categoria',
       offer_price: payload.offer_price ?? payload.regular_price ?? 0,
-      min_sell_amount: payload.min_sell_amount || 1,
+      min_sell_amount: payload.min_sell_amount || parseInt(1, 10),
       dimensions: payload.dimensions || dimensions,
       currency: payload.currency || 'AR$',
       published: true,
@@ -45,7 +45,9 @@ class ProductsServices {
   }
 
   async getProductById(id) {
+    console.log('getProductById', id);
     const product = await productsRepository.getProductById(id);
+    console.log('getProductById', product);
     const questions = await questionRepository.getQuestionsByProductId(id);
     product[0].questions = questions;
     return product;

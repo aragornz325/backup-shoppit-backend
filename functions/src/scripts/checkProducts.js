@@ -133,13 +133,24 @@ const checkProducts = async () => {
       flag = false;
       functions.logger.error(`product ${product.data().name} has no category`);
     }
+    if (!product.data().state) {
+      flag = false;
+      functions.logger.error(`product ${product.data().name} has no state`);
+    }
+
+    if (!product.data().currency) {
+      flag = false;
+      functions.logger.error(`product ${product.data().name} has no currency`);
+    }
+
+    flag = false;
     if (flag === false) {
       functions.logger.warn(
         `product ${product.data().name} has errors nand be deactived`
       );
-      await db.collection('products').doc(product.id).update({
-        is_valid: true,
-      });
+      // await db.collection('products').doc(product.id).update({
+      //   is_valid: true,
+      // });
     } else {
       functions.logger.info(`product ${product.data().name} is valid`);
     }

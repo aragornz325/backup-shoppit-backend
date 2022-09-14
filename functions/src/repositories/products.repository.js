@@ -238,10 +238,14 @@ class ProductsRepository {
       .doc(id)
       .get()
       .then((doc) => {
-        product.push({
-          id: doc.id,
-          ...doc.data(),
-        });
+        if (!doc.exists) {
+          throw boom.notFound('Product not found');
+        } else {
+          product.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        }
       })
       .catch((error) => {
         throw boom.badData(error);

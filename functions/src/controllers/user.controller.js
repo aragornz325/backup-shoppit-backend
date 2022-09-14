@@ -45,13 +45,8 @@ class UserController {
   async getUserById(req, res, next) {
     try {
       const { id } = req.params;
-      if (req.headers['x-device'] === 'web') {
-        const user = await service.getUserById(id);
-        res.status(200).send(user);
-      } else {
-        const user = await service.getUserByIdToMobile(id);
-        res.status(200).send(user);
-      }
+      const user = await service.getUserById(id);
+      res.status(200).send(user);
     } catch (error) {
       next(error);
     }
