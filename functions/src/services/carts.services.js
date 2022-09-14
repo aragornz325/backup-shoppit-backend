@@ -6,6 +6,7 @@ const ProductsRepository = require('../repositories/products.repository');
 const productsRepository = new ProductsRepository();
 const boom = require('@hapi/boom');
 const { db } = require('../../config/firebase');
+const functions = require('firebase-functions');
 
 class CartsServices {
   async createCart(payload) {
@@ -93,9 +94,11 @@ class CartsServices {
 
   async getCartByOwnerId(owner_id) {
     const carts = await cartsRepository.getCartByOwner(owner_id);
+    functions.logger.info('carts from repository', carts);
     let cartToFront = {};
     for (let i = 0; i < carts.length; i++) {
       const cart = carts[i];
+      cart.owner_id = owner_id;
       const newCart = await this.dtoGetCart(cart);
       cartToFront = { ...newCart };
     }
@@ -104,17 +107,24 @@ class CartsServices {
 
   async dtoGetCart(cart) {
     const owner = await userRepository.getUserById(cart.owner_id);
-
+    //functions.logger.info('buyer id', owner.id);
     const products_list = [];
     for (const product of cart.products_list) {
       const productData = await productsRepository.getProductById(
         product.product_id
       );
+      //functions.logger.info('productData', productData);
+      if (productData[0].owner_id === undefined) {
+        functions.logger.error('product', product);
+      }
+
       const seller = await userRepository.getUserById(productData[0].owner_id);
+      functions.logger.info('seller', seller);
 
       const variationfilterd = productData[0].variations.filter(
         (variation) => variation.variation === product.variation
       );
+
       const details = variationfilterd[0];
       products_list.push({
         ...details,

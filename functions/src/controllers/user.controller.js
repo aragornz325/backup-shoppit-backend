@@ -45,11 +45,11 @@ class UserController {
   async getUserById(req, res, next) {
     try {
       const { id } = req.params;
-      if (req.headers.origin === 'mobile') {
-        const user = await service.getUserByIdToMobile(id);
+      if (req.headers['x-device'] === 'web') {
+        const user = await service.getUserById(id);
         res.status(200).send(user);
       } else {
-        const user = await service.getUserById(id);
+        const user = await service.getUserByIdToMobile(id);
         res.status(200).send(user);
       }
     } catch (error) {
@@ -95,19 +95,24 @@ class UserController {
     const limit = req.query.limit || 25;
     const offset = req.query.offset || 0;
     try {
-      if (req.headers.origin === 'mobile') {
-        const users = await service.getUsersToMobile(
+      if (req.headers.origin === 'web') {
+        const users = await service.getUsers(
           search,
           role,
           status,
           limit,
           offset
         );
+
         res.status(200).send(users);
       }
-
-      const users = await service.getUsers(search, role, status, limit, offset);
-
+      const users = await service.getUsersToMobile(
+        search,
+        role,
+        status,
+        limit,
+        offset
+      );
       res.status(200).send(users);
     } catch (error) {
       next(error);

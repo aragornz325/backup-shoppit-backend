@@ -21,7 +21,7 @@ router.get(
   checkApiKey,
   isAuthenticated,
   isAuthorized({
-    hasRole: ['admin'],
+    hasRole: ['customer', 'selle', 'admin'],
     allowSameUser: true,
   }),
   usercontroller.getUserById
