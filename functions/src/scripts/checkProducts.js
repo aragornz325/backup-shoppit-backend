@@ -138,7 +138,7 @@ const checkProducts = async () => {
         `product ${product.data().name} has errors nand be deactived`
       );
       await db.collection('products').doc(product.id).update({
-        is_valid: false,
+        is_valid: true,
       });
     } else {
       functions.logger.info(`product ${product.data().name} is valid`);
