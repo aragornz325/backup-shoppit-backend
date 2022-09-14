@@ -65,13 +65,11 @@ class CategoriesRepository {
   }
 
   async getCategoryById(id) {
-    functions.logger.info('get category by id');
     const category = await db.collection('categories').doc(id).get();
     if (category.empty) {
       functions.logger.info(`category with id ${id} does not exist`);
       return { msg: 'ok' };
     } else {
-      functions.logger.info(`category with id ${id} already exists`);
       return category.data();
     }
   }

@@ -125,6 +125,7 @@ router.put(
 );
 
 router.get('/:id', checkApiKey, productsController.getProductById);
+
 router.post(
   '/:id',
   checkApiKey,

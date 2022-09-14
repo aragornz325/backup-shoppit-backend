@@ -1,6 +1,7 @@
 const ProductsServices = require('../services/products.services');
 const productsServices = new ProductsServices();
 const boom = require('@hapi/boom');
+const functions = require('firebase-functions');
 
 class ProductsController {
   async createProduct(req, res, next) {
@@ -24,24 +25,10 @@ class ProductsController {
   }
 
   async getProducts(req, res, next) {
-    let search = '';
-    if (Object.keys(req.query).length === 0) {
-      search = undefined;
-    } else {
-      search = req.query;
-    }
-    const category = req.query.category || undefined;
-    const { owner_id } = req.query;
     const limit = req.query.limit || 25;
     const offset = req.query.offset || 0;
     try {
-      const products = await productsServices.getProducts(
-        search,
-        category,
-        limit,
-        offset,
-        owner_id
-      );
+      const products = await productsServices.getProducts(limit, offset);
       res.status(200).send(products);
     } catch (error) {
       next(error);
@@ -112,7 +99,7 @@ class ProductsController {
   async getProductWithAlgolia(req, res, next) {
     try {
       const search = req.query.search || undefined;
-      const category = req.query.category || undefined;
+      let category = req.query.category || undefined;
       const limit = req.query.limit || 50;
       const offset = req.query.offset || 0;
 
@@ -133,7 +120,7 @@ class ProductsController {
         );
         res.status(200).send(products);
       }
-      if (search !== undefined && category == undefined) {
+      if (search !== undefined && category === undefined) {
         const products = await productsServices.getProductWithAlgolia(
           search,
           limit,

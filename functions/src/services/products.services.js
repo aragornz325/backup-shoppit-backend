@@ -35,29 +35,13 @@ class ProductsServices {
 
   async getProductById(id) {
     const product = await productsRepository.getProductById(id);
-    const questions = await questionRepository.get5QuestionsByProductId(id);
+    const questions = await questionRepository.getQuestionsByProductId(id);
     product[0].questions = questions;
     return product;
   }
 
-  async getProducts(search, category, limit, offset, owner_id) {
-    if (owner_id == undefined) {
-      if (search) {
-        return await productsRepository.getProductByFilter(
-          search,
-          limit,
-          offset
-        );
-      } else {
-        return await productsRepository.getProducts(limit, offset);
-      }
-    } else {
-      return await productsRepository.getProductByOwner(
-        owner_id,
-        limit,
-        offset
-      );
-    }
+  async getProducts(limit, offset) {
+    return await productsRepository.getProducts(limit, offset);
   }
 
   async updateProduct(id, payload, merge) {
@@ -96,12 +80,12 @@ class ProductsServices {
       offset
     );
   }
-  async getProductsByCategoryAndSearch(category, search, limit, offset) {
+  async getProductsByCategoryAndSearch(search, category, limit, offset) {
     const newCategory = await categoriesRepository.getCategoryByName(category);
 
     return await productsRepository.getProductsByCategoryAndSearch(
-      newCategory.id,
       search,
+      newCategory.id,
       limit,
       offset
     );

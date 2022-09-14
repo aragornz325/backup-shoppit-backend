@@ -55,7 +55,6 @@ class CartsController {
   async getCartByOwner(req, res, next) {
     try {
       const owner_id = req.headers['x-user-id'];
-      console.log(owner_id);
       const result = await cartsServices.getCartByOwnerId(owner_id);
       res.status(200).json(result);
     } catch (error) {
