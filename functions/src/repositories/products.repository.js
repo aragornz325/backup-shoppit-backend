@@ -315,9 +315,8 @@ class ProductsRepository {
         ...productswithIdCategory[i],
         category: categoryName,
       });
-
-      return products;
     }
+    return products;
   }
 
   async getProductsByCategoryAndSearch(search, category, limit, offset) {
