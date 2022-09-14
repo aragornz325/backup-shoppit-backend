@@ -51,6 +51,19 @@ class CartsServices {
   }
 
   async updateCart(payload, cart_id) {
+    try {
+      await cartsRepository.getCartById(cart_id);
+    } catch (error) {
+      const cart = {
+        owner_id: payload.owner_id,
+        products_list: [],
+        total_price: 0,
+        total_quantity: 0,
+        created_at: Math.floor(Date.now() / 1000),
+      }
+      await cartsRepository.createCart(cart);
+    }
+
     let total_quantity = 0;
     let amount = 0;
 
@@ -107,13 +120,11 @@ class CartsServices {
 
   async dtoGetCart(cart) {
     const owner = await userRepository.getUserById(cart.owner_id);
-    //functions.logger.info('buyer id', owner.id);
     const products_list = [];
     for (const product of cart.products_list) {
       const productData = await productsRepository.getProductById(
         product.product_id
       );
-      //functions.logger.info('productData', productData);
       if (productData[0].owner_id === undefined) {
         functions.logger.error('product', product);
       }
