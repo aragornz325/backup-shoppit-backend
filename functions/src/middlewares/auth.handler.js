@@ -5,16 +5,17 @@ const { config } = require('../config/config');
 getAuth().createUser;
 
 async function isAuthenticated(req, res, next) {
-  const { authorization } = req.headers;
-  if (!authorization) {
-    next(boom.unauthorized('unauthorized'));
+  const authorization = req.headers.authorization ?? 'sin token';
+  console.log('----------------------->', authorization);
+  if (authorization === 'sin token') {
+    next(boom.unauthorized('unauthorized / no token'));
   }
   if (!authorization.startsWith('Bearer ')) {
-    next(boom.unauthorized('unauthorized'));
+    next(boom.unauthorized('unauthorized / no valid bearer'));
   }
   const split = authorization.split('Bearer ');
   if (split.length !== 2) {
-    next(boom.unauthorized('unauthorized'));
+    next(boom.unauthorized('unauthorized / no valid or missing bearer'));
   }
   const token = split[1];
   try {
@@ -27,7 +28,7 @@ async function isAuthenticated(req, res, next) {
     };
     return next();
   } catch (error) {
-    next(boom.unauthorized('unauthorized'));
+    next(boom.unauthorized('unauthorized / invalid token'));
   }
 }
 

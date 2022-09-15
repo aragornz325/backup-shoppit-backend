@@ -97,6 +97,7 @@ class ProductsRepository {
   }
 
   async updateProduct(id, payload) {
+    await this.getProductById(id);
     await db
       .collection('products')
       .doc(id)
@@ -105,6 +106,18 @@ class ProductsRepository {
         throw boom.badData(error);
       });
     return { msg: 'updated' };
+  }
+
+  async deleteProduct(id) {
+    await this.getProductById(id);
+    await db
+      .collection('products')
+      .doc(id)
+      .delete()
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    return { msg: 'ok' };
   }
 
   async getProductByFilter(search, offset, limit) {

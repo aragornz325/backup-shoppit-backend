@@ -45,9 +45,7 @@ class ProductsServices {
   }
 
   async getProductById(id) {
-    console.log('getProductById', id);
     const product = await productsRepository.getProductById(id);
-    console.log('getProductById', product);
     const questions = await questionRepository.getQuestionsByProductId(id);
     product[0].questions = questions;
     return product;
