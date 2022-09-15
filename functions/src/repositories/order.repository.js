@@ -9,7 +9,6 @@ class OrderRepository {
   }
 
   async getOrders(limit, offset) {
-    console.log(limit);
     const orders = [];
     const query = db
       .collection('orders')

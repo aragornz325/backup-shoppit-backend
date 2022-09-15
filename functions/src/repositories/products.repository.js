@@ -198,7 +198,7 @@ class ProductsRepository {
       length: parseInt(limit, 10),
       offset: parseInt(offset, 10),
     });
-    console.log(resultAlgolia);
+
     resultAlgolia.hits.forEach((product) => {
       result.push(product.objectID);
     });
@@ -342,7 +342,7 @@ class ProductsRepository {
     const productIdschuncked = await chunckarray(productAlgolia, 10);
 
     const products = [];
-    //console.log(productIdschuncked);
+
     for (let i = 0; i < productIdschuncked.length; i++) {
       await db
         .collection('products')

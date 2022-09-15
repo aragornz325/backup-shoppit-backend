@@ -6,7 +6,7 @@ getAuth().createUser;
 
 async function isAuthenticated(req, res, next) {
   const authorization = req.headers.authorization ?? 'sin token';
-  console.log('----------------------->', authorization);
+
   if (authorization === 'sin token') {
     next(boom.unauthorized('unauthorized / no token'));
   }
