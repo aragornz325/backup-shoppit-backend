@@ -25,7 +25,11 @@ class ProductsServices {
         payload.variations.map((variation) => {
           return {
             ...variation,
-            sku: variation.sku || `${payload.name}-${variation.size}-${id}`,
+            sku:
+              variation.sku ||
+              `${variation.color}-${payload.name.replace(/\s+/g, '')}-${
+                variation.size
+              }-${id}`,
           };
         }) || [],
       images_url: payload.images_url || [],

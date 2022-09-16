@@ -42,7 +42,7 @@ function isAuthorized({ hasRole, allowSameUser }) {
     if (hasRole.includes(...role)) {
       next();
     } else {
-      next(boom.unauthorized('unauthorized'));
+      next(boom.unauthorized('unauthorized / no role o allow same user'));
     }
   };
 }
@@ -55,7 +55,7 @@ function checkApiKey(req, res, next) {
   if (apiKey === config.apiKeyShoppit) {
     next();
   } else {
-    next(boom.unauthorized('unauthorized'));
+    next(boom.unauthorized('unauthorized / invalid api key'));
   }
 }
 

@@ -50,47 +50,71 @@ class CartsServices {
     return await cartsRepository.getAllCarts();
   }
 
-  async updateCart(payload, cart_id) {
-    try {
-      await cartsRepository.getCartById(cart_id);
-    } catch (error) {
-      const cart = {
+  async updateCart(payload) {
+    await userRepository.getUserById(payload.owner_id);
+    const product = await productsRepository.getProductById(
+      payload.products_list[0].product_id
+    );
+    const checkIfvariationExist = product[0].variations.filter(
+      (variation) => variation.sku === payload.products_list[0].sku
+    );
+    if (checkIfvariationExist.length === 0) {
+      throw boom.notFound('variation not found');
+    }
+    const cart = await cartsRepository.getCartByOwnerId(payload.owner_id);
+    if (!cart.owner_id) {
+      let cartCreate = {
         owner_id: payload.owner_id,
-        products_list: [],
-        total_price: 0,
-        total_quantity: 0,
+        products_list: payload.products_list,
+        amount: product[0].regular_price * payload.products_list[0].quantity,
+        total_quantity: payload.products_list[0].quantity,
         created_at: Math.floor(Date.now() / 1000),
-      }
-      await cartsRepository.createCart(cart);
-    }
-
-    let total_quantity = 0;
-    let amount = 0;
-
-    if (payload.products_list.length == 1) {
-      total_quantity = payload.products_list[0].quantity;
+      };
+      await cartsRepository.createCart(cartCreate);
+      return { msg: 'cart created' };
     } else {
-      for (let i = 0; i < payload.products_list.length; i++) {
-        total_quantity += payload.products_list[i].quantity;
+      const checkIfProductExist = cart.products_list.filter(
+        (product) =>
+          product.product_id === payload.products_list[0].product_id &&
+          product.sku === payload.products_list[0].sku
+      );
+      if (checkIfProductExist.length === 0) {
+        const newCart = {
+          owner_id: payload.owner_id,
+          products_list: [...cart.products_list, ...payload.products_list],
+          amount:
+            cart.amount +
+            product[0].regular_price * payload.products_list[0].quantity,
+          total_quantity:
+            cart.total_quantity + payload.products_list[0].quantity,
+          created_at: Math.floor(Date.now() / 1000),
+        };
+        await cartsRepository.updateCart(newCart, cart.id);
+        return { msg: 'cart updated' };
+      } else {
+        const newCart = {
+          owner_id: payload.owner_id,
+          products_list: cart.products_list.map((product) => {
+            if (product.product_id === payload.products_list[0].product_id) {
+              return {
+                ...product,
+                quantity: product.quantity + payload.products_list[0].quantity,
+              };
+            } else {
+              return product;
+            }
+          }),
+          amount:
+            cart.amount +
+            product[0].regular_price * payload.products_list[0].quantity,
+          total_quantity:
+            cart.total_quantity + payload.products_list[0].quantity,
+          created_at: Math.floor(Date.now() / 1000),
+        };
+        await cartsRepository.updateCart(newCart, cart.id);
+        return { msg: 'cart updated' };
       }
     }
-    for (let i = 0; i < payload.products_list.length; i++) {
-      const prioductDb = await db
-        .collection('products')
-        .doc(payload.products_list[i].product_id)
-        .get();
-      amount +=
-        prioductDb.data().regular_price * payload.products_list[i].quantity;
-    }
-    const cartUpdate = {
-      ...payload,
-      total_price: amount,
-      total_quantity: total_quantity,
-      updated_at: Math.floor(Date.now() / 1000),
-    };
-
-    await cartsRepository.setCart(cartUpdate, cart_id, false);
-    return { msg: 'ok' };
   }
 
   async getCartById(cart_id) {

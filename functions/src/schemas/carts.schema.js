@@ -5,7 +5,7 @@ const products_list = joi.array().items(
   joi.object().keys({
     product_id: joi.string().required(),
     quantity: joi.number().required(),
-    variation: joi.string().required(),
+    sku: joi.string().required(),
   })
 );
 const created_at = joi.number();
