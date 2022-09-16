@@ -287,7 +287,7 @@ class UserRepository {
     const user = await userRef.get();
     if (!user.exists) {
       functions.logger.error(`user with ID ${uid} not found`);
-      throw boom.badData(`user with ID ${uid} not found`);
+      return { msg: 'ok' };
     }
     await userRef.delete();
     functions.logger.info(`delete ok`);

@@ -16,6 +16,10 @@ const MembershipsRepository = require('../repositories/memberships.repository');
 const membershipsRepository = new MembershipsRepository();
 const ProductsRepository = require('../repositories/products.repository');
 const productsRepository = new ProductsRepository();
+const CartsRepository = require('../repositories/carts.repositories');
+const cartsRepository = new CartsRepository();
+const OrdersRepository = require('../repositories/order.repository');
+const ordersRepository = new OrdersRepository();
 const { config } = require('../config/config');
 
 class UserServices {
@@ -279,7 +283,24 @@ class UserServices {
   }
 
   async deleteUserFromDb(uid) {
-    return await userRepository.deleteUser(uid);
+    functions.logger.log(`deleting carts to user with id:${uid} from db`);
+    await cartsRepository.deleteCartByOwnerId(uid);
+    functions.logger.log(
+      `deleting orders to user with id:${uid} like seller from db`
+    );
+    await ordersRepository.deleteOrdersBySeller(uid);
+    functions.logger.log(
+      `deleting orders to user with id:${uid} like buyer from db`
+    );
+    await ordersRepository.deleteOrderByOwner(uid);
+    functions.logger.log(`deleting products to user with id:${uid} from db`);
+    await productsRepository.deleteProductByOwner(uid);
+    functions.logger.log(`deleting user with id:${uid} from db`);
+    await userRepository.deleteUser(uid);
+    functions.logger.log(`all done for user with id:${uid}`);
+    return {
+      msg: 'ok',
+    };
   }
 
   async changeSuscription(body, id) {

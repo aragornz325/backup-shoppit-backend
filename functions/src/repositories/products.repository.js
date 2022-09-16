@@ -375,6 +375,45 @@ class ProductsRepository {
 
     return prodToFront;
   }
+
+  async getProductsByOwner(owner_id) {
+    let products = [];
+    await db
+      .collection('products')
+      .where('owner_id', '==', owner_id)
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          products.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        });
+      })
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    return products;
+  }
+
+  async deleteProductByOwner(owner_id) {
+    const products = await this.getProductsByOwner(owner_id);
+    if (products.length === 0) {
+      functions.logger.log('No product found for this owner');
+      return { msg: 'ok' };
+    }
+    const productIds = products.map((product) => product.id);
+    const batch = db.batch();
+    productIds.forEach((id) => {
+      const ref = db.collection('products').doc(id);
+      batch.delete(ref);
+    });
+    await batch.commit();
+    functions.logger.log('Products deleted');
+    return {
+      msg: 'ok',
+    };
+  }
 }
 
 module.exports = ProductsRepository;
