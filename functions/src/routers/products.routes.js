@@ -35,8 +35,8 @@ router.post(
   checkApiKey,
   isAuthenticated,
   isAuthorized({
-    hasRole: ['admin'],
-    allowSameUser: false,
+    hasRole: ['customer', 'selle', 'admin'],
+    allowSameUser: true,
   }),
   validatorHandler(createCategory, 'body'),
   categoriesController.createCategory

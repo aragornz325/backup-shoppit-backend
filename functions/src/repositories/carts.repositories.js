@@ -41,15 +41,24 @@ class CartsRepository {
   }
 
   async getCartByOwner(owner_id) {
-    const carts = [];
-    const cart = await db
+    const cart = {};
+    const cartRef = await db
       .collection('carts')
       .where('owner_id', '==', owner_id)
       .get();
-    cart.forEach((doc) => {
-      carts.push({ ...doc.data(), id: doc.id });
+    if (cartRef.empty) {
+      functions.logger.info('No matching cart.');
+      return {};
+    }
+    cartRef.forEach((doc) => {
+      cart.id = doc.id;
+      cart.owner_id = doc.data().owner_id;
+      cart.products_list = doc.data().products_list;
+      cart.total_price = doc.data().total_price;
+      cart.total_quantity = doc.data().total_quantity;
+      cart.created_at = doc.data().created_at;
     });
-    return carts;
+    return cart;
   }
 
   async setEmptyCart(user_id) {
@@ -81,9 +90,10 @@ class CartsRepository {
       .where('owner_id', '==', owner_id)
       .get();
     if (cart.empty) {
-      throw boom.notFound('Cart not found');
+      functions.logger.info('Cart not found');
+      return {};
     }
-    return cart.docs[0].id;
+    return { ...cart.docs[0].data(), id: cart.docs[0].id };
   }
 
   async deleteCartByOwnerId(owner_id) {
