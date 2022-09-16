@@ -97,6 +97,7 @@ class ProductsRepository {
   }
 
   async updateProduct(id, payload) {
+    await this.getProductById(id);
     await db
       .collection('products')
       .doc(id)
@@ -105,6 +106,18 @@ class ProductsRepository {
         throw boom.badData(error);
       });
     return { msg: 'updated' };
+  }
+
+  async deleteProduct(id) {
+    await this.getProductById(id);
+    await db
+      .collection('products')
+      .doc(id)
+      .delete()
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    return { msg: 'ok' };
   }
 
   async getProductByFilter(search, offset, limit) {
@@ -185,7 +198,7 @@ class ProductsRepository {
       length: parseInt(limit, 10),
       offset: parseInt(offset, 10),
     });
-    console.log(resultAlgolia);
+
     resultAlgolia.hits.forEach((product) => {
       result.push(product.objectID);
     });
@@ -238,10 +251,14 @@ class ProductsRepository {
       .doc(id)
       .get()
       .then((doc) => {
-        product.push({
-          id: doc.id,
-          ...doc.data(),
-        });
+        if (!doc.exists) {
+          throw boom.notFound('Product not found');
+        } else {
+          product.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        }
       })
       .catch((error) => {
         throw boom.badData(error);
@@ -325,7 +342,7 @@ class ProductsRepository {
     const productIdschuncked = await chunckarray(productAlgolia, 10);
 
     const products = [];
-    //console.log(productIdschuncked);
+
     for (let i = 0; i < productIdschuncked.length; i++) {
       await db
         .collection('products')
@@ -357,6 +374,45 @@ class ProductsRepository {
     }
 
     return prodToFront;
+  }
+
+  async getProductsByOwner(owner_id) {
+    let products = [];
+    await db
+      .collection('products')
+      .where('owner_id', '==', owner_id)
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          products.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        });
+      })
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    return products;
+  }
+
+  async deleteProductByOwner(owner_id) {
+    const products = await this.getProductsByOwner(owner_id);
+    if (products.length === 0) {
+      functions.logger.log('No product found for this owner');
+      return { msg: 'ok' };
+    }
+    const productIds = products.map((product) => product.id);
+    const batch = db.batch();
+    productIds.forEach((id) => {
+      const ref = db.collection('products').doc(id);
+      batch.delete(ref);
+    });
+    await batch.commit();
+    functions.logger.log('Products deleted');
+    return {
+      msg: 'ok',
+    };
   }
 }
 

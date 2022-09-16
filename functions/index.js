@@ -27,13 +27,9 @@ app.use(morgan('dev'));
 app.use(helmet());
 app.use(cors({ origin: true }));
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/src/views/index.html');
+  res.status(200).send('Welcome to the API');
 });
-// app.use(
-//   '/api-doc',
-//   swaggerUI.serve,
-//   swaggerUI.setup(swaggerJsDoc(swaggerSpec))
-// );
+//app.use('/docs', swaggerUI.serve, swaggerUI.setup(swaggerJsDoc(swaggerSpec)));
 app.get('/status', (req, res) => {
   res.status(200).end('server is running');
 });

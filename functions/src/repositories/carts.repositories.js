@@ -85,5 +85,19 @@ class CartsRepository {
     }
     return cart.docs[0].id;
   }
+
+  async deleteCartByOwnerId(owner_id) {
+    const cart = await db
+      .collection('carts')
+      .where('owner_id', '==', owner_id)
+      .get();
+    if (cart.empty) {
+      functions.logger.log('Cart not found');
+      return { msg: 'ok' };
+    }
+    await db.collection('carts').doc(cart.docs[0].id).delete();
+    functions.logger.log('Carts deleted');
+    return { msg: 'ok' };
+  }
 }
 module.exports = CartsRepository;

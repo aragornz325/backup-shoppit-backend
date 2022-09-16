@@ -9,7 +9,6 @@ class OrderRepository {
   }
 
   async getOrders(limit, offset) {
-    console.log(limit);
     const orders = [];
     const query = db
       .collection('orders')
@@ -76,6 +75,49 @@ class OrderRepository {
       });
     return orders;
   }
-}
 
+  async deleteOrdersBySeller(seller_id) {
+    await db
+      .collection('orders')
+      .where('seller_id', '==', seller_id)
+      .get()
+      .then((snapshot) => {
+        if (snapshot.empty) {
+          functions.logger.info('No matching documents.');
+          return { msg: 'ok' };
+        } else {
+          snapshot.forEach((doc) => {
+            doc.ref.delete();
+          });
+        }
+      })
+      .catch((err) => {
+        functions.logger.info(err);
+        throw new Error(err);
+      });
+    return { msg: 'ok' };
+  }
+
+  async deleteOrderByOwner(owner_id) {
+    await db
+      .collection('orders')
+      .where('owner_id', '==', owner_id)
+      .get()
+      .then((snapshot) => {
+        if (snapshot.empty) {
+          functions.logger.info('No matching documents.');
+          return { msg: 'ok' };
+        } else {
+          snapshot.forEach((doc) => {
+            doc.ref.delete();
+          });
+        }
+      })
+      .catch((err) => {
+        functions.logger.info(err);
+        throw new Error(err);
+      });
+    return { msg: 'ok' };
+  }
+}
 module.exports = OrderRepository;

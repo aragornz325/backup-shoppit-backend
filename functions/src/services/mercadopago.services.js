@@ -8,6 +8,7 @@ const UserRepository = require('../repositories/user.repository');
 const userRepository = new UserRepository();
 // const UserServices = require('../services/user.services');
 // const userServices = new UserServices();
+const functions = require('firebase-functions');
 
 class MercadopagoServices {
   async consultSubscription(id) {
@@ -68,8 +69,7 @@ class MercadopagoServices {
   }
 
   async createSubscription() {
-    console.log('ejecutando suscripcion');
-
+    functions.logger.log('save subscription');
     const body = {
       reason: 'Suscripción de ejemplo',
       auto_recurring: {
