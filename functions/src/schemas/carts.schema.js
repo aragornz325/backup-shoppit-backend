@@ -17,7 +17,6 @@ const cartSchema = joi.object().keys({
 });
 
 const cartUpdateSchema = joi.object().keys({
-  owner_id,
   products_list,
   created_at,
   updated_at,

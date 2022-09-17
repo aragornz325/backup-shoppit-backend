@@ -11,6 +11,17 @@ const {
   checkApiKey,
 } = require('../middlewares/auth.handler');
 
+router.patch(
+  '',
+  validatorHandler(cartUpdateSchema, 'body'),
+  checkApiKey,
+  isAuthenticated,
+  isAuthorized({
+    hasRole: ['customer', 'admin', 'seller'],
+    allowSameUser: true,
+  }),
+  cartsController.updateCart
+);
 router.post(
   '',
   checkApiKey,
@@ -52,17 +63,6 @@ router.get(
     allowSameUser: true,
   }),
   cartsController.getCartById
-);
-router.patch(
-  '/:cart_id',
-  validatorHandler(cartUpdateSchema, 'body'),
-  checkApiKey,
-  isAuthenticated,
-  isAuthorized({
-    hasRole: ['customer', 'admin', 'seller'],
-    allowSameUser: true,
-  }),
-  cartsController.updateCart
 );
 router.delete(
   '/:cart_id',

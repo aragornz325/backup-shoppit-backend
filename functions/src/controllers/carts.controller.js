@@ -15,8 +15,8 @@ class CartsController {
   async updateCart(req, res, next) {
     try {
       const payload = req.body;
-      const cart_id = req.params.cart_id;
-      const result = await cartsServices.updateCart(payload, cart_id);
+      const owner_id = req.headers['x-user-id'];
+      const result = await cartsServices.updateCart(payload, owner_id);
       res.status(200).json(result);
     } catch (error) {
       next(error);

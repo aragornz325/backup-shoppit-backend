@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const UserController = require('../controllers/user.controller');
 const usercontroller = new UserController();
+const WishlistController = require('../controllers/wishlist.controller');
+const wishlistcontroller = new WishlistController();
 
 const {
   isAuthenticated,
@@ -14,6 +16,9 @@ const validatorHandler = require('../middlewares/validatorHandler');
 const { masivecustomClaim } = require('../utils/masiveCostumerClaim');
 
 router.get('', checkApiKey, usercontroller.getUsers);
+router.get('/wishlist', checkApiKey, wishlistcontroller.getWishlist);
+router.patch('/wishlist/:id', checkApiKey, wishlistcontroller.updateWishlist);
+router.delete('/wishlist/:id', checkApiKey, wishlistcontroller.deleteWishlist);
 router.get('/masiveclaims', masivecustomClaim);
 
 router.get(
