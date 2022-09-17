@@ -50,8 +50,8 @@ class CartsServices {
     return await cartsRepository.getAllCarts();
   }
 
-  async updateCart(payload) {
-    await userRepository.getUserById(payload.owner_id);
+  async updateCart(payload, owner_id) {
+    await userRepository.getUserById(owner_id);
     const product = await productsRepository.getProductById(
       payload.products_list[0].product_id
     );
@@ -61,10 +61,10 @@ class CartsServices {
     if (checkIfvariationExist.length === 0) {
       throw boom.notFound('variation not found');
     }
-    const cart = await cartsRepository.getCartByOwnerId(payload.owner_id);
+    const cart = await cartsRepository.getCartByOwnerId(owner_id);
     if (!cart.owner_id) {
       let cartCreate = {
-        owner_id: payload.owner_id,
+        owner_id: owner_id,
         products_list: payload.products_list,
         amount: product[0].regular_price * payload.products_list[0].quantity,
         total_quantity: payload.products_list[0].quantity,
@@ -78,38 +78,57 @@ class CartsServices {
           product.product_id === payload.products_list[0].product_id &&
           product.sku === payload.products_list[0].sku
       );
+
       if (checkIfProductExist.length === 0) {
+        let products_list = [...cart.products_list, ...payload.products_list];
+        let total_quantity = 0;
+        let amount = 0;
+        for (let i = 0; i < products_list.length; i++) {
+          total_quantity += products_list[i].quantity;
+        }
+        for (let i = 0; i < products_list.length; i++) {
+          const prod = await productsRepository.getProductById(
+            products_list[i].product_id
+          );
+          amount += prod[0].regular_price * products_list[i].quantity;
+        }
         const newCart = {
-          owner_id: payload.owner_id,
-          products_list: [...cart.products_list, ...payload.products_list],
-          amount:
-            cart.amount +
-            product[0].regular_price * payload.products_list[0].quantity,
-          total_quantity:
-            cart.total_quantity + payload.products_list[0].quantity,
-          created_at: Math.floor(Date.now() / 1000),
+          owner_id: owner_id,
+          total_quantity: total_quantity,
+          products_list: products_list,
+          amount: amount,
+          updated_at: Math.floor(Date.now() / 1000),
         };
         await cartsRepository.updateCart(newCart, cart.id);
         return { msg: 'cart updated' };
       } else {
+        let products_list = cart.products_list.map((product) => {
+          if (
+            product.product_id === payload.products_list[0].product_id &&
+            product.sku === payload.products_list[0].sku
+          ) {
+            product.quantity = payload.products_list[0].quantity;
+          }
+          return product;
+        });
+        let total_quantity = 0;
+        let amount = 0;
+        for (let i = 0; i < products_list.length; i++) {
+          total_quantity += products_list[i].quantity;
+        }
+        for (let i = 0; i < products_list.length; i++) {
+          const prod = await productsRepository.getProductById(
+            products_list[i].product_id
+          );
+          console.log(prod);
+          amount += prod[0].regular_price * products_list[i].quantity;
+        }
         const newCart = {
-          owner_id: payload.owner_id,
-          products_list: cart.products_list.map((product) => {
-            if (product.product_id === payload.products_list[0].product_id) {
-              return {
-                ...product,
-                quantity: product.quantity + payload.products_list[0].quantity,
-              };
-            } else {
-              return product;
-            }
-          }),
-          amount:
-            cart.amount +
-            product[0].regular_price * payload.products_list[0].quantity,
-          total_quantity:
-            cart.total_quantity + payload.products_list[0].quantity,
-          created_at: Math.floor(Date.now() / 1000),
+          owner_id: owner_id,
+          total_quantity: total_quantity,
+          products_list: products_list,
+          amount: amount,
+          updated_at: Math.floor(Date.now() / 1000),
         };
         await cartsRepository.updateCart(newCart, cart.id);
         return { msg: 'cart updated' };
@@ -130,15 +149,12 @@ class CartsServices {
   }
 
   async getCartByOwnerId(owner_id) {
-    const carts = await cartsRepository.getCartByOwner(owner_id);
-    functions.logger.info('carts from repository', carts);
+    const cart = await cartsRepository.getCartByOwner(owner_id);
+    functions.logger.info('carts from repository', cart);
     let cartToFront = {};
-    for (let i = 0; i < carts.length; i++) {
-      const cart = carts[i];
-      cart.owner_id = owner_id;
-      const newCart = await this.dtoGetCart(cart);
-      cartToFront = { ...newCart };
-    }
+    cart.owner_id = owner_id;
+    const newCart = await this.dtoGetCart(cart);
+    cartToFront = { ...newCart };
     return cartToFront;
   }
 
