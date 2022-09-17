@@ -120,7 +120,6 @@ class CartsServices {
           const prod = await productsRepository.getProductById(
             products_list[i].product_id
           );
-          console.log(prod);
           amount += prod[0].regular_price * products_list[i].quantity;
         }
         const newCart = {
