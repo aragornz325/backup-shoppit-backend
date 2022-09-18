@@ -202,6 +202,13 @@ class CartsServices {
       updated_at: cart.updated_at,
     };
   }
+
+  async deleteProductFromCartByUserId(owner_id, product_id) {
+    return await cartsRepository.deleteProductFromCartByUserId(
+      owner_id,
+      product_id
+    );
+  }
 }
 
 module.exports = CartsServices;

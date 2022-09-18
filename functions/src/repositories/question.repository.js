@@ -5,28 +5,18 @@ const boom = require('@hapi/boom');
 
 class QuestionRepository {
   async createQuestion(payload, productId) {
-    await db
-      .collection('products')
-      .doc(productId)
-      .collection('questions')
-      .add({
-        ...payload,
-      })
-      .then((docRef) => {
-        functions.logger.log('Document written with ID: ', docRef.id);
-      })
-      .catch((error) => {
-        throw boom.badData(error);
-      });
+    await db.collection('questions').add({
+      ...payload,
+      product_id: productId,
+    });
     return { msg: 'ok' };
   }
 
   async getQuestionsByProductId(productId) {
     let questions = [];
     await db
-      .collection('products')
-      .doc(productId)
       .collection('questions')
+      .where('product_id', '==', productId)
       .where('answer', '!=', null)
       .get()
       .then((querySnapshot) => {
@@ -43,9 +33,8 @@ class QuestionRepository {
   async get5QuestionsByProductId(productId) {
     let questions = [];
     await db
-      .collection('products')
-      .doc(productId)
       .collection('questions')
+      .where('product_id', '==', productId)
       .where('answer', '!=', null)
       .limit(5)
       .get()
@@ -61,8 +50,6 @@ class QuestionRepository {
   }
   async updateQuestion(payload, productId) {
     await db
-      .collection('products')
-      .doc(productId)
       .collection('questions')
       .doc(payload.questionId)
       .update({
@@ -72,6 +59,23 @@ class QuestionRepository {
         throw boom.badData(error);
       });
     return { msg: 'ok' };
+  }
+
+  async getQuestionsBySellerId(sellerId) {
+    let questions = [];
+    await db
+      .collection('questions')
+      .where('sellerId', '==', sellerId)
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          questions.push({ id: doc.id, ...doc.data() });
+        });
+      })
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    return questions;
   }
 }
 module.exports = QuestionRepository;
