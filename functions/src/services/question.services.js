@@ -1,6 +1,6 @@
 const QuestionRepository = require('../repositories/question.repository');
 const questionRepository = new QuestionRepository();
-const ProductRepository = require('../repositories/product.repository');
+const ProductRepository = require('../repositories/products.repository');
 const productRepository = new ProductRepository();
 
 class QuestionServices {
