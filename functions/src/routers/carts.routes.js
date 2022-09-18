@@ -35,7 +35,7 @@ router.post(
 );
 
 router.delete(
-  '/deletebyseller/:product_id',
+  '/deletebyseller/:seller_id',
   checkApiKey,
   cartsController.deleteProductFromCartByUser
 );

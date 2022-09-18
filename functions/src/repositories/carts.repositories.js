@@ -110,7 +110,7 @@ class CartsRepository {
     return { msg: 'ok' };
   }
 
-  async deleteProductFromCartByUserId(user_id, product_id) {
+  async deleteProductFromCartByUserId(user_id, seller_id) {
     const cart = await db
       .collection('carts')
       .where('owner_id', '==', user_id)
@@ -130,7 +130,7 @@ class CartsRepository {
     const cartData = cart.docs[0].data();
     const productsList = cartData.products_list;
     const newProductsList = productsList.filter(
-      (product) => product.product_id !== product_id
+      (product) => product.owner_id !== seller_id
     );
     let total_quantity = 0;
     let amount = 0;

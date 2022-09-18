@@ -203,10 +203,10 @@ class CartsServices {
     };
   }
 
-  async deleteProductFromCartByUserId(owner_id, product_id) {
+  async deleteProductFromCartByUserId(owner_id, seller_id) {
     return await cartsRepository.deleteProductFromCartByUserId(
       owner_id,
-      product_id
+      seller_id
     );
   }
 }
