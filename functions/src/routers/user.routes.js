@@ -4,6 +4,8 @@ const UserController = require('../controllers/user.controller');
 const usercontroller = new UserController();
 const WishlistController = require('../controllers/wishlist.controller');
 const wishlistcontroller = new WishlistController();
+const QuestionController = require('../controllers/question.controller');
+const questionController = new QuestionController();
 
 const {
   isAuthenticated,
@@ -97,6 +99,12 @@ router.get(
     allowSameUser: true,
   }),
   usercontroller.getUserProductsByOwner
+);
+
+router.get(
+  '/:id/questions',
+  checkApiKey,
+  questionController.getQuestionsByProductId
 );
 
 router.post('/register', checkApiKey, usercontroller.registerUser);

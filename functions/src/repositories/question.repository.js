@@ -61,11 +61,11 @@ class QuestionRepository {
     return { msg: 'ok' };
   }
 
-  async getQuestionsBySellerId(sellerId) {
+  async getQuestionsBySellerId(seller_id) {
     let questions = [];
     await db
       .collection('questions')
-      .where('sellerId', '==', sellerId)
+      .where('seller_id', '==', seller_id)
       .get()
       .then((querySnapshot) => {
         querySnapshot.forEach((doc) => {

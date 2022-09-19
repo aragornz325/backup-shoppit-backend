@@ -26,9 +26,9 @@ class OrderService {
     return await orderRepository.deleteOrder(id);
   }
 
-  async getOrdersBySeller(sellerId, limit, offset) {
+  async getOrdersBySeller(seller_id, limit, offset) {
     const orders = await orderRepository.getOrdersBySeller(
-      sellerId,
+      seller_id,
       limit,
       offset
     );

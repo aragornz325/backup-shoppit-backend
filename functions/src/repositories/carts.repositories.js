@@ -117,14 +117,14 @@ class CartsRepository {
       .get();
     if (cart.empty) {
       functions.logger.info('Cart not found');
-      const newCart = await db.collection('carts').add({
+      await db.collection('carts').add({
         owner_id: user_id,
         products_list: [],
         total_price: '',
         total_quantity: '',
         created_at: Math.floor(Date.now() / 1000),
       });
-      return newCart;
+      return { msg: 'ok' };
     }
     const cartId = cart.docs[0].id;
     const cartData = cart.docs[0].data();

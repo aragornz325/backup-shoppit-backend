@@ -6,9 +6,9 @@ const productRepository = new ProductRepository();
 class QuestionServices {
   async createQuestion(payload, productId) {
     const product = await productRepository.getProductById(productId);
-    const sellerId = product[0].owner_id;
+    const seller_id = product[0].owner_id;
     const questionPayload = {
-      sellerId: sellerId,
+      seller_id,
       question: payload.question || null,
       answer: payload.answer || null,
       created_at: Math.floor(Date.now() / 1000),
@@ -43,8 +43,10 @@ class QuestionServices {
     return question;
   }
 
-  async getQuestionsBySellerId(sellerId) {
-    const questions = await questionRepository.getQuestionsBySellerId(sellerId);
+  async getQuestionsBySellerId(seller_id) {
+    const questions = await questionRepository.getQuestionsBySellerId(
+      seller_id
+    );
     return questions;
   }
 }
