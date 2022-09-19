@@ -39,6 +39,17 @@ class QuestionRouter {
       next(error);
     }
   }
+  async c(req, res, next) {
+    try {
+      const seller_id = req.params.id;
+      const questions = await questionServices.getQuestionsBySellerId(
+        seller_id
+      );
+      res.status(200).json(questions);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = QuestionRouter;

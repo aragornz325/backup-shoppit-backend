@@ -120,7 +120,6 @@ class CartsServices {
           const prod = await productsRepository.getProductById(
             products_list[i].product_id
           );
-          console.log(prod);
           amount += prod[0].regular_price * products_list[i].quantity;
         }
         const newCart = {
@@ -202,6 +201,13 @@ class CartsServices {
       created_at: cart.created_at,
       updated_at: cart.updated_at,
     };
+  }
+
+  async deleteProductFromCartByUserId(owner_id, seller_id) {
+    return await cartsRepository.deleteProductFromCartByUserId(
+      owner_id,
+      seller_id
+    );
   }
 }
 

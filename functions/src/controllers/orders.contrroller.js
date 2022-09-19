@@ -56,11 +56,11 @@ class OrderController {
 
   async getOrdersBySeller(req, res, next) {
     try {
-      const sellerId = req.headers['x-user-id'];
+      const seller_id = req.headers['x-user-id'];
       const limit = req.query.limit || 25;
       const offset = req.query.offset || 0;
       const result = await orderService.getOrdersBySeller(
-        sellerId,
+        seller_id,
         limit,
         offset
       );

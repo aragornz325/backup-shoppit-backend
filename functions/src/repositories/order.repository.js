@@ -54,11 +54,11 @@ class OrderRepository {
     return { msg: 'ok' };
   }
 
-  async getOrdersBySeller(sellerId, limit, offset) {
+  async getOrdersBySeller(seller_id, limit, offset) {
     const orders = [];
     const query = db
       .collection('orders')
-      .where('seller_id', '==', sellerId)
+      .where('seller_id', '==', seller_id)
       .orderBy('created_at', 'desc')
       .limit(parseInt(limit, 10))
       .offset(parseInt(offset, 10));

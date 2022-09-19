@@ -1,9 +1,14 @@
 const QuestionRepository = require('../repositories/question.repository');
 const questionRepository = new QuestionRepository();
+const ProductRepository = require('../repositories/products.repository');
+const productRepository = new ProductRepository();
 
 class QuestionServices {
   async createQuestion(payload, productId) {
+    const product = await productRepository.getProductById(productId);
+    const seller_id = product[0].owner_id;
     const questionPayload = {
+      seller_id,
       question: payload.question || null,
       answer: payload.answer || null,
       created_at: Math.floor(Date.now() / 1000),
@@ -36,6 +41,13 @@ class QuestionServices {
       productId
     );
     return question;
+  }
+
+  async getQuestionsBySellerId(seller_id) {
+    const questions = await questionRepository.getQuestionsBySellerId(
+      seller_id
+    );
+    return questions;
   }
 }
 

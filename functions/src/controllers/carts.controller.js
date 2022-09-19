@@ -61,6 +61,20 @@ class CartsController {
       next(error);
     }
   }
+
+  async deleteProductFromCartByUser(req, res, next) {
+    try {
+      const { seller_id } = req.params;
+      const owner_id = req.headers['x-user-id'];
+      const result = await cartsServices.deleteProductFromCartByUserId(
+        owner_id,
+        seller_id
+      );
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = CartsController;

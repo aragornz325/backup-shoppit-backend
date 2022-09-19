@@ -33,6 +33,13 @@ router.post(
   validatorHandler(cartSchema, 'body'),
   cartsController.createCart
 );
+
+router.delete(
+  '/:seller_id/products/',
+  checkApiKey,
+  cartsController.deleteProductFromCartByUser
+);
+
 router.get(
   '',
   checkApiKey,

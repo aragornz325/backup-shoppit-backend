@@ -109,5 +109,51 @@ class CartsRepository {
     functions.logger.log('Carts deleted');
     return { msg: 'ok' };
   }
+
+  async deleteProductFromCartByUserId(user_id, seller_id) {
+    const cart = await db
+      .collection('carts')
+      .where('owner_id', '==', user_id)
+      .get();
+    if (cart.empty) {
+      functions.logger.info('Cart not found');
+      await db.collection('carts').add({
+        owner_id: user_id,
+        products_list: [],
+        total_price: '',
+        total_quantity: '',
+        created_at: Math.floor(Date.now() / 1000),
+      });
+      return { msg: 'ok' };
+    }
+    const cartId = cart.docs[0].id;
+    const cartData = cart.docs[0].data();
+    const productsList = cartData.products_list;
+    const newProductsList = productsList.filter(
+      (product) => product.owner_id !== seller_id
+    );
+    let total_quantity = 0;
+    let amount = 0;
+    newProductsList.forEach((product) => {
+      total_quantity += product.quantity;
+    });
+    for (let i = 0; i < newProductsList.length; i++) {
+      const product = await db
+        .collection('products')
+        .doc(newProductsList[i].product_id)
+        .get();
+      amount += product.data().price * newProductsList[i].quantity;
+    }
+    await db
+      .collection('carts')
+      .doc(cartId)
+      .update({
+        products_list: newProductsList,
+        total_quantity,
+        amount,
+        updated_at: Math.floor(Date.now() / 1000),
+      });
+    return { msg: 'ok' };
+  }
 }
 module.exports = CartsRepository;
