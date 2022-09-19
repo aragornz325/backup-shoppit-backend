@@ -149,7 +149,6 @@ class CartsServices {
 
   async getCartByOwnerId(owner_id) {
     const cart = await cartsRepository.getCartByOwner(owner_id);
-    functions.logger.info('carts from repository', cart);
     let cartToFront = {};
     cart.owner_id = owner_id;
     const newCart = await this.dtoGetCart(cart);
@@ -169,12 +168,10 @@ class CartsServices {
       }
 
       const seller = await userRepository.getUserById(productData[0].owner_id);
-      functions.logger.info('seller', seller);
 
       const variationfilterd = productData[0].variations.filter(
         (variation) => variation.variation === product.variation
       );
-
       const details = variationfilterd[0];
       products_list.push({
         ...details,
@@ -186,7 +183,7 @@ class CartsServices {
         product_id: product.product_id,
         quantity: product.quantity,
         varition: product.variation,
-        sku: variationfilterd[0].sku,
+        sku: product.sku,
         price: productData[0].regular_price ?? 0,
         picture: productData[0].images_url[0] || '',
       });
