@@ -194,7 +194,7 @@ class CartsServices {
       owner_name: owner.firstName + ' ' + owner.lastName,
       owner_email: owner.email,
       products_list: products_list,
-      total_price: cart.total_price,
+      amount: cart.amount,
       total_quantity: cart.total_quantity,
       created_at: cart.created_at,
       updated_at: cart.updated_at,
