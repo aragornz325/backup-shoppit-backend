@@ -17,7 +17,7 @@ class CheckoutServices {
       if (!productsByIdMap.has(order.products_list[i].product_id)) {
         let varitionsMap = new Map();
         varitionsMap.set(
-          order.products_list[i].variation,
+          `${order.products_list[i].variation}_${order.products_list[i].size}`,
           order.products_list[i].quantity
         );
         productsByIdMap.set(order.products_list[i].product_id, varitionsMap);
@@ -25,15 +25,21 @@ class CheckoutServices {
         let variationsMap = productsByIdMap.get(
           order.products_list[i].product_id
         );
-        if (!variationsMap.has(order.products_list[i].variation)) {
+        if (
+          !variationsMap.has(
+            `${order.products_list[i].variation}_${order.products_list[i].size}`
+          )
+        ) {
           variationsMap.set(
-            order.products_list[i].variation,
+            `${order.products_list[i].variation}_${order.products_list[i].size}`,
             order.products_list[i].quantity
           );
         } else {
-          let quantity = variationsMap.get(order.products_list[i].variation);
+          let quantity = variationsMap.get(
+            `${order.products_list[i].variation}_${order.products_list[i].size}`
+          );
           variationsMap.set(
-            order.products_list[i].variation,
+            `${order.products_list[i].variation}_${order.products_list[i].size}`,
             quantity + order.products_list[i].quantity
           );
         }
@@ -58,13 +64,15 @@ class CheckoutServices {
           order_items: [],
         };
         for (let [variation, quantity] of variationMap) {
+          let variationArray = variation.split('_');
           let orderItem = {
             product_id: product.id,
-            variation,
+            variation: variationArray[0],
             quantity,
             price: product.regular_price,
             status_by_buyer: 'approved',
             status_by_seller: 'pending',
+            size: variationArray[1] == 'null' ? null : variationArray[1],
           };
           newOrder.order_items.push(orderItem);
         }
@@ -73,13 +81,15 @@ class CheckoutServices {
         let variationMap = productsByIdMap.get(product.id);
         let order = ordersByOwner.get(product.owner_id);
         for (let [variation, quantity] of variationMap) {
+          let variationArray = variation.split('_');
           let orderItem = {
             product_id: product.id,
-            variation,
+            variation: variationArray[0],
             quantity,
             price: product.regular_price,
             status_by_buyer: 'approved',
             status_by_seller: 'pending',
+            size: variationArray[1] == 'null' ? null : variationArray[1],
           };
           order.order_items.push(orderItem);
         }
