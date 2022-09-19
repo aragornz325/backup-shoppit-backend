@@ -207,6 +207,33 @@ class CartsServices {
       seller_id
     );
   }
+
+  async deleteProductBySkuFromCartByUserId(owner_id, sku) {
+    const cart = await cartsRepository.getCartByOwner(owner_id);
+    let products_list = cart.products_list.filter(
+      (product) => product.sku !== sku
+    );
+    let total_quantity = 0;
+    let amount = 0;
+    for (let i = 0; i < products_list.length; i++) {
+      total_quantity += products_list[i].quantity;
+    }
+    for (let i = 0; i < products_list.length; i++) {
+      const prod = await productsRepository.getProductById(
+        products_list[i].product_id
+      );
+      amount += prod[0].regular_price * products_list[i].quantity;
+    }
+    const newCart = {
+      owner_id: owner_id,
+      total_quantity: total_quantity,
+      products_list: products_list,
+      amount: amount,
+      updated_at: Math.floor(Date.now() / 1000),
+    };
+    await cartsRepository.updateCart(newCart, cart.id);
+    return { msg: 'cart updated' };
+  }
 }
 
 module.exports = CartsServices;

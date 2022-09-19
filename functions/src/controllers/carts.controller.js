@@ -75,6 +75,20 @@ class CartsController {
       next(error);
     }
   }
+
+  async deleteProductBySkuFromCartByUserId(req, res, next) {
+    try {
+      const sku = req.query.sku;
+      const owner_id = req.headers['x-user-id'];
+      const result = await cartsServices.deleteProductBySkuFromCartByUserId(
+        owner_id,
+        sku
+      );
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = CartsController;
