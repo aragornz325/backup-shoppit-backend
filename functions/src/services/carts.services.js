@@ -182,10 +182,11 @@ class CartsServices {
         seller_name: seller.firstName + ' ' + seller.lastName,
         seller_email: seller.billing.email,
         storeName: seller.billing.storeName,
-        name: productData.name,
+        name: productData[0].name,
         product_id: product.product_id,
         quantity: product.quantity,
         varition: product.variation,
+        sku: variationfilterd[0].sku,
         price: productData[0].regular_price ?? 0,
         picture: productData[0].images_url[0] || '',
       });
