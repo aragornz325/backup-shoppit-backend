@@ -1,5 +1,6 @@
 const CartsServices = require('../services/carts.services');
 const cartsServices = new CartsServices();
+const functions = require('firebase-functions');
 
 class CartsController {
   async createCart(req, res, next) {
@@ -79,7 +80,9 @@ class CartsController {
   async deleteProductBySkuFromCartByUserId(req, res, next) {
     try {
       const sku = req.query.sku;
+      functions.logger.log('sku', sku);
       const owner_id = req.headers['x-user-id'];
+      functions.logger.log('owner_id', owner_id);
       const result = await cartsServices.deleteProductBySkuFromCartByUserId(
         owner_id,
         sku

@@ -2,6 +2,7 @@ const { db } = require('../../config/firebase');
 const functions = require('firebase-functions');
 
 const boom = require('@hapi/boom');
+const ProductsRepository = require('./products.repository');
 
 class CartsRepository {
   async createCart(payload) {
@@ -129,9 +130,16 @@ class CartsRepository {
     const cartId = cart.docs[0].id;
     const cartData = cart.docs[0].data();
     const productsList = cartData.products_list;
-    const newProductsList = productsList.filter(
-      (product) => product.owner_id !== seller_id
-    );
+    const newProductsList = [];
+    for (let i = 0; i < productsList.length; i++) {
+      const product = await db
+        .collection('products')
+        .doc(productsList[i].product_id)
+        .get();
+      if (product.data().owner_id !== seller_id) {
+        newProductsList.push(productsList[i]);
+      }
+    }
     let total_quantity = 0;
     let amount = 0;
     newProductsList.forEach((product) => {
@@ -142,7 +150,7 @@ class CartsRepository {
         .collection('products')
         .doc(newProductsList[i].product_id)
         .get();
-      amount += product.data().price * newProductsList[i].quantity;
+      amount += product.data().regular_price * newProductsList[i].quantity;
     }
     await db
       .collection('carts')

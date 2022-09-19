@@ -47,12 +47,6 @@ router.get(
 );
 router.delete('/one', cartsController.deleteProductBySkuFromCartByUserId);
 
-router.delete(
-  '/:seller_id/products/',
-  checkApiKey,
-  cartsController.deleteProductFromCartByUser
-);
-
 checkApiKey,
   router.get(
     '/byownerid',
@@ -65,6 +59,11 @@ checkApiKey,
     cartsController.getCartByOwner
   );
 
+router.delete(
+  '/:seller_id/products',
+  checkApiKey,
+  cartsController.deleteProductFromCartByUser
+);
 router.get(
   '/:cart_id',
   checkApiKey,
