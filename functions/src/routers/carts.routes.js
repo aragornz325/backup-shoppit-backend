@@ -22,6 +22,7 @@ router.patch(
   }),
   cartsController.updateCart
 );
+
 router.post(
   '',
   checkApiKey,
@@ -34,12 +35,6 @@ router.post(
   cartsController.createCart
 );
 
-router.delete(
-  '/:seller_id/products/',
-  checkApiKey,
-  cartsController.deleteProductFromCartByUser
-);
-
 router.get(
   '',
   checkApiKey,
@@ -50,6 +45,8 @@ router.get(
   }),
   cartsController.getAllCarts
 );
+router.delete('/one', cartsController.deleteProductBySkuFromCartByUserId);
+
 checkApiKey,
   router.get(
     '/byownerid',
@@ -61,6 +58,12 @@ checkApiKey,
     }),
     cartsController.getCartByOwner
   );
+
+router.delete(
+  '/:seller_id/products',
+  checkApiKey,
+  cartsController.deleteProductFromCartByUser
+);
 router.get(
   '/:cart_id',
   checkApiKey,

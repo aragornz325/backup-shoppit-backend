@@ -149,7 +149,6 @@ class CartsServices {
 
   async getCartByOwnerId(owner_id) {
     const cart = await cartsRepository.getCartByOwner(owner_id);
-    functions.logger.info('carts from repository', cart);
     let cartToFront = {};
     cart.owner_id = owner_id;
     const newCart = await this.dtoGetCart(cart);
@@ -169,12 +168,10 @@ class CartsServices {
       }
 
       const seller = await userRepository.getUserById(productData[0].owner_id);
-      functions.logger.info('seller', seller);
 
       const variationfilterd = productData[0].variations.filter(
         (variation) => variation.variation === product.variation
       );
-
       const details = variationfilterd[0];
       products_list.push({
         ...details,
@@ -182,10 +179,11 @@ class CartsServices {
         seller_name: seller.firstName + ' ' + seller.lastName,
         seller_email: seller.billing.email,
         storeName: seller.billing.storeName,
-        name: productData.name,
+        name: productData[0].name,
         product_id: product.product_id,
         quantity: product.quantity,
         varition: product.variation,
+        sku: product.sku,
         price: productData[0].regular_price ?? 0,
         picture: productData[0].images_url[0] || '',
       });
@@ -196,7 +194,7 @@ class CartsServices {
       owner_name: owner.firstName + ' ' + owner.lastName,
       owner_email: owner.email,
       products_list: products_list,
-      total_price: cart.total_price,
+      amount: cart.amount,
       total_quantity: cart.total_quantity,
       created_at: cart.created_at,
       updated_at: cart.updated_at,
@@ -208,6 +206,33 @@ class CartsServices {
       owner_id,
       seller_id
     );
+  }
+
+  async deleteProductBySkuFromCartByUserId(owner_id, sku) {
+    const cart = await cartsRepository.getCartByOwner(owner_id);
+    let products_list = cart.products_list.filter(
+      (product) => product.sku !== sku
+    );
+    let total_quantity = 0;
+    let amount = 0;
+    for (let i = 0; i < products_list.length; i++) {
+      total_quantity += products_list[i].quantity;
+    }
+    for (let i = 0; i < products_list.length; i++) {
+      const prod = await productsRepository.getProductById(
+        products_list[i].product_id
+      );
+      amount += prod[0].regular_price * products_list[i].quantity;
+    }
+    const newCart = {
+      owner_id: owner_id,
+      total_quantity: total_quantity,
+      products_list: products_list,
+      amount: amount,
+      updated_at: Math.floor(Date.now() / 1000),
+    };
+    await cartsRepository.updateCart(newCart, cart.id);
+    return { msg: 'cart updated' };
   }
 }
 
