@@ -4,6 +4,7 @@ const UserRepository = require('./../repositories/user.repository');
 const userRepository = new UserRepository();
 const ProductsRepository = require('./../repositories/products.repository');
 const productsRepository = new ProductsRepository();
+const boom = require('@hapi/boom');
 
 class OrderService {
   async createOrder(order) {
@@ -19,7 +20,40 @@ class OrderService {
   }
 
   async updateOrder(id, order) {
-    return await orderRepository.updateOrder(id, order);
+    const orderExists = await orderRepository.getOrder(id);
+    if (!orderExists[0].id) {
+      throw boom.badRequest(`Order ${id} not found`);
+    }
+
+    order.order_items.forEach((item) => {
+      const checkProduct = productsRepository.getProductById(item.product_id);
+      if (!checkProduct[0].id) {
+        throw boom.badRequest(`Product ${item.product_id} not found`);
+      }
+    });
+
+    order.order_items.forEach(async (item) => {
+      const product = await productsRepository.getProductById(item.product_id);
+      item.price = product[0].regular_price;
+      let total_quantity = order.order_items.reduce(
+        (acc, item) => acc + item.quantity,
+        0
+      );
+    });
+
+    let amount = 0;
+    for (const item of order.order_items) {
+      const product = await productsRepository.getProduct(item.product_id);
+      amount += product.regular_price * item.quantity;
+    }
+
+    const orderData = {
+      ...order,
+      total_quantity,
+      total_price: amount,
+      updated_at: Math.floor(Date.now() / 1000),
+    };
+    return await orderRepository.updateOrder(id, orderData);
   }
 
   async deleteOrder(id) {
