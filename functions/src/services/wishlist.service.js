@@ -1,11 +1,19 @@
 const UserRepository = require('../repositories/user.repository');
 const userRepository = new UserRepository();
+const ProductRepository = require('../repositories/products.repository');
+const productRepository = new ProductRepository();
 const functions = require('firebase-functions');
 
 class WishlistService {
   async getWishlistByUserId(userId) {
     const user = await userRepository.getUserById(userId);
-    return user.wishlist;
+    let wishlistWithProductsData = [];
+    const wishlist = user.wishlist;
+    for (const product_id of wishlist) {
+      const product = await productRepository.getProductById(product_id);
+      wishlistWithProductsData.push(product[0]);
+    }
+    return wishlistWithProductsData;
   }
 
   async updateWishlist(userId, product_id) {
