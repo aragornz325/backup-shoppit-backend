@@ -173,6 +173,7 @@ class CartsServices {
         (variation) => variation.variation === product.variation
       );
       const details = variationfilterd[0];
+      const spliSku = product.sku.split('-');
       products_list.push({
         ...details,
         selle_id: seller.id,
@@ -184,6 +185,8 @@ class CartsServices {
         quantity: product.quantity,
         varition: product.variation,
         sku: product.sku,
+        size: spliSku[2],
+        color: spliSku[0],
         price: productData[0].regular_price ?? 0,
         picture: productData[0].images_url[0] || '',
       });
