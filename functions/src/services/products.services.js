@@ -12,43 +12,8 @@ const functions = require('firebase-functions');
 const googleSheetsRepository = new GoogleSheetsRepository();
 
 class ProductsServices {
-  async createProduct(payload, id) {
-    const dimensions = {
-      width: 0,
-      height: 0,
-      longitude: 0,
-      weight: 0,
-    };
-    payload = {
-      name: payload.name || 'sin nombre',
-      description: payload.description || 'sin descripcion',
-      regular_price: payload.regular_price || 0,
-      state: payload.state || 'new',
-      variations:
-        payload.variations.map((variation) => {
-          return {
-            ...variation,
-            sku:
-              variation.sku ||
-              `${variation.color}-${payload.name.replace(/\s+/g, '')}-${
-                variation.size
-              }-${id}`,
-          };
-        }) || [],
-      images_url: payload.images_url || [],
-      category: payload.category || 'si categoria',
-      offer_price: payload.offer_price ?? payload.regular_price ?? 0,
-      min_sell_amount: payload.min_sell_amount || parseInt(1, 10),
-      dimensions: payload.dimensions || dimensions,
-      currency: payload.currency || 'AR$',
-      published: true,
-      is_valid: true,
-      thumbnail:
-        payload.thumbnail ||
-        'https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg',
-      owner_id: id,
-    };
-    return await productsRepository.createProduct(payload, id);
+  async createProduct(payload) {
+    return await productsRepository.createProduct(payload);
   }
 
   async getProductById(id) {

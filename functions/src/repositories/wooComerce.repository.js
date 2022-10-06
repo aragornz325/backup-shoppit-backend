@@ -14,11 +14,9 @@ const WooDb = new WooCommerceRestApi({
 
 class WooCommerceRepository {
   async createProduct(product) {
-    const { error } = await WooDb.post('products', product);
-    if (error) {
-      throw new error(error);
-    }
-    return { msg: 'ok' };
+    const newProduc = await WooDb.post('products', product);
+
+    return newProduc.data;
   }
 
   async getProducts(limit, offset) {

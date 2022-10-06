@@ -113,9 +113,6 @@ class GoogleSheetsRepository {
     functions.logger.info(`starting process of destructuring sheet`);
     const productsForBatch = [];
     for (let i = 0; i < rows.length; i++) {
-      setTimeout(async () => {
-        functions.logger.info(`running ${i} time`); // dont delete this!,
-      }, 700);
       const item = rows[i];
       if (item.id) {
         functions.logger.info(`the row is already indexed in the db`);
