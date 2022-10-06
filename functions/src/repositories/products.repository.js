@@ -16,20 +16,20 @@ const { chunckarray } = require('../utils/auxiliar');
 
 class ProductsRepository {
   async createProduct(payload, id) {
-    await userRepository.getUserById(id);
-    let total_stock = 0;
-    if (payload.variations.length === 1) {
-      total_stock = parseInt(payload.variations[0].quantity, 10);
-    } else {
-      for (let i = 0; i < payload.variations.length; i++) {
-        total_stock += parseInt(payload.variations[i].quantity, 10);
-      }
-    }
+    //await userRepository.getUserById(id);
+    // let total_stock = 0;
+    // if (payload.variations.length === 1) {
+    //   total_stock = parseInt(payload.variations[0].quantity, 10);
+    // } else {
+    //   for (let i = 0; i < payload.variations.length; i++) {
+    //     total_stock += parseInt(payload.variations[i].quantity, 10);
+    //   }
+    // }
 
     let productID = '';
     await db
       .collection('products')
-      .add({ total_stock, ...payload })
+      .add({ ...payload })
       .then((docRef) => {
         productID = docRef.id;
       })

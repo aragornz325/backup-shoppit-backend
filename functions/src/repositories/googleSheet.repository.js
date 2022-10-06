@@ -1,65 +1,72 @@
 const { GoogleSpreadsheet } = require('google-spreadsheet');
+const boom = require('@hapi/boom');
 const { config } = require('../config/config');
 const functions = require('firebase-functions');
-const { createProduct } = require('../schemas/prod.schema');
+
 const ProductsRepository = require('../repositories/products.repository');
 const productsRepository = new ProductsRepository();
 
-const boom = require('@hapi/boom');
+const {
+  createProduct,
+  createInSheetNewShoppitProduct,
+} = require('../schemas/prod.schema');
+
 const headers = [
-  'name',
-  'description',
-  'currency',
-  'regular_price',
-  'state',
-  'images_url',
-  'category',
-  'offer_price',
-  'min_sell_amount',
-  'sku',
-  'variation_type',
-  'size',
-  'color',
-  'quantity',
-  'height',
-  'width',
-  'longitude',
-  'weight',
+  'Proveedor',
+  'Codigo',
+  'SKU',
+  'SAP',
+  'Descripcion',
+  'Rubro',
+  'Linea',
+  'Sublinea',
+  'Marca',
+  'Forma',
+  'UxB',
+  'Imp. Int.',
+  'IVA',
+  'Cotiz.',
+  'LISTA GENERAL',
+  'LISTA MELI',
 ];
 
 let userSheet = null;
 
 class GoogleSheetsRepository {
   async createProductObject(spreadId, item, rowRef, userId) {
+    const listageneralSplit = item['LISTA GENERAL']
+      ? item['LISTA GENERAL'].split(' ')
+      : '0,0';
+    const listameliSplit = item['LISTA MELI']
+      ? item['LISTA MELI'].split(' ')
+      : '0,0';
+    const impIntSplit = item['Imp. Int.']
+      ? item['Imp. Int.'].split(' ')
+      : '0,0';
+    const ivaSplit = item['IVA'] ? item['IVA'].split(' ') : '0,0';
+
+    const listaGeneral = parseFloat(listageneralSplit[1].replace(',', '.'), 10);
+    const listaMeli = parseFloat(listameliSplit[1].replace(',', '.'), 10);
+    const impInt = parseFloat(impIntSplit[0], 10);
+    const iva = parseFloat(ivaSplit[0], 10);
+
     const product = {
-      name: item.name,
-      currency: item.currency,
-      regular_price: parseInt(item.regular_price, 10),
-      description: item.description,
-      state: item.state,
-      images_url: [item.images_url] || [''],
-      category: item.category,
-      variations: [
-        {
-          variation_type: item.variation_type,
-          size: item.size,
-          color: item.color,
-          quantity: item.quantity,
-          sku:
-            item.sku || `row_${rowRef}/${item.name}/${item.color}/${spreadId}`,
-        },
-      ],
-      dimensions: {
-        height: parseFloat(item.height),
-        width: parseFloat(item.width),
-        longitude: parseFloat(item.longitude),
-        weight: parseFloat(item.weight),
-      },
-      offer_price: parseFloat(item.offer_price, 10),
-      min_sell_amount: parseInt(item.min_sell_amount, 10),
-      publish: true,
-      owner_id: userId,
-      total_stock: parseInt(item.quantity, 10),
+      proveedor: item.Proveedor,
+      codigo: item.Codigo,
+      sku: item.SKU,
+      sap: item.SAP,
+      descripcion: item.Descripcion,
+      rubro: item.Rubro || 'sin Rubro',
+      linea: item.Linea || 'sin Linea',
+      sublinea: item.Sublinea || 'sin sublinea',
+      marca: item.Marca || 'sin marca',
+      forma: item.Forma,
+      uxb: parseInt(item.UxB, 10),
+      impInt,
+      iva,
+      cotiz: item.Cotiz || 1,
+      listaGeneral: isNaN(listaGeneral) ? 0 : listaGeneral,
+      listaMeli: isNaN(listaMeli) ? 0 : listaMeli,
     };
 
     return product;
@@ -104,7 +111,11 @@ class GoogleSheetsRepository {
       throw boom.badData('The sheet is empty');
     }
     functions.logger.info(`starting process of destructuring sheet`);
+    const productsForBatch = [];
     for (let i = 0; i < rows.length; i++) {
+      setTimeout(async () => {
+        functions.logger.info(`running ${i} time`); // dont delete this!,
+      }, 700);
       const item = rows[i];
       if (item.id) {
         functions.logger.info(`the row is already indexed in the db`);
@@ -117,19 +128,17 @@ class GoogleSheetsRepository {
         rowRef,
         userId
       );
-
-      const { error } = createProduct.validate(payload);
+      const { error } = createInSheetNewShoppitProduct.validate(payload);
       if (error) {
         functions.logger.log(`error in item ${rows[i].name}, ${error}`);
         throw boom.badData(`error in item ${rows[i].name}, ${error}`);
       }
       functions.logger.log(`inserting product of row ${rowRef} in collection`);
-      const productID = await productsRepository.createProduct(payload);
-      functions.logger.log(` setting id in sheet`);
-      item.id = productID;
+      productsForBatch.push(payload);
+      item.id = 'created';
       await item.save();
     }
-    return { msg: 'ok' };
+    return productsForBatch;
   }
 
   async updateProduct(spreadId) {
@@ -144,27 +153,27 @@ class GoogleSheetsRepository {
       const rowRef = parseInt(item._rowNumber, 10);
       const productInDb = await productsRepository.getProductById(item.id);
       if (
-        productInDb.name === payload.name &&
-        productInDb.offer_price === payload.offer_price &&
-        productInDb.regular_price === payload.regular_price &&
-        productInDb.description === payload.description &&
-        productInDb.image_url === payload.image_url &&
-        productInDb.stock_XS === payload.stock_XS &&
-        productInDb.stock_S === payload.stock_S &&
-        productInDb.stock_M === payload.stock_M &&
-        productInDb.stock_L === payload.stock_L &&
-        productInDb.stock_XL === payload.stock_XL &&
+        productInDb.proveedor === payload.proveedor &&
+        productInDb.codigo === payload.codigo &&
         productInDb.sku === payload.sku &&
-        productInDb.height === payload.height &&
-        productInDb.width === payload.width &&
-        productInDb.longitude === payload.longitude &&
-        productInDb.weight === payload.weight
+        productInDb.sap === payload.sap &&
+        productInDb.descripcion === payload.descripcion &&
+        productInDb.rubro === payload.rubro &&
+        productInDb.linea === payload.linea &&
+        productInDb.sublinea === payload.sublinea &&
+        productInDb.marca === payload.marca &&
+        productInDb.UxB === payload.UxB &&
+        productInDb.impInt === payload.impInt &&
+        productInDb.iva === payload.iva &&
+        productInDb.cotiz === payload.cotiz &&
+        productInDb.listaGeneral === payload.listaGeneral &&
+        productInDb.listaMeli === payload.listaMeli
       ) {
         functions.logger.log(`the row ${rowRef} not need to be updated`);
         continue;
       }
 
-      const { error } = createProduct.validate(payload);
+      const { error } = createInSheetNewShoppitProduct.validate(payload);
       if (error) {
         functions.logger.log(`error in item ${rows[i].name}, ${error}`);
         throw boom.badData(`error in item ${rows[i].name}, ${error}`);

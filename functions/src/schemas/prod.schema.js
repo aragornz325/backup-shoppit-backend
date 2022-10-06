@@ -80,6 +80,25 @@ const validateSheetsProduct = joi.object({
   stock_XL: stock_XL.required(),
 });
 
+const createInSheetNewShoppitProduct = joi.object({
+  proveedor: joi.string().required(),
+  codigo: joi.number().integer().required(),
+  sku: joi.number().integer().required(),
+  sap: joi.string().required(),
+  descripcion: joi.string().required(),
+  rubro: joi.string().required(),
+  linea: joi.string(),
+  sublinea: joi.string(),
+  marca: joi.string().required(),
+  forma: joi.string().required(),
+  uxb: joi.number().integer().required(),
+  impInt: joi.number().integer().required(),
+  iva: joi.number().integer().required(),
+  cotiz: joi.number().integer().required(),
+  listaGeneral: joi.number().required(),
+  listaMeli: joi.number().required(),
+});
+
 const validateItem = joi
   .array()
   .items(
@@ -125,4 +144,5 @@ module.exports = {
   updateProduct,
   getOne,
   validateItem,
+  createInSheetNewShoppitProduct,
 };

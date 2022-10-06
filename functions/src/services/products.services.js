@@ -5,6 +5,9 @@ const QuestionRepository = require('../repositories/question.repository');
 const questionRepository = new QuestionRepository();
 const CategoriesRepository = require('../repositories/categories.repositories');
 const categoriesRepository = new CategoriesRepository();
+const WooCommerceRepository = require('../repositories/wooComerce.repository');
+const wooCommerceRepository = new WooCommerceRepository();
+const functions = require('firebase-functions');
 
 const googleSheetsRepository = new GoogleSheetsRepository();
 
@@ -71,7 +74,16 @@ class ProductsServices {
     return await googleSheetsRepository.initSheet(id, payload);
   }
   async getProductSheet(id, userId) {
-    return await googleSheetsRepository.getProduct(id, userId);
+    const productList = await googleSheetsRepository.getProduct(id, userId);
+    console.log(productList);
+    for (let i = 0; i < productList.length; i++) {
+      try {
+        await wooCommerceRepository.createProduct(productList[i]);
+      } catch (error) {
+        functions.logger.error('error', error);
+      }
+    }
+    return { msg: 'ok' };
   }
 
   async getProductByOwner(owner_id, limit, offset) {

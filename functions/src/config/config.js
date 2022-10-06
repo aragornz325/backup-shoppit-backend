@@ -28,6 +28,10 @@ const config = {
   private_key: process.env.PRIVATE_KEY,
   project_id: process.env.PROJECT_ID,
   trial_membership_id: process.env.TRIAL_MEMBERSHIP_ID,
+  wooCommerce: {
+    consummerKey: process.env.WOO_CLAVE_DE_CLIENTE,
+    consummerSecret: process.env.WOO_CLAVE_SECRETA_DE_CLIENTE,
+  },
 };
 
 module.exports = { config };
