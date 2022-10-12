@@ -179,6 +179,34 @@ class GoogleSheetsRepository {
       await productsRepository.updateProduct(item.id, payload);
     }
   }
+
+  async getForWC(spreadId) {
+    const doc = await this.docConstructor(spreadId);
+    await doc.loadInfo();
+    const sheet = doc.sheetsByIndex[1];
+    const rows = await sheet.getRows();
+    let allProducts = [];
+    for (const item of rows) {
+      allProducts.push({
+        name: item.Descripcion,
+        type: item.type || 'simple',
+        regular_price: item.listaGeneral,
+        description: item.Descripcion,
+        sku: item.SKU,
+        price: item.listaGeneral,
+        stock_quantity: item.UxB,
+        manage_stock: true,
+        stock_status: 'instock',
+        categories: [item.Rubro, item.Linea, item.Sublinea],
+        images: [
+          {
+            src: `https://firebasestorage.googleapis.com/v0/b/shoppit-9b9f7.appspot.com/o/productos%2F${item.SKU}.jpg?alt=media`,
+          },
+        ],
+      });
+    }
+    return allProducts;
+  }
 }
 
 module.exports = GoogleSheetsRepository;
