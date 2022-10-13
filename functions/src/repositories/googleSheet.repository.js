@@ -52,7 +52,7 @@ class GoogleSheetsRepository {
 
     const product = {
       proveedor: item.Proveedor,
-      codigo: item.Codigo,
+      codigo: item['Código'],
       sku: item.SKU,
       sap: item.SAP,
       descripcion: item.Descripcion,
@@ -125,6 +125,7 @@ class GoogleSheetsRepository {
         rowRef,
         userId
       );
+      console.log('payload', payload);
       const { error } = createInSheetNewShoppitProduct.validate(payload);
       if (error) {
         functions.logger.log(`error in item ${rows[i].name}, ${error}`);
