@@ -38,66 +38,7 @@ async function compareObj(productInDb, item) {
   return true;
 }
 
-async function changeOrderStatus(order) {
-  if (
-    order.status_by_buyer === 'approved' &&
-    order.status_by_seller === 'approved'
-  ) {
-    return { ...order, status: 'approved' };
-  }
-  if (
-    order.status_by_buyer === 'approved' &&
-    order.status_by_seller === 'pendig'
-  ) {
-    return { ...order, status: 'pending' };
-  }
-  if (
-    order.status_by_buyer === 'pending' &&
-    order.status_by_seller === 'approved'
-  ) {
-    return { ...order, status: 'pending' };
-  }
-  if (
-    order.status_by_buyer === 'pending' &&
-    order.status_by_seller === 'pending'
-  ) {
-    return { ...order, status: 'pending' };
-  }
-  if (
-    order.status_by_buyer === 'rejected' &&
-    order.status_by_seller === 'approved'
-  ) {
-    return { ...order, status: 'rejected' };
-  }
-  if (
-    order.status_by_buyer === 'rejected' &&
-    order.status_by_seller === 'pending'
-  ) {
-    return { ...order, status: 'rejected' };
-  }
-  if (
-    order.status_by_buyer === 'rejected' &&
-    order.status_by_seller === 'rejected'
-  ) {
-    return { ...order, status: 'rejected' };
-  }
-  if (
-    order.status_by_buyer === 'approved' &&
-    order.status_by_seller === 'rejected'
-  ) {
-    return { ...order, status: 'rejected' };
-  }
-  if (
-    order.status_by_buyer === 'pending' &&
-    order.status_by_seller === 'rejected'
-  ) {
-    return { ...order, status: 'rejected' };
-  }
-  return order;
-}
-
 module.exports = {
-  changeOrderStatus,
   chunckarray,
   compareObj,
 };

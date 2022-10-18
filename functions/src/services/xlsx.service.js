@@ -1,8 +1,19 @@
 const XLSX = require('xlsx');
+const WooCommerceRestApi = require('@woocommerce/woocommerce-rest-api').default;
 const { initializeApp, cert } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
-require('dotenv').config();
 const functions = require('firebase-functions');
+const { chunckarray } = require('../utils/auxiliar');
+
+const { config } = require('../config/config');
+require('dotenv').config();
+
+const WooDb = new WooCommerceRestApi({
+  url: 'https://shoppit.com.ar/',
+  consumerKey: 'ck_6297661bf04733d57612f24f2a00a78f35e1f1c2',
+  consumerSecret: 'cs_7d032d7dadbdac14611e59be3f203de6fcf9c550',
+  version: 'wc/v3',
+});
 
 //credenciales
 
@@ -32,33 +43,31 @@ async function readXlsx(path) {
       functions.logger.error(`SKU is missing for product ${product}`);
       continue;
     }
+
+    const categoria = await getcategoryByProduct(product['Rubro']);
+    console.log('categoria', categoria);
+
     const payload = {
       name: product['Descripcion'] || 'missing data',
       type: 'grouped',
-      regular_price:
-        product['LISTA MELI c/impuestos'] !== ''
-          ? parseFloat(
-              product['LISTA MELI c/impuestos'].split(' ')[1].replace(',', '.'),
-              10
-            )
-          : 0,
+      regular_price: product['LISTA MELI c/impuestos'] || '0.00',
       description: product['Rubro'] || 'missing data',
       short_description: product['Rubro'] || 'missing data',
       categories: [
         {
-          id: 9,
+          id: categoria,
         },
       ],
       images: [
         {
           src:
             product['Imagen'] ||
-            'https://play-lh.googleusercontent.com/_SSevhCxUfU3Q0wr2cAkY7ayt_M6AbLudYkCXQrFicY-i9jL9U8f4q9tyBvuQ60m6VE=w240-h480-rw',
+            'https://bullseyetrading.com.au/assets/components/phpthumbof/cache/warehouse2.3df28ae2b7cfd96bd9edfc0d39091ee926.jpg',
         },
       ],
-      sku: product['SKU'] || 'missing data',
+      sku: `${product['SKU']}-${product['SAP']}` || 'missing data',
       price:
-        product['LISTA GENERAL c/impuestos'] !== ''
+        product['LISTA GENERAL c/impuestos'] !== undefined
           ? parseFloat(
               product['LISTA GENERAL c/impuestos']
                 .split(' ')[1]
@@ -67,10 +76,16 @@ async function readXlsx(path) {
             )
           : 0,
       shipping_required: true,
-      status: 'private',
+      status: 'publish',
     };
+    console.log(payload);
+    const prodWooCommerce = await WooDb.post('products', payload);
 
-    await db.collection('products').add(payload);
+    await db.collection('products').add({
+      ...prodWooCommerce.data,
+      spa: product['SAP'],
+      sku: product['SKU'],
+    });
   }
   functions.logger.info('all done');
   return { msg: 'ok' };
@@ -83,30 +98,671 @@ async function updateStock(path) {
   const sheet = workbookSheets[0];
   const dataExcel = XLSX.utils.sheet_to_json(workbook.Sheets[sheet]);
 
+  let update = [];
+
   for (let i = 0; i < dataExcel.length; i++) {
     const product = dataExcel[i];
-    if (!product.SKU) {
+    if (!product.SKU || !product.SAP) {
       functions.logger.error(
-        `SKU is missing for product ${product['Cod.Art']}`
+        `SKU is missing for product ${product['Cod.Art']}, please check this product`
       );
       continue;
     }
+
+    const stock_quantity = parseInt(product['Stock Bultos'], 10) || 0;
+    const stock_status = stock_quantity <= 0 ? 'outofstock' : 'instock';
     const payload = {
-      stock_quantity: parseInt(product['Stock Bultos'], 10) || 0,
+      stock_quantity,
+      stock_status,
     };
 
     const querySnapshot = await db
       .collection('products')
       .where('sku', '==', product['SKU'])
+      .where('spa', '==', product['SAP'])
       .get();
-    querySnapshot.forEach((doc) => {
-      db.collection('products').doc(doc.id).update(payload);
+    querySnapshot.forEach(async (doc) => {
+      update.push({ id: doc.data().id, ...payload });
+      await db.collection('products').doc(doc.id).update(payload);
     });
   }
+
+  const chunked = await chunckarray(update, 90);
+  chunked.forEach(async (chunk) => {
+    await WooDb.post('products/batch', { update: chunk });
+  });
+
   functions.logger.info('all done');
   return { msg: 'ok' };
+}
+
+async function deleteAllProducts() {
+  let prodfromWoo = [];
+  let onlyIds = [];
+  await WooDb.get('products', {
+    per_page: 30,
+  })
+    .then((response) => {
+      console.log('response length', response.data.length);
+      prodfromWoo.push(response.data);
+    })
+    .catch((error) => {
+      console.log(error.response.data);
+    });
+  prodfromWoo[0].forEach((prod) => {
+    onlyIds.push(prod.id);
+  });
+  onlyIds.forEach(async (id) => {
+    await WooDb.delete(`products/${id}`)
+      .then((response) => {
+        console.log(`Product ${id} deleted`);
+      })
+      .catch((error) => {
+        console.log(error.response.data);
+      });
+  });
+}
+
+async function getAllCategories() {
+  let categories = [];
+  await WooDb.get('products/categories', {
+    per_page: 100,
+  })
+    .then((response) => {
+      console.log('response length', response.data.length);
+      categories.push(response.data);
+    })
+    .catch((error) => {
+      console.log(error.response.data);
+    });
+  categories[0].forEach(async (cat) => {
+    await db.collection('categories').add({
+      ...cat,
+    });
+    console.log(`Category ${cat.name} added`);
+  });
+}
+
+async function getcategoryByProduct(rubro) {
+  if (rubro === 'Aderezos') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Aderezos')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Almacen') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Almacen')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Anexo') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Hogar')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Azucar') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Almacen')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Barras') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Kiosko')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Bebidas') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Bebidas')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Bolsas') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Accesorios')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Cabello') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Cuidado Personal')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Cafe') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Infusiones')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Caldos') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'almacen')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Capsulas') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Infusiones')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Caramelos') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Golosinas')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Chicles') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Golosinas')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Chocolates') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Golosinas')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Cigarrillos') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Cigarrillos')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Compactos') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Lavado')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Condimentos') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Condimentos')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Cuidado del aire') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Limpieza')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Cuidado del hogar') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Limpieza')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Cuidado personal') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Cuidado personal')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Det_Liquido') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Lavado')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Det_Polvo') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Lavado')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Dry Mixes') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Postres')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Galletitas') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Galletitas')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Golosinas') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Golosinas')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Infusiones') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Infusiones')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Insecticidas') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Insecticidas')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Jugos') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Jugos')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Lavavajilla') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Limpieza')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Pequeñas superficies') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Limpieza')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Perfumeria') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Perfumeria')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Premezclas') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Panaderia')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Pure Listo') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Almacen')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Salsas') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Envasados')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Sopas') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Sopas')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Suavizante') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Suavizante')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Tabaco') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Tabaqueria')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else if (rubro === 'Tocador') {
+    let id = 0;
+    await db
+      .collection('categories')
+      .where('name', '==', 'Tocador')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+    return id;
+  } else {
+    return 16;
+  }
 }
 
 updateStock(
   '/home/rodrigo/Documentos/software/backend/cloud functions/backend/functions/src/public/belgroup.xlsx'
 );
+
+// deleteAllProducts();
+
+// getAllCategories();
