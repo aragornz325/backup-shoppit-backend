@@ -35,5 +35,10 @@ class WooCommerceRepository {
     const deleteProduct = await WooDb.delete(`products/${id}`);
     return deleteProduct.data;
   }
+
+  async getProductById(id) {
+    const product = await WooDb.get(`products/${id}`);
+    return product.data;
+  }
 }
 module.exports = WooCommerceRepository;

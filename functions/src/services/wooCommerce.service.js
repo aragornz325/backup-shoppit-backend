@@ -20,6 +20,10 @@ class WooCommerceService {
     return await wooCommerceRepository.getProducts(limit, offset);
   }
 
+  async getProductById(id) {
+    return await wooCommerceRepository.getProductById(id);
+  }
+
   async updateProduct(id, payload) {
     const product = await wooCommerceRepository.updateProduct(id, payload);
     await productsServices.updateProduct(id, product, true);
