@@ -16,6 +16,10 @@ class ProductsServices {
     return await productsRepository.createProduct(payload);
   }
 
+  async getProductByName(name) {
+    return await productsRepository.getProductByName(name);
+  }
+
   async getProductById(id) {
     const product = await productsRepository.getProductById(id);
     const questions = await questionRepository.getQuestionsByProductId(id);

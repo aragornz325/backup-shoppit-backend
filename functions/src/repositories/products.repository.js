@@ -96,6 +96,25 @@ class ProductsRepository {
     return productsToFront;
   }
 
+  async getProductByName(name) {
+    let products = {};
+    await db
+      .collection('products')
+      .where('name', '==', name)
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          products = {
+            ...doc.data(),
+          };
+        });
+      })
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    return products;
+  }
+
   async updateProduct(id, payload) {
     await this.getProductById(id);
     await db

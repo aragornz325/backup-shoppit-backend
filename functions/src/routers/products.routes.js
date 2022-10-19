@@ -29,7 +29,7 @@ const {
 
 const validatorHandler = require('../middlewares/validatorHandler');
 
-//router.get('', checkApiKey, productsController.getProducts);
+router.get('', checkApiKey, productsController.getProducts);
 
 // router.get('/:id', checkApiKey, productsController.getProductById);
 // router.post(

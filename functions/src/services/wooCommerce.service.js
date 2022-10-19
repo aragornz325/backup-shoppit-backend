@@ -1,3 +1,4 @@
+const boom = require('@hapi/boom');
 const functions = require('firebase-functions');
 const WooCommerceRepository = require('../repositories/wooComerce.repository');
 const wooCommerceRepository = new WooCommerceRepository();
@@ -6,6 +7,10 @@ const productsServices = new ProductsServices();
 
 class WooCommerceService {
   async createProduct(payload) {
+    const checkProduct = await productsServices.getProductByName(payload.name);
+    if (checkProduct.name === payload.name) {
+      throw boom.conflict('Product with same name already exists');
+    }
     const product = await wooCommerceRepository.createProduct(payload);
     await productsServices.createProduct(product);
     return { message: 'product created' };
@@ -17,7 +22,7 @@ class WooCommerceService {
 
   async updateProduct(id, payload) {
     const product = await wooCommerceRepository.updateProduct(id, payload);
-    await productsServices.updateProduct(product);
+    await productsServices.updateProduct(id, product, true);
     return { message: 'product updated' };
   }
 

@@ -11,6 +11,7 @@ const WooDb = new WooCommerceRestApi({
   consumerSecret: config.wooCommerce.consummerSecret,
   version: config.wooCommerce.version,
 });
+console.log(config.wooCommerce);
 
 class WooCommerceRepository {
   async createProduct(product) {
