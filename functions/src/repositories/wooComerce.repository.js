@@ -6,10 +6,10 @@ const functions = require('firebase-functions');
 const { config } = require('../config/config');
 
 const WooDb = new WooCommerceRestApi({
-  url: 'https://paginaprueba.tech/',
-  consumerKey: 'ck_1c566c3e445125ae147bc619e374bc7306d7fab0',
-  consumerSecret: 'cs_34ecdc90b13b3209f864a9af331012d20b693dd1',
-  version: 'wc/v3',
+  url: config.wooCommerce.url,
+  consumerKey: config.wooCommerce.consummerKey,
+  consumerSecret: config.wooCommerce.consummerSecret,
+  version: config.wooCommerce.version,
 });
 
 class WooCommerceRepository {
@@ -23,6 +23,16 @@ class WooCommerceRepository {
     const allProducts = await WooDb.get('products');
 
     return allProducts.data;
+  }
+
+  async updateProduct(id, product) {
+    const updateProduct = await WooDb.put(`products/${id}`, product);
+    return updateProduct.data;
+  }
+
+  async deleteProduct(id) {
+    const deleteProduct = await WooDb.delete(`products/${id}`);
+    return deleteProduct.data;
   }
 }
 module.exports = WooCommerceRepository;

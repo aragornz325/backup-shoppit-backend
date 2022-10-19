@@ -14,6 +14,18 @@ class WooCommerceService {
   async getProducts(limit, offset) {
     return await wooCommerceRepository.getProducts(limit, offset);
   }
+
+  async updateProduct(id, payload) {
+    const product = await wooCommerceRepository.updateProduct(id, payload);
+    await productsServices.updateProduct(product);
+    return { message: 'product updated' };
+  }
+
+  async deleteProduct(id) {
+    const product = await wooCommerceRepository.deleteProduct(id);
+    await productsServices.deleteProduct(product);
+    return { message: 'product deleted' };
+  }
 }
 
 module.exports = WooCommerceService;

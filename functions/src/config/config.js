@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const config = {
   urlPushNotification: process.env.URL_PUSH_NOTIFICATION,
   tokenPushNotification: process.env.TOKEN_PUSH_NOTIFICACION,
@@ -29,8 +27,10 @@ const config = {
   project_id: process.env.PROJECT_ID,
   trial_membership_id: process.env.TRIAL_MEMBERSHIP_ID,
   wooCommerce: {
-    consummerKey: process.env.WOO_CLAVE_DE_CLIENTE,
-    consummerSecret: process.env.WOO_CLAVE_SECRETA_DE_CLIENTE,
+    url: process.env.WOO_COMMERCE_URL,
+    consummerKey: process.env.WOO_COMMERCE_CONSUMER_KEY,
+    consummerSecret: process.env.WOO_COMMERCE_CONSUMER_SECRET,
+    version: process.env.WOO_COMMERCE_VERSION,
   },
 };
 

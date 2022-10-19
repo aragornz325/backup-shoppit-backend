@@ -20,6 +20,27 @@ class wooCommerceController {
       next(error);
     }
   }
+
+  async updateProduct(req, res, next) {
+    try {
+      const { id } = req.params;
+      const payload = req.body;
+      const product = await wooService.updateProduct(id, payload);
+      res.status(200).json(product);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteProduct(req, res, next) {
+    try {
+      const { id } = req.params;
+      const product = await wooService.deleteProduct(id);
+      res.status(200).json(product);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = wooCommerceController;
