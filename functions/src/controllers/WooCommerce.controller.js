@@ -1,4 +1,4 @@
-const WooService = require('../services/WooCommerce.service');
+const WooService = require('../services/wooCommerce.service');
 const wooService = new WooService();
 
 class wooCommerceController {
