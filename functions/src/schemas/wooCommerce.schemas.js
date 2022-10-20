@@ -75,6 +75,7 @@ const createProductWC = joi.object({
   short_description: short_description.required(),
   categories: categories.required(),
   images: images.required(),
+  stock_quantity: stock_quantity,
 });
 
 const updateProductWC = joi.object({

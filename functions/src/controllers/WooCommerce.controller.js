@@ -41,6 +41,40 @@ class wooCommerceController {
       next(error);
     }
   }
+
+  async getProductById(req, res, next) {
+    try {
+      const { id } = req.params;
+      const product = await wooService.getProductById(id);
+      res.status(200).json(product);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getByCategories(req, res, next) {
+    try {
+      const id = req.params.id;
+      const limit = req.query.limit || 25;
+      const offset = req.query.offset || 0;
+      const products = await wooService.getProductsByCategory(
+        id,
+        limit,
+        offset
+      );
+      res.status(200).json(products);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getCategories(req, res, next) {
+    try {
+      const categories = await wooService.getCategories();
+      res.status(200).json(categories);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = wooCommerceController;

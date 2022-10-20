@@ -67,14 +67,8 @@ class ProductsServices {
     );
   }
 
-  async getProductsByCategory(category, limit, offset) {
-    const newCategory = await categoriesRepository.getCategoryByName(category);
-
-    return await productsRepository.getProductsByCategory(
-      newCategory.id,
-      limit,
-      offset
-    );
+  async getProductsByCategory(id, limit, offset) {
+    return await productsRepository.getProductsByCategory(id, limit, offset);
   }
   async getProductsByCategoryAndSearch(search, category, limit, offset) {
     const newCategory = await categoriesRepository.getCategoryByName(category);

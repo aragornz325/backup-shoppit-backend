@@ -40,5 +40,25 @@ class WooCommerceRepository {
     const product = await WooDb.get(`products/${id}`);
     return product.data;
   }
+
+  async getProductsByCategory(category, limit, offset) {
+    const limitparse = parseInt(limit, 10);
+    console.log(typeof limitparse);
+    const products = await WooDb.get(`products?category=${category}`, {
+      per_page: 25,
+    });
+    return products.data;
+  }
+
+  async getCategories() {
+    let cat = [];
+    const categories = await WooDb.get('products/categories', {
+      per_page: 100,
+    });
+    categories.data.forEach((element) => {
+      cat.push(element.id, element.name, element.slug);
+    });
+    return cat;
+  }
 }
 module.exports = WooCommerceRepository;

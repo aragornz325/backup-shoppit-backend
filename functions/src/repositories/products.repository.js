@@ -320,9 +320,7 @@ class ProductsRepository {
     let productswithIdCategory = [];
     await db
       .collection('products')
-      .where('category', '==', category)
-      .where('published', '==', true)
-      .where('is_valid', '==', true)
+      .where('category[0].id', '==', category)
       .orderBy('name')
       .limit(parseInt(limit, 10))
       .startAfter(parseInt(offset, 10))

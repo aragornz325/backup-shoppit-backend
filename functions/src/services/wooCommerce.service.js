@@ -35,6 +35,19 @@ class WooCommerceService {
     await productsServices.deleteProduct(product);
     return { message: 'product deleted' };
   }
+
+  async getProductsByCategory(id, limit, offset) {
+    const products = await wooCommerceRepository.getProductsByCategory(
+      id,
+      limit,
+      offset
+    );
+    return products;
+  }
+
+  async getCategories() {
+    return await wooCommerceRepository.getCategories();
+  }
 }
 
 module.exports = WooCommerceService;

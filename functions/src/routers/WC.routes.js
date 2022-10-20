@@ -19,6 +19,12 @@ router.post(
 
 router.get('', checkApiKey, wooCommerceController.getProducts);
 
+router.get('/categories', checkApiKey, wooCommerceController.getCategories);
+router.get(
+  '/categories/:id',
+  checkApiKey,
+  wooCommerceController.getByCategories
+);
 router.put(
   '/:id',
   checkApiKey,
