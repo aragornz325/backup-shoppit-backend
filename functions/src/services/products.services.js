@@ -35,6 +35,10 @@ class ProductsServices {
     return await productsRepository.updateProduct(id, payload, merge);
   }
 
+  async deleteProductWooCoomerce(id) {
+    return await productsRepository.deleteProductWooCoomerce(id);
+  }
+
   async deleteProduct(id) {
     return await productsRepository.deleteProduct(id);
   }

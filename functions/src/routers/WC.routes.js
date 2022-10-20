@@ -18,6 +18,11 @@ router.post(
 );
 
 router.get('', checkApiKey, wooCommerceController.getProducts);
+router.get(
+  '/search',
+  checkApiKey,
+  wooCommerceController.searchByStringProducts
+);
 
 router.get('/categories', checkApiKey, wooCommerceController.getCategories);
 router.get(
@@ -25,6 +30,7 @@ router.get(
   checkApiKey,
   wooCommerceController.getByCategories
 );
+
 router.put(
   '/:id',
   checkApiKey,

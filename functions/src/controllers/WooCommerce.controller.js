@@ -13,8 +13,8 @@ class wooCommerceController {
   }
   async getProducts(req, res, next) {
     try {
-      const { limit, offset } = req.query;
-      const products = await wooService.getProducts(limit, offset);
+      const { limit, page } = req.query;
+      const products = await wooService.getProducts(limit, page);
       res.status(200).json(products);
     } catch (error) {
       next(error);
@@ -55,12 +55,8 @@ class wooCommerceController {
     try {
       const id = req.params.id;
       const limit = req.query.limit || 25;
-      const offset = req.query.offset || 0;
-      const products = await wooService.getProductsByCategory(
-        id,
-        limit,
-        offset
-      );
+      const page = req.query.page || 1;
+      const products = await wooService.getProductsByCategory(id, limit, page);
       res.status(200).json(products);
     } catch (error) {
       next(error);
@@ -71,6 +67,22 @@ class wooCommerceController {
     try {
       const categories = await wooService.getCategories();
       res.status(200).json(categories);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async searchByStringProducts(req, res, next) {
+    try {
+      const { search } = req.query;
+      const limit = req.query.limit || 25;
+      const page = req.query.page || 1;
+      const products = await wooService.searchByStringProducts(
+        search,
+        limit,
+        page
+      );
+      res.status(200).json(products);
     } catch (error) {
       next(error);
     }

@@ -16,8 +16,8 @@ class WooCommerceService {
     return { message: 'product created' };
   }
 
-  async getProducts(limit, offset) {
-    return await wooCommerceRepository.getProducts(limit, offset);
+  async getProducts(limit, page) {
+    return await wooCommerceRepository.getProducts(limit, page);
   }
 
   async getProductById(id) {
@@ -31,22 +31,30 @@ class WooCommerceService {
   }
 
   async deleteProduct(id) {
-    const product = await wooCommerceRepository.deleteProduct(id);
-    await productsServices.deleteProduct(product);
+    await productsServices.deleteProductWooCoomerce(id);
+    await wooCommerceRepository.deleteProduct(id);
     return { message: 'product deleted' };
   }
 
-  async getProductsByCategory(id, limit, offset) {
+  async getProductsByCategory(id, limit, page) {
     const products = await wooCommerceRepository.getProductsByCategory(
       id,
       limit,
-      offset
+      page
     );
     return products;
   }
 
   async getCategories() {
     return await wooCommerceRepository.getCategories();
+  }
+
+  async searchByStringProducts(search, limit, page) {
+    return await wooCommerceRepository.searchByStringProducts(
+      search,
+      limit,
+      page
+    );
   }
 }
 

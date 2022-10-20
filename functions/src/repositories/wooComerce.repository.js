@@ -20,10 +20,17 @@ class WooCommerceRepository {
     return newProduc.data;
   }
 
-  async getProducts(limit, offset) {
-    const allProducts = await WooDb.get('products');
+  async getProducts(limit, page) {
+    const allProducts = await WooDb.get('products', {
+      per_page: parseInt(limit, 10),
+      page: parseInt(page, 10),
+      orderby: 'id',
+    });
 
-    return allProducts.data;
+    return {
+      products: allProducts.data,
+      total_pages: allProducts.headers['x-wp-totalpages'],
+    };
   }
 
   async updateProduct(id, product) {
@@ -41,13 +48,17 @@ class WooCommerceRepository {
     return product.data;
   }
 
-  async getProductsByCategory(category, limit, offset) {
-    const limitparse = parseInt(limit, 10);
-    console.log(typeof limitparse);
+  async getProductsByCategory(category, limit, page) {
     const products = await WooDb.get(`products?category=${category}`, {
-      per_page: 25,
+      per_page: parseInt(limit, 10),
+      page: parseInt(page, 10),
+      orderby: 'id',
     });
-    return products.data;
+    console.log(products.headers);
+    return {
+      products: products.data,
+      total_pages: products.headers['x-wp-totalpages'],
+    };
   }
 
   async getCategories() {
@@ -59,6 +70,19 @@ class WooCommerceRepository {
       cat.push(element.id, element.name, element.slug);
     });
     return cat;
+  }
+
+  async searchByStringProducts(search, limit, page) {
+    const products = await WooDb.get(`products`, {
+      search: search,
+      per_page: parseInt(limit, 10),
+      page: parseInt(page, 10),
+      orderby: 'id',
+    });
+    return {
+      products: products.data,
+      total_pages: products.headers['x-wp-totalpages'],
+    };
   }
 }
 module.exports = WooCommerceRepository;

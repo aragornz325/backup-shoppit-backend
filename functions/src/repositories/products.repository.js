@@ -127,6 +127,31 @@ class ProductsRepository {
     return { msg: 'updated' };
   }
 
+  async deleteProductWooCoomerce(id) {
+    let idToDelete = '';
+    await db
+      .collection('products')
+      .where('id', '==', parseInt(id, 10))
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          console.log(doc);
+          idToDelete = doc.id;
+        });
+      })
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    await db
+      .collection('products')
+      .doc(idToDelete)
+      .delete()
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    return { msg: 'deleted' };
+  }
+
   async deleteProduct(id) {
     await this.getProductById(id);
     await db
