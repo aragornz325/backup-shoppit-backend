@@ -1,7 +1,6 @@
 //const { WooDb } = require('../../config/wooCommerce');
 
 const WooCommerceRestApi = require('@woocommerce/woocommerce-rest-api').default;
-const functions = require('firebase-functions');
 
 const { config } = require('../config/config');
 
@@ -11,7 +10,6 @@ const WooDb = new WooCommerceRestApi({
   consumerSecret: config.wooCommerce.consummerSecret,
   version: config.wooCommerce.version,
 });
-console.log(config.wooCommerce);
 
 class WooCommerceRepository {
   async createProduct(product) {
@@ -21,6 +19,7 @@ class WooCommerceRepository {
   }
 
   async getProducts(limit, page) {
+    console.log('voy a buscar a todos los productos');
     const allProducts = await WooDb.get('products', {
       per_page: parseInt(limit, 10),
       page: parseInt(page, 10),
@@ -54,7 +53,7 @@ class WooCommerceRepository {
       page: parseInt(page, 10),
       orderby: 'id',
     });
-    console.log(products.headers);
+
     return {
       products: products.data,
       total_pages: products.headers['x-wp-totalpages'],
@@ -67,7 +66,7 @@ class WooCommerceRepository {
       per_page: 100,
     });
     categories.data.forEach((element) => {
-      cat.push(element.id, element.name, element.slug);
+      cat.push({ id: element.id, name: element.name, slug: element.slug });
     });
     return cat;
   }
@@ -83,6 +82,11 @@ class WooCommerceRepository {
       products: products.data,
       total_pages: products.headers['x-wp-totalpages'],
     };
+  }
+
+  async getShippments() {
+    const shippments = await WooDb.get('shipping_methods');
+    return shippments.data;
   }
 }
 module.exports = WooCommerceRepository;

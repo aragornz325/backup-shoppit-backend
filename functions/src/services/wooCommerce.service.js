@@ -1,5 +1,5 @@
 const boom = require('@hapi/boom');
-const functions = require('firebase-functions');
+
 const WooCommerceRepository = require('../repositories/wooComerce.repository');
 const wooCommerceRepository = new WooCommerceRepository();
 const ProductsServices = require('../services/products.services');
@@ -11,6 +11,15 @@ class WooCommerceService {
     if (checkProduct.name === payload.name) {
       throw boom.conflict('Product with same name already exists');
     }
+    const weight = payload.weight ? payload.weight : '1';
+    const dimensions = payload.dimensions
+      ? payload.dimensions
+      : { length: '40', width: '40', height: '40' };
+    payload = {
+      ...payload,
+      weight,
+      dimensions,
+    };
     const product = await wooCommerceRepository.createProduct(payload);
     await productsServices.createProduct(product);
     return { message: 'product created' };
@@ -55,6 +64,10 @@ class WooCommerceService {
       limit,
       page
     );
+  }
+
+  async getShippments() {
+    return await wooCommerceRepository.getShippments();
   }
 }
 

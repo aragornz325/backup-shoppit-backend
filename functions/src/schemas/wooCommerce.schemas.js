@@ -76,6 +76,8 @@ const createProductWC = joi.object({
   categories: categories.required(),
   images: images.required(),
   stock_quantity: stock_quantity,
+  weight: weight,
+  dimensions: dimensions,
 });
 
 const updateProductWC = joi.object({

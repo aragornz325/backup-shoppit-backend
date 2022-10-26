@@ -10,6 +10,7 @@ const {
 const validatorHandler = require('../middlewares/validatorHandler');
 const { checkApiKey } = require('../middlewares/auth.handler');
 
+router.get('', checkApiKey, wooCommerceController.getProducts);
 router.post(
   '',
   checkApiKey,
@@ -17,12 +18,12 @@ router.post(
   wooCommerceController.createProduct
 );
 
-router.get('', checkApiKey, wooCommerceController.getProducts);
 router.get(
   '/search',
   checkApiKey,
   wooCommerceController.searchByStringProducts
 );
+router.get('/shippments', checkApiKey, wooCommerceController.getShippments);
 
 router.get('/categories', checkApiKey, wooCommerceController.getCategories);
 router.get(

@@ -13,7 +13,8 @@ class wooCommerceController {
   }
   async getProducts(req, res, next) {
     try {
-      const { limit, page } = req.query;
+      const limit = req.query.limit || 25;
+      const page = req.query.page || 1;
       const products = await wooService.getProducts(limit, page);
       res.status(200).json(products);
     } catch (error) {
@@ -83,6 +84,15 @@ class wooCommerceController {
         page
       );
       res.status(200).json(products);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getShippments(req, res, next) {
+    try {
+      const shippments = await wooService.getShippments();
+      res.status(200).json(shippments);
     } catch (error) {
       next(error);
     }
