@@ -66,7 +66,12 @@ class WooCommerceRepository {
       per_page: 100,
     });
     categories.data.forEach((element) => {
-      cat.push({ id: element.id, name: element.name, slug: element.slug });
+      cat.push({
+        id: element.id,
+        name: element.name,
+        slug: element.slug,
+        parent: element.parent,
+      });
     });
     return cat;
   }
