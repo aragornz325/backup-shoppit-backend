@@ -33,7 +33,7 @@ const db = getFirestore();
 async function readXlsx(path) {
   const workbook = XLSX.readFile(path);
   const workbookSheets = workbook.SheetNames;
-  //console.log('workbookSheets', workbookSheets);
+
   const sheet = workbookSheets[1];
   const dataExcel = XLSX.utils.sheet_to_json(workbook.Sheets[sheet]);
 
@@ -45,7 +45,6 @@ async function readXlsx(path) {
     }
 
     const categoria = await getcategoryByProduct(product['Rubro']);
-    console.log('categoria', categoria);
 
     const payload = {
       name: product['Descripcion'] || 'missing data',
@@ -77,8 +76,9 @@ async function readXlsx(path) {
           : 0,
       shipping_required: true,
       status: 'publish',
+      manage_stock: true,
     };
-    console.log(payload);
+
     const prodWooCommerce = await WooDb.post('products', payload);
 
     await db.collection('products').add({
@@ -94,7 +94,7 @@ async function readXlsx(path) {
 async function updateStock(path) {
   const workbook = XLSX.readFile(path);
   const workbookSheets = workbook.SheetNames;
-  //console.log('workbookSheets', workbookSheets);
+
   const sheet = workbookSheets[0];
   const dataExcel = XLSX.utils.sheet_to_json(workbook.Sheets[sheet]);
 
@@ -143,11 +143,10 @@ async function deleteAllProducts() {
     per_page: 30,
   })
     .then((response) => {
-      console.log('response length', response.data.length);
       prodfromWoo.push(response.data);
     })
     .catch((error) => {
-      console.log(error.response.data);
+      functions.logger.info(error.response.data);
     });
   prodfromWoo[0].forEach((prod) => {
     onlyIds.push(prod.id);
@@ -155,10 +154,10 @@ async function deleteAllProducts() {
   onlyIds.forEach(async (id) => {
     await WooDb.delete(`products/${id}`)
       .then((response) => {
-        console.log(`Product ${id} deleted`);
+        functions.logger.info(`Product ${id} deleted`);
       })
       .catch((error) => {
-        console.log(error.response.data);
+        functions.logger.info(error.response.data);
       });
   });
 }
@@ -169,17 +168,17 @@ async function getAllCategories() {
     per_page: 100,
   })
     .then((response) => {
-      console.log('response length', response.data.length);
+      functions.logger.info('response length', response.data.length);
       categories.push(response.data);
     })
     .catch((error) => {
-      console.log(error.response.data);
+      functions.logger.info(error.response.data);
     });
   categories[0].forEach(async (cat) => {
     await db.collection('categories').add({
       ...cat,
     });
-    console.log(`Category ${cat.name} added`);
+    functions.logger.info(`Category ${cat.name} added`);
   });
 }
 
@@ -196,7 +195,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Almacen') {
@@ -211,7 +210,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Anexo') {
@@ -226,7 +225,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Azucar') {
@@ -241,7 +240,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Barras') {
@@ -256,7 +255,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Bebidas') {
@@ -271,7 +270,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Bolsas') {
@@ -286,7 +285,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Cabello') {
@@ -301,7 +300,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Cafe') {
@@ -316,7 +315,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Caldos') {
@@ -331,7 +330,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Capsulas') {
@@ -346,7 +345,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Caramelos') {
@@ -361,7 +360,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Chicles') {
@@ -376,7 +375,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Chocolates') {
@@ -391,7 +390,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Cigarrillos') {
@@ -406,7 +405,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Compactos') {
@@ -421,7 +420,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Condimentos') {
@@ -436,7 +435,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Cuidado del aire') {
@@ -451,7 +450,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Cuidado del hogar') {
@@ -466,7 +465,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Cuidado personal') {
@@ -481,7 +480,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Det_Liquido') {
@@ -496,7 +495,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Det_Polvo') {
@@ -511,7 +510,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Dry Mixes') {
@@ -526,7 +525,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Galletitas') {
@@ -541,7 +540,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Golosinas') {
@@ -556,7 +555,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Infusiones') {
@@ -571,7 +570,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Insecticidas') {
@@ -586,7 +585,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Jugos') {
@@ -601,7 +600,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Lavavajilla') {
@@ -616,7 +615,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Pequeñas superficies') {
@@ -631,7 +630,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Perfumeria') {
@@ -646,7 +645,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Premezclas') {
@@ -661,7 +660,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Pure Listo') {
@@ -676,7 +675,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Salsas') {
@@ -691,7 +690,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Sopas') {
@@ -706,7 +705,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Suavizante') {
@@ -721,7 +720,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Tabaco') {
@@ -736,7 +735,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else if (rubro === 'Tocador') {
@@ -751,7 +750,7 @@ async function getcategoryByProduct(rubro) {
         });
       })
       .catch((error) => {
-        console.log('Error getting documents: ', error);
+        functions.logger.info('Error getting documents: ', error);
       });
     return id;
   } else {

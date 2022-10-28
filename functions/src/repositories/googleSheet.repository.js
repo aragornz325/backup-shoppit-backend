@@ -125,7 +125,7 @@ class GoogleSheetsRepository {
         rowRef,
         userId
       );
-      console.log('payload', payload);
+
       const { error } = createInSheetNewShoppitProduct.validate(payload);
       if (error) {
         functions.logger.log(`error in item ${rows[i].name}, ${error}`);

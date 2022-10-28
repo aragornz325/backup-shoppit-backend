@@ -19,7 +19,6 @@ class WooCommerceRepository {
   }
 
   async getProducts(limit, page) {
-    console.log('voy a buscar a todos los productos');
     const allProducts = await WooDb.get('products', {
       per_page: parseInt(limit, 10),
       page: parseInt(page, 10),

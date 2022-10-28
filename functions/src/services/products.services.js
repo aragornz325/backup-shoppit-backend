@@ -48,7 +48,7 @@ class ProductsServices {
   }
   async getProductSheet(id, userId) {
     const productList = await googleSheetsRepository.getProduct(id, userId);
-    console.log(productList);
+
     for (let i = 0; i < productList.length; i++) {
       try {
         await wooCommerceRepository.createProduct(productList[i]);

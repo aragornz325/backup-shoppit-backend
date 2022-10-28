@@ -116,7 +116,8 @@ class ProductsRepository {
   }
 
   async updateProduct(id, payload) {
-    await this.getProductById(id);
+    console;
+    await this.getProductByWooCommerceId(id);
     await db
       .collection('products')
       .doc(id)
@@ -135,7 +136,6 @@ class ProductsRepository {
       .get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
-          console.log(doc);
           idToDelete = doc.id;
         });
       })
@@ -286,6 +286,26 @@ class ProductsRepository {
 
       return prodToFront;
     }
+  }
+
+  async getProductByWooCommerceId(id) {
+    let product = {};
+    await db
+      .collection('products')
+      .where('id', '==', parseInt(id, 10))
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          product = {
+            id: doc.id,
+            ...doc.data(),
+          };
+        });
+      })
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    return product;
   }
 
   async getProductById(id) {
