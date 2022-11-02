@@ -92,5 +92,10 @@ class WooCommerceRepository {
     const shippments = await WooDb.get('shipping_methods');
     return shippments.data;
   }
+
+  async deleteProductInBatch(data) {
+    const deleteProduct = await WooDb.post('products/batch', data);
+    return deleteProduct.data;
+  }
 }
 module.exports = WooCommerceRepository;

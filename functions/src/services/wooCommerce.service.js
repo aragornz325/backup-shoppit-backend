@@ -80,6 +80,19 @@ class WooCommerceService {
   async getShippments() {
     return await wooCommerceRepository.getShippments();
   }
+
+  async deleteProductsInBatch(payload) {
+    let deleteInter = [];
+    payload.forEach(async (id) => {
+      deleteInter.push(parseInt(id, 10));
+    });
+    const data = {
+      delete: deleteInter,
+    };
+    await wooCommerceRepository.deleteProductInBatch(data);
+    productsServices.deleteProductInBatch(payload);
+    return { message: 'products deleted' };
+  }
 }
 
 module.exports = WooCommerceService;

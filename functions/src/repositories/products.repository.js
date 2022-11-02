@@ -398,6 +398,28 @@ class ProductsRepository {
     return products;
   }
 
+  async deleteProductInBatch(ids) {
+    let idsForDelete = [];
+    ids.forEach(async (id) => {
+      await db
+        .collection('products')
+        .where('id', '==', id)
+        .get()
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            idsForDelete.push(doc.id);
+          });
+        });
+    });
+    const batch = db.batch();
+    idsForDelete.forEach((id) => {
+      const docRef = db.collection('products').doc(id);
+      batch.delete(docRef);
+    });
+    await batch.commit();
+    return { message: 'Products deleted' };
+  }
+
   async getProductsByCategoryAndSearch(search, category, limit, offset) {
     const productAlgolia = await this.getIndexAlgolia(search, limit, offset);
 

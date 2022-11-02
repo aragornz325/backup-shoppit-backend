@@ -36,7 +36,7 @@ const stock_quantity = joi.number();
 const stock_status = joi.string().valid('instock', 'outofstock', 'onbackorder');
 const backorders = joi.string().valid('no', 'notify', 'yes');
 const sold_individually = joi.boolean();
-const weight = joi.string();
+const weight = joi.string().allow(''); // allow empty string for weight
 const dimensions = joi.object({
   length: joi.string(),
   width: joi.string(),
@@ -80,6 +80,7 @@ const createProductWC = joi.object({
   dimensions: dimensions,
   stock_status: stock_status,
   sale_price: sale_price,
+  featured: featured,
 });
 
 const updateProductWC = joi.object({

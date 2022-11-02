@@ -61,7 +61,12 @@ async function readXlsx(path) {
         {
           src:
             product['Imagen'] ||
-            'https://bullseyetrading.com.au/assets/components/phpthumbof/cache/warehouse2.3df28ae2b7cfd96bd9edfc0d39091ee926.jpg',
+            'https://firebasestorage.googleapis.com/v0/b/shoppit-app-stg.appspot.com/o/assets%2FLogo%20Shoppit-01.png?alt=media&token=fe8f30e8-d4c5-4d8d-b7c0-fcd167785db3',
+        },
+        {
+          src:
+            product['Imagen 2'] ||
+            'https://firebasestorage.googleapis.com/v0/b/shoppit-app-stg.appspot.com/o/assets%2FLogo%20Shoppit-03.png?alt=media&token=b4039d99-5ff1-4b6a-9634-059446983495',
         },
       ],
       sku: `${product['SKU']}-${product['SAP']}` || 'missing data',

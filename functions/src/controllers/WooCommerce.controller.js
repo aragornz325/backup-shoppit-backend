@@ -97,6 +97,17 @@ class wooCommerceController {
       next(error);
     }
   }
+
+  async deleteProductsInBatch(req, res, next) {
+    try {
+      const payload = req.body.products;
+      await wooService.deleteProductsInBatch(payload);
+
+      res.status(200).json('products deleted');
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = wooCommerceController;

@@ -26,6 +26,11 @@ router.get(
 router.get('/shippments', checkApiKey, wooCommerceController.getShippments);
 
 router.get('/categories', checkApiKey, wooCommerceController.getCategories);
+router.delete(
+  '/batch',
+  checkApiKey,
+  wooCommerceController.deleteProductsInBatch
+);
 router.get(
   '/categories/:id',
   checkApiKey,

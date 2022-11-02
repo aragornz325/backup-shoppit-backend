@@ -84,6 +84,10 @@ class ProductsServices {
       offset
     );
   }
+
+  async deleteProductInBatch(ids) {
+    return await productsRepository.deleteProductInBatch(ids);
+  }
 }
 
 module.exports = ProductsServices;

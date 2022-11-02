@@ -11,6 +11,7 @@ const adsRouter = require('./ads.routes');
 const questionRouter = require('./question.routes');
 const cloudinaryRouter = require('./cloudinary.routes');
 const wooCommerceRouter = require('./WC.routes');
+const webhooksRouter = require('./webhooks.routes');
 
 function routerApi(app) {
   app.use('/users', useRouter);
@@ -26,6 +27,7 @@ function routerApi(app) {
   app.use('/questions', questionRouter);
   app.use('/cloudinary', cloudinaryRouter);
   app.use('/woocommerce', wooCommerceRouter);
+  app.use('/webhooks', webhooksRouter);
 }
 
 module.exports = routerApi;
