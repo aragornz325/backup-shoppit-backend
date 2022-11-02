@@ -102,7 +102,7 @@ class wooCommerceController {
   async deleteProductsInBatch(req, res, next) {
     try {
       const payload = req.body.products;
-
+      console.log(payload);
       await wooService.deleteProductsInBatch(payload);
 
       res.status(200).json('products deleted');

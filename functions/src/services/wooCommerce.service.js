@@ -44,6 +44,19 @@ class WooCommerceService {
   }
 
   async updateProduct(id, payload) {
+    const dimensions = {
+      length: payload.dimensions?.length || '40',
+      width: payload.dimensions?.width || '40',
+      height: payload.dimensions?.height || '40',
+    };
+    const weight =
+      payload.weight === '' || !payload.weight ? '0,5' : payload.weight;
+    payload = {
+      ...payload,
+      manage_stock: true,
+      dimensions,
+      weight,
+    };
     const product = await wooCommerceRepository.updateProduct(id, payload);
 
     await productsServices.updateProduct(id, product, true);
