@@ -1,5 +1,6 @@
 const WooService = require('../services/wooCommerce.service');
 const wooService = new WooService();
+const functions = require('firebase-functions');
 
 class wooCommerceController {
   async createProduct(req, res, next) {
@@ -101,6 +102,7 @@ class wooCommerceController {
   async deleteProductsInBatch(req, res, next) {
     try {
       const payload = req.body.products;
+
       await wooService.deleteProductsInBatch(payload);
 
       res.status(200).json('products deleted');
