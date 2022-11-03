@@ -5,8 +5,8 @@ const QuestionRepository = require('../repositories/question.repository');
 const questionRepository = new QuestionRepository();
 const CategoriesRepository = require('../repositories/categories.repositories');
 const categoriesRepository = new CategoriesRepository();
-// const WooCommerceRepository = require('../repositories/wooComerce.repository');
-// const wooCommerceRepository = new WooCommerceRepository();
+const WooCommerceRepository = require('../repositories/wooComerce.repository');
+const wooCommerceRepository = new WooCommerceRepository();
 const functions = require('firebase-functions');
 
 const googleSheetsRepository = new GoogleSheetsRepository();

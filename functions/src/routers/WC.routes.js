@@ -46,4 +46,6 @@ router.put(
 
 router.delete('/:id', checkApiKey, wooCommerceController.deleteProduct);
 
+router.get('/:id', checkApiKey, wooCommerceController.getProductById);
+
 module.exports = router;

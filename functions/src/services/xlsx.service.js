@@ -10,8 +10,8 @@ require('dotenv').config();
 
 const WooDb = new WooCommerceRestApi({
   url: 'https://shoppit.com.ar/',
-  consumerKey: 'ck_6297661bf04733d57612f24f2a00a78f35e1f1c2',
-  consumerSecret: 'cs_7d032d7dadbdac14611e59be3f203de6fcf9c550',
+  consumerKey: 'ck_833e63a206637b6114e850260ce7430c900d04d0',
+  consumerSecret: 'cs_5c7f5311b6ce5fe376da20390524bde428fa81f6',
   version: 'wc/v3',
 });
 
@@ -27,7 +27,6 @@ initializeApp({
   }),
   databaseURL: 'https://shoppit-app-stg-default-rtdb.firebaseio.com',
 });
-
 const db = getFirestore();
 
 async function readXlsx(path) {
@@ -48,7 +47,7 @@ async function readXlsx(path) {
 
     const payload = {
       name: product['Descripcion'] || 'missing data',
-      type: 'grouped',
+      type: 'variable',
       regular_price: product['LISTA MELI c/impuestos'] || '0.00',
       description: product['Rubro'] || 'missing data',
       short_description: product['Rubro'] || 'missing data',
@@ -82,6 +81,13 @@ async function readXlsx(path) {
       shipping_required: true,
       status: 'publish',
       manage_stock: true,
+      shipping_class: 'zippin',
+      dimensions: {
+        length: '10',
+        width: '10',
+        height: '10',
+      },
+      weight: '0.5',
     };
 
     const prodWooCommerce = await WooDb.post('products', payload);
@@ -116,9 +122,18 @@ async function updateStock(path) {
 
     const stock_quantity = parseInt(product['Stock Bultos'], 10) || 0;
     const stock_status = stock_quantity <= 0 ? 'outofstock' : 'instock';
+
     const payload = {
       stock_quantity,
       stock_status,
+      manage_stock: true,
+      shipping_class: 'zippin',
+      dimensions: {
+        length: '10',
+        width: '10',
+        height: '10',
+      },
+      weight: '0.5',
     };
 
     const querySnapshot = await db
@@ -763,8 +778,80 @@ async function getcategoryByProduct(rubro) {
   }
 }
 
+async function createVariation(path) {
+  const workbook = XLSX.readFile(path);
+  const workbookSheets = workbook.SheetNames;
+
+  const sheet = workbookSheets[0];
+  const dataExcel = XLSX.utils.sheet_to_json(workbook.Sheets[sheet]);
+
+  for (let i = 0; i < dataExcel.length; i++) {
+    const data = dataExcel[i];
+    let id;
+    const prodInFirestore = await db
+      .collection('products')
+      .where('sku', '==', data['SKU'])
+      .where('spa', '==', data['SAP'])
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          id = doc.data().id;
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting documents: ', error);
+      });
+
+    const dataVariation = {
+      regular_price:
+        data['LISTA GENERAL c/impuestos'] !== undefined
+          ? parseFloat(
+              data['LISTA GENERAL c/impuestos'].split(' ')[1].replace(',', '.'),
+              10
+            ) * 1.3
+          : 0,
+
+      attributes: [
+        {
+          id: 0, // color
+          name: 'Unidad',
+          option: 'Unidad',
+        },
+      ],
+      image: prodInFirestore.image.forEach((image, i) => {
+        return {
+          id: i,
+          src: image.src,
+        };
+      }),
+      sku: `variation-${data['SKU']}-${data['SAP']}`,
+      dimensions: {
+        length: '5',
+        width: '5',
+        height: '5',
+      },
+      weight: '0.3',
+      stock_quantity:
+        (parseInt(data['LISTA  X BULTO C/ IMP.'], 10) /
+          parseInt(data['LISTA GENERAL c/impuestos'])) *
+        parseInt(data['UNIDADES POR BULTO'], 10),
+      manage_stock: true,
+      stock_status: 'instock',
+      shipping_class: 'zippin',
+    };
+    const variationWoo = await WooDb.post(
+      `products/${id}/variations`,
+      dataVariation
+    );
+    await db.collection('products').add({
+      ...variationWoo.data,
+    });
+    console.log('variation created');
+  }
+}
+
 updateStock(
-  '/home/rodrigo/Documentos/software/backend/cloud functions/backend/functions/src/public/belgroup.xlsx'
+  '/home/rodrigo/Documentos/software/backend/cloud functions/backend/functions/src/public/pruebavariaciones.xlsx'
 );
 
 // deleteAllProducts();

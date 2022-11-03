@@ -116,14 +116,13 @@ class ProductsRepository {
   }
 
   async updateProduct(id, payload) {
-    console;
     await this.getProductByWooCommerceId(id);
     await db
       .collection('products')
       .doc(id)
       .set(payload, { merge: true })
       .catch((error) => {
-        throw boom.badData(error);
+        return { error };
       });
     return { msg: 'updated' };
   }

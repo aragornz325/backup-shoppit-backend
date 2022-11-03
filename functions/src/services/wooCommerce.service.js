@@ -11,13 +11,16 @@ class WooCommerceService {
     if (checkProduct.name === payload.name) {
       throw boom.conflict('Product with same name already exists');
     }
-    const weight =
-      payload.weight === '' || !payload.weight ? '0,5' : payload.weight;
-
+    const weight = payload?.weight !== '' ? payload.weight : '0,5';
+    const shipping_class = payload.shipping_class
+      ? payload.shipping_class
+      : 'zippin';
     const dimensions = {
-      length: payload.dimensions?.length || '40',
-      width: payload.dimensions?.width || '40',
-      height: payload.dimensions?.height || '40',
+      length:
+        payload.dimensions?.length !== '' ? payload.dimensions.length : '40',
+      width: payload.dimensions?.width !== '' ? payload.dimensions.width : '40',
+      height:
+        payload.dimensions?.height !== '' ? payload.dimensions.height : '40',
     };
     const stock_quantity = payload.stock_quantity
       ? parseInt(payload.stock_quantity, 10)
@@ -29,6 +32,7 @@ class WooCommerceService {
       dimensions,
       manage_stock: true,
       stock_quantity,
+      shipping_class,
     };
     const product = await wooCommerceRepository.createProduct(payload);
     productsServices.createProduct(product);
@@ -49,6 +53,9 @@ class WooCommerceService {
       width: payload.dimensions?.width || '40',
       height: payload.dimensions?.height || '40',
     };
+    const shipping_class = payload.shipping_class
+      ? payload.shipping_class
+      : 'zippin';
     const weight =
       payload.weight === '' || !payload.weight ? '0,5' : payload.weight;
     payload = {
@@ -56,6 +63,7 @@ class WooCommerceService {
       manage_stock: true,
       dimensions,
       weight,
+      shipping_class,
     };
     const product = await wooCommerceRepository.updateProduct(id, payload);
 

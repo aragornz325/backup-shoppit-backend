@@ -43,7 +43,9 @@ class WooCommerceRepository {
 
   async getProductById(id) {
     const product = await WooDb.get(`products/${id}`);
-    return product.data;
+    const variation = await WooDb.get(`products/${id}/variations`);
+
+    return [product.data, variation.data];
   }
 
   async getProductsByCategory(category, limit, page) {
@@ -96,6 +98,11 @@ class WooCommerceRepository {
   async deleteProductInBatch(data) {
     const deleteProduct = await WooDb.post('products/batch', data);
     return deleteProduct.data;
+  }
+
+  async getProductVariations(id) {
+    const variations = await WooDb.get(`products/${id}/variations`);
+    return variations.data;
   }
 }
 module.exports = WooCommerceRepository;
