@@ -48,10 +48,10 @@ class QuestionRepository {
       });
     return questions;
   }
-  async updateQuestion(payload, productId) {
+  async updateQuestion(payload, questionId) {
     await db
       .collection('questions')
-      .doc(payload.questionId)
+      .doc(questionId)
       .update({
         ...payload,
       })
@@ -76,6 +76,18 @@ class QuestionRepository {
         throw boom.badData(error);
       });
     return questions;
+  }
+
+  async getQuestionById(questionId) {
+    const questionRef = db.collection('questions').doc(questionId);
+    const question = await questionRef.get();
+
+    if (!question.exists) {
+      functions.logger.error(`question with ID ${questionId} not found`);
+      throw boom.badData(`question with ID ${questionId} not found`);
+    }
+
+    return question.data();
   }
 }
 module.exports = QuestionRepository;

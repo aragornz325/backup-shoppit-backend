@@ -16,20 +16,20 @@ const { chunckarray } = require('../utils/auxiliar');
 
 class ProductsRepository {
   async createProduct(payload, id) {
-    await userRepository.getUserById(id);
-    let total_stock = 0;
-    if (payload.variations.length === 1) {
-      total_stock = parseInt(payload.variations[0].quantity, 10);
-    } else {
-      for (let i = 0; i < payload.variations.length; i++) {
-        total_stock += parseInt(payload.variations[i].quantity, 10);
-      }
-    }
+    //await userRepository.getUserById(id);
+    // let total_stock = 0;
+    // if (payload.variations.length === 1) {
+    //   total_stock = parseInt(payload.variations[0].quantity, 10);
+    // } else {
+    //   for (let i = 0; i < payload.variations.length; i++) {
+    //     total_stock += parseInt(payload.variations[i].quantity, 10);
+    //   }
+    // }
 
     let productID = '';
     await db
       .collection('products')
-      .add({ total_stock, ...payload })
+      .add({ ...payload })
       .then((docRef) => {
         productID = docRef.id;
       })
@@ -96,16 +96,59 @@ class ProductsRepository {
     return productsToFront;
   }
 
+  async getProductByName(name) {
+    let products = {};
+    await db
+      .collection('products')
+      .where('name', '==', name)
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          products = {
+            ...doc.data(),
+          };
+        });
+      })
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    return products;
+  }
+
   async updateProduct(id, payload) {
-    await this.getProductById(id);
+    await this.getProductByWooCommerceId(id);
     await db
       .collection('products')
       .doc(id)
       .set(payload, { merge: true })
       .catch((error) => {
-        throw boom.badData(error);
+        return { error };
       });
     return { msg: 'updated' };
+  }
+
+  async deleteProductWooCoomerce(id) {
+    let idToDelete = '';
+    await db
+      .collection('products')
+      .where('id', '==', parseInt(id, 10))
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          idToDelete = doc.id;
+        });
+      })
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    await db
+      .collection('products')
+      .doc(idToDelete)
+      .delete()
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    return { msg: 'deleted' };
   }
 
   async deleteProduct(id) {
@@ -244,6 +287,26 @@ class ProductsRepository {
     }
   }
 
+  async getProductByWooCommerceId(id) {
+    let product = {};
+    await db
+      .collection('products')
+      .where('id', '==', parseInt(id, 10))
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          product = {
+            id: doc.id,
+            ...doc.data(),
+          };
+        });
+      })
+      .catch((error) => {
+        throw boom.badData(error);
+      });
+    return product;
+  }
+
   async getProductById(id) {
     let product = [];
     await db
@@ -301,9 +364,7 @@ class ProductsRepository {
     let productswithIdCategory = [];
     await db
       .collection('products')
-      .where('category', '==', category)
-      .where('published', '==', true)
-      .where('is_valid', '==', true)
+      .where('category[0].id', '==', category)
       .orderBy('name')
       .limit(parseInt(limit, 10))
       .startAfter(parseInt(offset, 10))
@@ -334,6 +395,28 @@ class ProductsRepository {
       });
     }
     return products;
+  }
+
+  async deleteProductInBatch(ids) {
+    let idsForDelete = [];
+    ids.forEach(async (id) => {
+      await db
+        .collection('products')
+        .where('id', '==', id)
+        .get()
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            idsForDelete.push(doc.id);
+          });
+        });
+    });
+    const batch = db.batch();
+    idsForDelete.forEach((id) => {
+      const docRef = db.collection('products').doc(id);
+      batch.delete(docRef);
+    });
+    await batch.commit();
+    return { message: 'Products deleted' };
   }
 
   async getProductsByCategoryAndSearch(search, category, limit, offset) {

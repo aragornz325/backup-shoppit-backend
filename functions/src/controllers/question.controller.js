@@ -4,11 +4,13 @@ const questionServices = new QuestionServices();
 class QuestionRouter {
   async createQuestion(req, res, next) {
     try {
+      const user_id = req.headers['x-user-id'];
       const productId = req.params.id;
       const payload = req.body;
       const question = await questionServices.createQuestion(
         payload,
-        productId
+        productId,
+        user_id
       );
       res.status(200).json(question);
     } catch (error) {
@@ -28,11 +30,11 @@ class QuestionRouter {
   }
   async updateQuestion(req, res, next) {
     try {
-      const productId = req.params.id;
+      const { questionId } = req.params;
       const payload = req.body;
       const question = await questionServices.updateQuestion(
         payload,
-        productId
+        questionId
       );
       res.status(200).json(question);
     } catch (error) {
