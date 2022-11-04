@@ -37,6 +37,12 @@ router.get(
   wooCommerceController.getByCategories
 );
 
+router.get(
+  '/variation/:id',
+  checkApiKey,
+  wooCommerceController.getProductVariations
+);
+
 router.put(
   '/:id',
   checkApiKey,

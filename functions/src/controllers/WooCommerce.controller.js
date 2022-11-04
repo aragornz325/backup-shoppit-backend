@@ -110,6 +110,16 @@ class wooCommerceController {
       next(error);
     }
   }
+
+  async getProductVariations(req, res, next) {
+    try {
+      const { id } = req.params;
+      const variations = await wooService.getProductVariations(id);
+      res.status(200).json(variations);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = wooCommerceController;

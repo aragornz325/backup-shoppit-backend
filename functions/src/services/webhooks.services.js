@@ -11,7 +11,7 @@ class WebhooksService {
 
   async woocomerceUpdateProducts(payload) {
     const id = payload.id;
-    //await productsRepository.updateProduct(id, payload);
+    await productsRepository.updateProduct(id, payload);
     webhooksRepository.woocommerceUpdateProducts(payload);
     return { msg: 'updated' };
   }

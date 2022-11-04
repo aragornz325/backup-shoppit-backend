@@ -7,7 +7,7 @@ class WebhooksRepository {
   }
 
   async woocommerceUpdateProducts(data) {
-    const doc = await db.collection('webhooks').add({
+    const doc = await db.collection('webhooksUpdateProduct').add({
       msg: 'update product',
       ...data,
     });

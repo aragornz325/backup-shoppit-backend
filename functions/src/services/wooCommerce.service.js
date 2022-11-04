@@ -114,6 +114,10 @@ class WooCommerceService {
     productsServices.deleteProductInBatch(payload);
     return { message: 'products deleted' };
   }
+
+  async getProductVariations(id) {
+    return await wooCommerceRepository.getProductVariations(id);
+  }
 }
 
 module.exports = WooCommerceService;

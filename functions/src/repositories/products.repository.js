@@ -116,10 +116,11 @@ class ProductsRepository {
   }
 
   async updateProduct(id, payload) {
-    await this.getProductByWooCommerceId(id);
+    const prodDb = await this.getProductByWooCommerceId(id);
+    console.log('prodDb', prodDb.id);
     await db
       .collection('products')
-      .doc(id)
+      .doc(prodDb.id)
       .set(payload, { merge: true })
       .catch((error) => {
         return { error };
@@ -296,13 +297,13 @@ class ProductsRepository {
       .then((snapshot) => {
         snapshot.forEach((doc) => {
           product = {
-            id: doc.id,
             ...doc.data(),
+            id: doc.id,
           };
         });
       })
       .catch((error) => {
-        throw boom.badData(error);
+        return { error };
       });
     return product;
   }
