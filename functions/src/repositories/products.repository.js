@@ -116,11 +116,23 @@ class ProductsRepository {
   }
 
   async updateProduct(id, payload) {
-    const prodDb = await this.getProductByWooCommerceId(id);
-    console.log('prodDb', prodDb.id);
+    let prodDb;
     await db
       .collection('products')
-      .doc(prodDb.id)
+      .where('id', '==', parseInt(id, 10))
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          prodDb = { ...doc.data(), idFirebase: doc.id };
+        });
+      });
+    if (prodDb.empty) {
+      await this.createProduct(payload);
+      return { msg: 'created' };
+    }
+    await db
+      .collection('products')
+      .doc(prodDb.idFirebase)
       .set(payload, { merge: true })
       .catch((error) => {
         return { error };
@@ -296,10 +308,14 @@ class ProductsRepository {
       .get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
-          product = {
-            ...doc.data(),
-            id: doc.id,
-          };
+          if (doc.exists) {
+            product = {
+              id: doc.id,
+              ...doc.data(),
+            };
+          } else {
+            return { msg: 'not found' };
+          }
         });
       })
       .catch((error) => {

@@ -81,6 +81,19 @@ class UserRepository {
     }
   }
 
+  async createWooCommerceUser(body) {
+    const userRef = db.collection('users').doc(body.id);
+    const user = await userRef.get();
+    if (!user.exists) {
+      functions.logger.info(`create user with ID ${body.id}`);
+      await userRef.set(body);
+    } else {
+      functions.logger.info(`update user with ID ${body.id}`);
+      await userRef.set(body, { merge: true });
+    }
+    return { msg: 'ok' };
+  }
+
   async getUserById(id) {
     const userRef = db.collection('users').doc(id);
     const user = await userRef.get();
@@ -182,7 +195,6 @@ class UserRepository {
     return result;
   }
 
-  //TODO: manejar offset
   async getUsersWithoutAlgolia(role, status, limit, offset) {
     functions.logger.info('execute search users without algolia');
     let collectionRef = db.collection('users');
@@ -214,7 +226,7 @@ class UserRepository {
       return { users, total: users.length };
     }
   }
-  //TODO: manejar offset
+
   async getUsersWithAlgolia(search, role, status, limit, offset) {
     functions.logger.info('execute search users with algolia');
     const indexAlgolia = await this.getIndexAlgolia(search, limit, offset);

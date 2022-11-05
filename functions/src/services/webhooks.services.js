@@ -15,6 +15,17 @@ class WebhooksService {
     webhooksRepository.woocommerceUpdateProducts(payload);
     return { msg: 'updated' };
   }
+
+  async woocomerceCreateProducts(payload) {
+    const checkProduct = await productsRepository.getProductByName(
+      payload.name
+    );
+    if (checkProduct.name === payload.name) {
+      return { msg: 'product already exists' };
+    }
+    const response = await productsRepository.createProduct(payload);
+    return response;
+  }
 }
 
 module.exports = WebhooksService;
