@@ -36,7 +36,7 @@ class WebhooksController {
   async woocomerceCreateCustomer(req, res, next) {
     try {
       functions.logger.debug(req.headers);
-      const response = await userServices.registerUser(req.body);
+      const response = await userServices.createWoocommerceUser(req.body);
       res.status(200).json(response);
     } catch (error) {
       next(error);

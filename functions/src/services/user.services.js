@@ -337,9 +337,16 @@ class UserServices {
   }
 
   async createWoocommerceUser(body) {
-    const userCreated = await userRepository.createWooCommerceUser(body);
-    webhooksRepository.woocommerceCreateUser(userCreated);
-    return userCreated;
+    await userRepository.createWooCommerceUser(body);
+    await webhooksRepository.woocommerceCreateUser(body);
+    const mail = {
+      from: 'shoppit info',
+      to: body.email,
+      subject: 'tu cuenta ha sido activada',
+      html: createUser(),
+    };
+    await sendEmail(mail);
+    return { msg: 'ok' };
   }
 }
 

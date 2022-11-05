@@ -15,11 +15,15 @@ class WebhooksRepository {
   }
 
   async woocommerceCreateUser(data) {
-    const doc = await db.collection('webhooksCreateUser').add({
+    await db.collection('webhooksCreateUser').add({
       msg: 'create user',
-      ...data,
+      userCreated: data.username,
+      email: data.email,
+      first_name: data.first_name,
+      last_name: data.last_name,
+      collection: 'users',
     });
-    return { msg: 'recibed', id: doc.id };
+    return { msg: 'ok' };
   }
 }
 

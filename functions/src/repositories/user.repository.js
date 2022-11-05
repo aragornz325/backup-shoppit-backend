@@ -82,15 +82,15 @@ class UserRepository {
   }
 
   async createWooCommerceUser(body) {
-    const userRef = db.collection('users').doc(body.id);
-    const user = await userRef.get();
-    if (!user.exists) {
-      functions.logger.info(`create user with ID ${body.id}`);
-      await userRef.set(body);
-    } else {
-      functions.logger.info(`update user with ID ${body.id}`);
-      await userRef.set(body, { merge: true });
-    }
+    await db
+      .collection('users')
+      .add(body)
+      .then((docRef) => {
+        functions.logger.info(`user created successfully ${docRef}`);
+      })
+      .catch((error) => {
+        functions.logger.info(error);
+      });
     return { msg: 'ok' };
   }
 
