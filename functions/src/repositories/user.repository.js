@@ -82,6 +82,11 @@ class UserRepository {
   }
 
   async createWooCommerceUser(body) {
+    const checkUserInDB = await this.getUserByEmail(body.email);
+    if (checkUserInDB.email === body.email) {
+      functions.logger.info({ msg: 'user already exists' });
+      return { msg: 'user already exists' };
+    }
     await db
       .collection('users')
       .add(body)
