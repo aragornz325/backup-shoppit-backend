@@ -20,6 +20,9 @@ const CartsRepository = require('../repositories/carts.repositories');
 const cartsRepository = new CartsRepository();
 const OrdersRepository = require('../repositories/order.repository');
 const ordersRepository = new OrdersRepository();
+const WebhooksRepository = require('../repositories/webhoooks.repository');
+const webhooksRepository = new WebhooksRepository();
+
 const { config } = require('../config/config');
 
 class UserServices {
@@ -334,7 +337,8 @@ class UserServices {
   }
 
   async createWoocommerceUser(body) {
-    const userCreated = await userRepository.createUser(body);
+    const userCreated = await userRepository.createWooCommerceUser(body);
+    webhooksRepository.woocommerceCreateUser(userCreated);
     return userCreated;
   }
 }

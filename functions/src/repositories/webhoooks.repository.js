@@ -13,6 +13,14 @@ class WebhooksRepository {
     });
     return { msg: 'recibed', id: doc.id };
   }
+
+  async woocommerceCreateUser(data) {
+    const doc = await db.collection('webhooksCreateUser').add({
+      msg: 'create user',
+      ...data,
+    });
+    return { msg: 'recibed', id: doc.id };
+  }
 }
 
 module.exports = WebhooksRepository;
